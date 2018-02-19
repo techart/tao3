@@ -1,0 +1,16 @@
+form.tao-form {
+    position: relative;
+}
+
+    form.tao-form div.shadow {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #eee;
+        background-image: url(/tao/images/loader2.gif);
+        background-repeat: no-repeat;
+        background-position: center center;
+        opacity: 0.8;
+    }

@@ -1,0 +1,2 @@
+{{ app()->taoAssets->setMeta('title', $title) }}
+@section('h1'){{ $title }}@endsection

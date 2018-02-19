@@ -1,0 +1,88 @@
+.b-comments {
+}
+
+    .b-comments__empty {
+        color:  #ff8c00;
+        margin: 15px 0;
+        font-size: 14px;
+    }
+    
+    .b-comments__nouser {
+        display: inline-block;
+        margin: 5px 0;
+        padding: 5px 10px;
+        background-color: #ff8c00;
+        color: #fff;
+        font-size: 12px;
+        cursor: pointer;
+    }
+
+    .b-comments__form, .b-comments__edit {
+        width: 100%;
+        max-width: 800px;
+        text-align: right;
+    }
+
+        .b-comments__form textarea, .b-comments__edit textarea {
+            display: block;
+            margin: 5px 0;
+            padding: 5px;
+            width: 100%;
+            height: 100px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .b-comments__form span, .b-comments__edit span {
+            display: inline-block;
+            margin: 5px 0 5px 5px;
+            padding: 5px 10px;
+            background-color: #ff8c00;
+            color: #fff;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+            .b-comments__form span.disabled, .b-comments__edit span.disabled {
+                background-color: #ccc;
+                cursor: default;
+            }
+
+    .b-comments__comment {
+        margin: 20px 0;
+    }
+    
+        .b-comments__header {
+            font-size: 14px;
+        }
+    
+            .b-comments__author {
+                display: inline-block;
+                color: #2222cc;
+            }
+    
+            .b-comments__date {
+                display: inline-block;
+                font-size: 12px;
+                color: #888;
+            }
+
+        .b-comments__content {
+            font-size: 14px;
+        }
+
+        .b-comments__buttons {
+            padding: 0 0px;
+            font-size: 11px;
+        }
+
+            .b-comments__buttons span {
+                color: #228888;
+                cursor: pointer;
+            }
+
+                .b-comments__buttons span:hover {
+                    text-decoration: underline;
+                }
+    

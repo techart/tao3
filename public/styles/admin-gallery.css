@@ -1,0 +1,39 @@
+.tao-fields-gallery-filelist {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+    .tao-fields-gallery-filelist .entry {
+        width: 180px;
+        border: 1px solid #eee;
+        margin: 0 10px 10px 0;
+    }
+    
+        .tao-fields-gallery-filelist .entry .file-name {
+            display: inline-block;
+            width: 128px;
+            height: 20px;
+            overflow: hidden;
+            background-color: #eee;
+            padding: 0 3px;
+            font-size: 11px;
+        }
+        
+        .tao-fields-gallery-filelist .button {
+            vertical-align: top;
+        }
+        
+        .tao-fields-gallery-filelist .image {
+            width: 177px;
+            height: 177px;
+            background-color: #fcfcfc;
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        
+        .tao-fields-gallery-filelist .description {
+            font-size: 12px;
+            line-height: 15px;
+        }
+    

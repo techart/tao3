@@ -1,0 +1,1 @@
+<div class="b-comments__errorcomment">{!! $message !!}</div>
