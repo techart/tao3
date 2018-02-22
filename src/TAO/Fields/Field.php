@@ -3,7 +3,12 @@
 namespace TAO\Fields;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Fluent;
 use TAO\Callback;
+use TAO\Foundation\Request;
+use TAO\ORM\Model;
+use TAO\Schema\Index\Builder;
+use TAO\Type;
 
 /**
  *
@@ -38,7 +43,7 @@ abstract class Field
      * Итем, к которому привязано поле
      * Переопределения не требует, заполняется автоматически
      *
-     * @var \TAO\Fields\Model
+     * @var Model
      */
     public $item;
 
@@ -67,6 +72,7 @@ abstract class Field
      * Чаще всего переопределение требуется в случае сложного поля (создание сопутствующих таблиц и т.п.)
      *
      * @param Blueprint $table
+     * @return $this
      */
     public function checkSchema(Blueprint $table)
     {
@@ -86,6 +92,7 @@ abstract class Field
      * Создание поля в таблице БД
      *
      * @param Blueprint $table
+     * @return Fluent|void
      */
     public function createField(Blueprint $table)
     {
@@ -93,16 +100,16 @@ abstract class Field
     }
 
     /**
-     *
      * Проверка индексов в таблице БД.
      * Как правило, переопределение не требуется. Описание индексов берется из параметра type - строки вида "string(200) index(f1, f2)"
      *
      * @param Blueprint $table
+     * @return $this
      */
     public function checkIndexes(Blueprint $table)
     {
         $index = false;
-        foreach (['index', 'unique'] as $type) {
+        foreach (['index', 'unique', 'fulltext'] as $type) {
             if (isset($this->params[$type])) {
                 $index = $this->params[$type];
             }
@@ -112,19 +119,12 @@ abstract class Field
             $name = $index['extra'] ? $index['extra'] : ('idx_' . $this->item->getTable() . '_' . $this->name);
             $columns = $index['args'] ? $index['args'] : array($this->name);
 
-            $info = $this->item->getIndexInfo($name);
-            if (!$info) {
-                $table->$type($columns, $name);
-            } else {
-                $currentType = $info->isUnique() ? 'Unique' : 'Index';
-                $currentTypeString = strtolower($currentType) . ':' . implode(',', $info->getColumns());
-                $newTypeString = $type . ':' . implode(',', $columns);
-                if ($newTypeString != $currentTypeString) {
-                    $dropMethod = "drop{$currentType}";
-                    $table->$dropMethod($name);
-                    $table->$type($columns, $name);
-                }
-            }
+            /**
+             * @var Builder $indexBuilder
+             */
+            $indexBuilder = app()->make('\TAO\Schema\Index\Builder');
+            $index = $indexBuilder->makeIndex($name, $columns, $type);
+            $indexBuilder->process($index, $table, $this->item->getConnection());
         }
         return $this;
     }
@@ -140,6 +140,9 @@ abstract class Field
         $this->item[$this->name] = $value;
     }
 
+    /**
+     * @param Request $request
+     */
     public function setFromRequest($request)
     {
         $value = null;
@@ -154,6 +157,10 @@ abstract class Field
         $this->set(isset($requestData[$this->name]) ? $requestData[$this->name] :  $this->nullValue());
     }
 
+    /**
+     * @param Request $request
+     * @return mixed
+     */
     protected function getValueFromRequest($request)
     {
         return $request->input($this->name);
@@ -262,7 +269,7 @@ abstract class Field
      */
     public function isEmpty()
     {
-        if (isset($this->data['is_empty']) && Core_Types::is_callable($this->data['is_empty'])) {
+        if (isset($this->data['is_empty']) && Type::isCallable($this->data['is_empty'])) {
             return call_user_func_array($this->data['is_empty'], [$this, $this->item]);
         }
         return $this->checkEmpty();
@@ -322,7 +329,7 @@ abstract class Field
      * Рендер значения
      *
      * @param $arg1 - имя шаблона или контекст (если шаблон стандартный)
-     * $param $arg2 - контекст
+     * @param $arg2 - контекст
      *
      * @return string
      */
@@ -391,7 +398,7 @@ abstract class Field
      * Рендер инпута в форме
      *
      * @param $arg1 - имя шаблона или контекст (если шаблон стандартный)
-     * $param $arg2 - контекст
+     * @param $arg2 - контекст
      *
      * @return string
      */

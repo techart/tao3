@@ -5,11 +5,11 @@ namespace TAO\Admin\Controller;
 use Illuminate\Support\Facades\Auth;
 use TAO\Admin\Traits\Actions;
 use TAO\Admin\Traits\Forms;
-use TAO\Admin\Traits\Table;
+use TAO\Admin\Traits\Table as TableTrait;
 
 class Table extends Base
 {
-    use Actions, Table, Forms;
+    use Actions, TableTrait, Forms;
 
     protected $datatype;
     protected $datatypeCode;
