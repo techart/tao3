@@ -2,7 +2,7 @@
 
 namespace TAO\Admin\Controller;
 
-use TAO\Fields\Controllers\Actions;
+use TAO\Admin\Traits\Actions;
 
 class Vars extends Base
 {
