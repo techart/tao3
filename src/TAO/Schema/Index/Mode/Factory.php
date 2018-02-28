@@ -12,19 +12,19 @@ use Doctrine\DBAL\Schema\Index;
  */
 class Factory
 {
-    /**
-     * @param Index $index
-     * @return ModeInterface
-     */
-    public static function mode(Index $index)
-    {
-        if ($index->isUnique()) {
-            $class = 'Unique';
-        } else if ($index->hasFlag('fulltext')) {
-            $class = 'Fulltext';
-        } else {
-            $class = 'Simple';
-        }
-        return app()->make('TAO\\Schema\\Index\\Mode\\' . $class);
-    }
+	/**
+	 * @param Index $index
+	 * @return ModeInterface
+	 */
+	public static function mode(Index $index)
+	{
+		if ($index->isUnique()) {
+			$class = 'Unique';
+		} else if ($index->hasFlag('fulltext')) {
+			$class = 'Fulltext';
+		} else {
+			$class = 'Simple';
+		}
+		return app()->make('TAO\\Schema\\Index\\Mode\\' . $class);
+	}
 }

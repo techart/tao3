@@ -13,25 +13,25 @@ use TAO\Text\ProcessorInterface;
  */
 class Markdown implements ProcessorInterface
 {
-    protected $parser;
+	protected $parser;
 
-    /**
-     * @param string $text
-     * @return string
-     */
-    public function process($text)
-    {
-        return $this->parser()->parse($text);
-    }
+	/**
+	 * @param string $text
+	 * @return string
+	 */
+	public function process($text)
+	{
+		return $this->parser()->parse($text);
+	}
 
-    /**
-     * @return \Parsedown
-     */
-    protected function parser()
-    {
-        if (!$this->parser) {
-            $this->parser = new \Parsedown();
-        }
-        return $this->parser;
-    }
+	/**
+	 * @return \Parsedown
+	 */
+	protected function parser()
+	{
+		if (!$this->parser) {
+			$this->parser = new \Parsedown();
+		}
+		return $this->parser;
+	}
 }

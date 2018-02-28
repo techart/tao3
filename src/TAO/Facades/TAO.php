@@ -6,8 +6,8 @@ use Illuminate\Support\Facades\Facade;
 
 class TAO extends Facade
 {
-    protected static function getFacadeAccessor()
-    {
-        return 'tao';
-    }
+	protected static function getFacadeAccessor()
+	{
+		return 'tao';
+	}
 }

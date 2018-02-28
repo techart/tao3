@@ -9,11 +9,11 @@ class StringField extends Field
 {
 	protected $value_processors = [];
 
-    public function createField(Blueprint $table)
-    {
-        $len = $this->typeParamsIntArg(250);
-        return $table->string($this->name, $len);
-    }
+	public function createField(Blueprint $table)
+	{
+		$len = $this->typeParamsIntArg(250);
+		return $table->string($this->name, $len);
+	}
 
 	protected function prepareValue($value)
 	{

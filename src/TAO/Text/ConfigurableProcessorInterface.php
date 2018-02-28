@@ -8,10 +8,10 @@ namespace TAO\Text;
  */
 interface ConfigurableProcessorInterface
 {
-    /**
-     * @param string $text
-     * @param array $options
-     * @return string
-     */
-    public function process($text, $options);
+	/**
+	 * @param string $text
+	 * @param array $options
+	 * @return string
+	 */
+	public function process($text, $options);
 }

@@ -7,8 +7,8 @@ use TAO\Fields\Field;
 
 class RememberToken extends StringField
 {
-    public function createField(Blueprint $table)
-    {
-        return $table->rememberToken($this->name);
-    }
+	public function createField(Blueprint $table)
+	{
+		return $table->rememberToken($this->name);
+	}
 }

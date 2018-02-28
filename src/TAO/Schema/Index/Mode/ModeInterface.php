@@ -1,4 +1,5 @@
 <?php
+
 namespace TAO\Schema\Index\Mode;
 
 use Doctrine\DBAL\Schema\Index;
@@ -12,6 +13,7 @@ use Illuminate\Database\Schema\Blueprint;
  */
 interface ModeInterface
 {
-    public function create(Index $index, Blueprint $table);
-    public function drop(Index $index, Blueprint $table);
+	public function create(Index $index, Blueprint $table);
+
+	public function drop(Index $index, Blueprint $table);
 }

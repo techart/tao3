@@ -8,9 +8,9 @@ namespace TAO\Text;
  */
 interface ProcessorInterface
 {
-    /**
-     * @param string $text
-     * @return string
-     */
-    public function process($text);
+	/**
+	 * @param string $text
+	 * @return string
+	 */
+	public function process($text);
 }
