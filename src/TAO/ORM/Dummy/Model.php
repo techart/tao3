@@ -37,6 +37,11 @@ class Model implements \ArrayAccess
 		return $this->belongs[$relations];
 	}
 
+	public function getAttributeValue($name)
+	{
+		return $this[$name] ?? null;
+	}
+
 	public function offsetExists($offset)
 	{
 		return isset($this->attributes[$offset]);
@@ -44,7 +49,7 @@ class Model implements \ArrayAccess
 
 	public function offsetGet($offset)
 	{
-		return $this->attributes[$offset];
+		return $this->attributes[$offset] ?? null;
 	}
 
 	public function offsetSet($offset, $value)
