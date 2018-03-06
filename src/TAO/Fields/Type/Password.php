@@ -15,9 +15,10 @@ class Password extends StringField
 	 * @param Blueprint $table
 	 * @return \Illuminate\Support\Fluent
 	 */
-	public function createField(Blueprint $table)
+	public function createField(Blueprint $table, $column = false)
 	{
-		return $table->string($this->name, 150);
+		$column = $column? $column : $this->name;
+		return $table->string($column, 150)->default('');
 	}
 
 	/**

@@ -37,6 +37,7 @@ class TAO
 	protected $selectors = [];
 	protected $viewsPaths = [];
 	protected $viewsPrefixes = [];
+	protected $variant = false;
 
 	public function useLayout($name)
 	{
@@ -475,6 +476,7 @@ class TAO
 			$vendor = uniqid('v');
 		}
 		$this->viewsPaths[$vendor] = $path;
+		return $this;
 	}
 
 	public function getViewsPaths()
@@ -486,10 +488,66 @@ class TAO
 	public function addViewsPrefix($prefix)
 	{
 		$this->viewsPrefixes[] = $prefix;
+		return $this;
 	}
 
 	public function getViewsPrefixes()
 	{
 		return $this->viewsPrefixes;
+	}
+
+	/**
+	 * Возвращает список вариантов контента (например языков или регионов сайта)
+	 */
+	public function getVariants()
+	{
+		static $variants = null;
+		if (is_null($variants)) {
+			$variants = config('tao.variants', false);
+			if (!is_array($variants) || empty($variants)) {
+				return $variants = false;
+			}
+			if (!isset($variants['default'])) {
+				$variants['default'] = array(
+					'label' => 'Default',
+					'postfix' => '',
+				);
+			}
+			$out = array();
+			foreach ($variants as $code => $variant) {
+				if (!isset($variant['postfix'])) {
+					$variant['postfix'] = $code == 'default' ? '' : "_v_{$code}";
+				}
+				$out[$code] = $variant;
+			}
+			$variants = $out;
+		}
+		return $variants;
+	}
+
+	/**
+	 * Устанавливает текущий вариант контента
+	 *
+	 * @param $variant
+	 * @return $this
+	 */
+	public function setVariant($variant)
+	{
+		$this->variant = $variant;
+		return $this;
+	}
+
+	/**
+	 * Возвращает текущий вариант контента
+	 *
+	 * @return bool
+	 */
+	public function getVariant()
+	{
+		$variant = $this->variant;
+		if (!$variant) {
+			return 'default';
+		}
+		return $variant;
 	}
 }

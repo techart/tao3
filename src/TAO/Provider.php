@@ -30,6 +30,22 @@ class Provider extends ServiceProvider
 		Blade::directive('navflag', function ($name) {
 			return "<?php TAO::navigation()->flag({$name}); ?>";
 		});
+
+		Blade::directive('asset', function ($args) {
+			return "<?php Assets::useFile({$args}); ?>";
+		});
+
+		Blade::directive('style', function ($args) {
+			return "<?php Assets::useFile({$args}); ?>";
+		});
+
+		Blade::directive('script', function ($args) {
+			return "<?php Assets::useFile({$args}); ?>";
+		});
+
+		Blade::directive('bottomScript', function ($args) {
+			return "<?php Assets::useBottomScript({$args}); ?>";
+		});
 	}
 
 	public function register()

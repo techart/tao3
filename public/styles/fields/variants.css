@@ -1,0 +1,19 @@
+.b-variants {
+	padding: 0 0 3px 0;
+}
+
+	.b-variants__button {
+		margin: 0;
+		padding: 1px 3px;
+		border: 1px solid #ccc;
+		background-color: #eee;
+		color: #888;
+		font-size: 10px;
+		line-height: 12px;
+	}
+	
+		.b-variants__button--current {
+			background-color: #44aac8;
+			border: 1px solid #44aac8;
+			color: white;
+		}

@@ -1,8 +1,8 @@
 @foreach ($field->extraCSS() as $file)
-    {{ Assets::useFile($file) }}
+    @style($file)
 @endforeach
 @foreach ($field->extraJS() as $file)
-    {{ Assets::useBottomScript($file) }}
+    @bottomScript($file)
 @endforeach
 <div class="tao-fields-attaches">
     <input type="hidden" name="{{ $field->name }}" value="{{ $field->tempId() }}" id="tao_attaches_hidden_{{ $field->name }}">

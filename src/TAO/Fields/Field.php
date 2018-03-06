@@ -204,9 +204,15 @@ abstract class Field
 	 */
 	public function setupDefault()
 	{
-		$value = isset($this->data['default']) ? $this->data['default'] : $this->defaultValue();
-		$this->set($value);
+		if (!$this->itemHasValue()) {
+			$this->set($this->data['default'] ?? $this->defaultValue());
+		}
 		return $this;
+	}
+
+	protected function itemHasValue()
+	{
+		return !is_null($this->item->getAttributeValue($this->name));
 	}
 
 	/**

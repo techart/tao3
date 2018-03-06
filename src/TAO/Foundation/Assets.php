@@ -59,25 +59,29 @@ class Assets
 		return $this->renderMeta();
 	}
 
-	public function useFile($file, $scope = false)
+	/**
+	 * @param string $path
+	 * @param array|string $fileParams
+	 * @return $this
+	 */
+	public function useFile($path, $fileParams = [])
 	{
-		if (empty($file)) {
+		if (empty($path)) {
 			return $this;
 		}
-		if (is_string($file)) {
-			$file = array(
-				'path' => $file,
-			);
+		$scope = '';
+		if (is_string($fileParams)) {
+			$scope = $fileParams;
+			$fileParams = [];
+		} else if (isset($fileParams['scope'])) {
+			$scope = $fileParams['scope'];
+			unset($fileParams['scope']);
 		}
-		if (!isset($file['path'])) {
-			return;
-		}
-		$path = $file['path'];
+
 		if (!preg_match('{^http://}', $path) && !preg_match('{^/}', $path)) {
 			$path = "/{$path}";
 		}
-		$file['path'] = $path;
-
+		$fileParams['path'] = $path;
 		if (!$scope) {
 			if (preg_match('{\.css$}i', $path)) {
 				$scope = 'styles';
@@ -85,13 +89,13 @@ class Assets
 				$scope = 'scripts';
 			}
 		}
-
 		if ($scope) {
 			if (!isset($this->scopes[$scope])) {
 				$this->scopes[$scope] = array();
 			}
-			$this->scopes[$scope][$path] = $file;
+			$this->scopes[$scope][$path] = $fileParams;
 		}
+		return $this;
 	}
 
 	public function useBottomScript($file)
@@ -163,8 +167,7 @@ class Assets
 			return '';
 		}
 		$html = '';
-		$scope = $this->scopes[$scope];
-		foreach ($scope as $file) {
+		foreach ($this->sortFiles($this->scopes[$scope]) as $file) {
 			$html .= $this->renderFile($file);
 		}
 		return $html;
@@ -239,4 +242,30 @@ class Assets
 		}
 	}
 
+	/**
+	 * @param array $filesList
+	 * @return array
+	 */
+	protected function sortFiles($filesList)
+	{
+		$filesList = $this->assignAutoWeight($filesList);
+		uasort($filesList, function ($fileParams1, $fileParams2) {
+			$weight1 = $fileParams1['weight'] ?? 0;
+			$weight2 = $fileParams2['weight'] ?? 0;
+			return $weight1 > $weight2;
+		});
+		return $filesList;
+	}
+
+	protected function assignAutoWeight($filesList)
+	{
+		$autoWeight = 0.0001;
+		foreach ($filesList as $key => $fileParams) {
+			if (!isset($filesList[$key]['weight'])) {
+				$filesList[$key]['weight'] = $autoWeight;
+				$autoWeight += $autoWeight;
+			}
+		}
+		return $filesList;
+	}
 }

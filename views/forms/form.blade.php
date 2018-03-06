@@ -1,4 +1,4 @@
-{{ \Assets::useFile('/tao/styles/forms.css') }}
+@style('/tao/styles/forms.css')
 @if ($ajax)
   @include($form->templateAjax($__data))
 @endif
@@ -9,5 +9,5 @@
   @endif
   {{ csrf_field() }}<input type="hidden" name="_session_key" value="{{ $session_key }}">
   @include($form->templateFields($__data))
-  @include($form->templateSubmit($__data, ['settings' => $form->submitButtonSettings()]))
+  @include($form->templateSubmit($__data), ['settings' => $form->submitButtonSettings()])
 </form>

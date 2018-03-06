@@ -4,15 +4,17 @@ namespace TAO\Fields\Type;
 
 use Illuminate\Database\Schema\Blueprint;
 use TAO\Fields\Field;
+use TAO\Fields\MultivariantField;
 
-class StringField extends Field
+class StringField extends MultivariantField
 {
 	protected $value_processors = [];
 
-	public function createField(Blueprint $table)
+	public function createField(Blueprint $table, $column = false)
 	{
+		$column = $column? $column : $this->name;
 		$len = $this->typeParamsIntArg(250);
-		return $table->string($this->name, $len);
+		return $table->string($column, $len)->default('');
 	}
 
 	protected function prepareValue($value)

@@ -1,7 +1,9 @@
-<textarea
-	name="{{ $field->name }}"
-	class="input text {{ $field->classForInput() }}"
-	style="{!! $field->styleForInput() !!}"
-	{!! $field->renderAttrs() !!}
->{{ htmlspecialchars($item[$field->name]) }}
-</textarea>
+@include("fields.variants")
+@foreach($field->variantsWithDefault() as $code => $vdata)
+	<textarea
+		name="{{ $field->name }}{{ $vdata['postfix'] }}"
+		class="input text input-{{ $field->name }}-variant input-{{ $field->name }}-variant-{{ $code }} {{ $field->classForInput() }}"
+		style="{!! trim($field->styleForInput(), ';') !!}{!! ($code=='default'? '' : ';display:none;') !!}"
+		{!! $field->renderAttrs() !!}
+	>{{ htmlspecialchars($field->variantValue($code)) }}</textarea>
+@endforeach

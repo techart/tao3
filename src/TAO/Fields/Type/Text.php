@@ -7,11 +7,12 @@ use TAO\Fields\Field;
 
 class Text extends StringField
 {
-	public function createField(Blueprint $table)
+	public function createField(Blueprint $table, $column = false)
 	{
+		$column = $column? $column : $this->name;
 		$size = $this->typeParamsEnumArg(array('medium', 'long'));
 		$method = $size ? "{$size}Text" : 'text';
-		return $table->$method($this->name);
+		return $table->$method($column)->nullable();
 	}
 
 	public function styleForAdminInput()

@@ -10,7 +10,7 @@
 			@foreach($field->items() as $tid => $tag)
 				<span @if($field->isAttached($tid))class="selected"@endif>{{ $tag }}</span>
 			@endforeach
-			{{ Assets::useBottomScript('/tao/scripts/fields/multilink-tags.js') }}
+			@script('/tao/scripts/fields/multilink-tags.js')
 		</div>
 	@endif
 </div>

@@ -9,7 +9,7 @@ class Checkbox extends Field
 {
 	public function createField(Blueprint $table)
 	{
-		return $table->boolean($this->name);
+		return $table->boolean($this->name)->default(0);
 	}
 
 	public function defaultValue()

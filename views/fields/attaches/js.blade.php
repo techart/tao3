@@ -7,8 +7,8 @@
         var $filelist = $("#tao_attaches_filelist_{{ $field->name }}");
         
         @if ($field->isSortable())
-            {{ \Assets::useBottomScript('/tao/scripts/jquery-ui.min.js') }}
-            {{ \Assets::useFile('/tao/styles/jquery-ui.css') }}
+            @bottomScript('/tao/scripts/jquery-ui.min.js')
+            @style('/tao/styles/jquery-ui.css')
             $filelist.sortable({
                 update: function() {
                     var items = $(this).sortable('toArray');

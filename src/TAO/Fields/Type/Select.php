@@ -24,9 +24,9 @@ class Select extends Field
 			}
 		}
 		if ($string) {
-			return $table->string($this->name, $length);
+			return $table->string($this->name, $length)->default('');
 		}
-		return $table->integer($this->name, false, false);
+		return $table->integer($this->name, false, false)->default(0);
 	}
 
 	public function items()

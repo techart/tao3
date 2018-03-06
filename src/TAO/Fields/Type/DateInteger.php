@@ -9,7 +9,7 @@ class DateInteger extends Field
 {
 	public function createField(Blueprint $table)
 	{
-		return $table->integer($this->name, false, true);
+		return $table->integer($this->name, false, true)->default(0);
 	}
 
 	public function defaultValue()

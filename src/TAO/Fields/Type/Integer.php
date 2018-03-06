@@ -12,7 +12,7 @@ class Integer extends Field
 		$size = $this->typeParamsEnumArg(array('tiny', 'small', 'medium', 'big'));
 		$unsigned = (bool)$this->typeParamsEnumArg(array('unsigned'));
 		$method = $size ? "{$size}Integer" : 'integer';
-		return $table->$method($this->name, false, $unsigned);
+		return $table->$method($this->name, false, $unsigned)->default(0);
 	}
 
 	public function defaultValue()

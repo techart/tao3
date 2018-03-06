@@ -1,6 +1,6 @@
 @if ($field->withInfo())
-    {{ \Assets::useBottomScript('/tao/scripts/jquery-ui.min.js') }}
-    {{ \Assets::useFile('/tao/styles/jquery-ui.css') }}
+    @bottomScript('/tao/scripts/jquery-ui.min.js')
+    @style('/tao/styles/jquery-ui.css')
     $edit = $('<a>').addClass('edit').attr('href', 'javascript:void(0)').html('&nbsp;').click(function() {
         var $form = $('<div>').addClass('tao-fields-attaches__iform');
         @foreach($field->infoFields() as $name => $data)

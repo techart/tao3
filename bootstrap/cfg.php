@@ -15,13 +15,13 @@ function tao_cfg($name, $values = [])
 function tao_cfg_merge($out, $values = [])
 {
 	foreach ($values as $k => $value) {
-		if (is_array($value) && is_array($out[$k])) {
+		if (is_array($value) && isset($out[$k]) && is_array($out[$k])) {
 			if (\TAO\Type\Collection::isIndexed($value) && \TAO\Type\Collection::isIndexed($out[$k])) {
 				$out[$k] = array_merge($out[$k], $value);
 			} else {
 				$out[$k] = tao_cfg_merge($out[$k], $value);
 			}
-		} elseif (is_null($value)) {
+		} elseif (is_null($value) && isset($out[$k])) {
 			unset($out[$k]);
 		} else {
 			$out[$k] = $value;

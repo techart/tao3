@@ -20,7 +20,7 @@ class Upload extends Field
 	 */
 	public function createField(Blueprint $table)
 	{
-		return $table->string($this->name, 250);
+		return $table->string($this->name, 250)->default('');
 	}
 
 	/**

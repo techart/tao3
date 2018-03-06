@@ -12,9 +12,10 @@ class Attaches extends StringField implements \IteratorAggregate
 {
 	use FileField;
 
-	public function createField(Blueprint $table)
+	public function createField(Blueprint $table, $column = false)
 	{
-		return $table->text($this->name);
+		$column = $column? $column : $this->name;
+		return $table->text($column);
 	}
 
 	protected function defaultFileNameTemplate()
