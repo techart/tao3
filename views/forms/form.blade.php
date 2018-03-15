@@ -3,7 +3,12 @@
   @include($form->templateAjax($__data))
 @endif
 
-<form id="{{ $form->htmlId($__data) }}" class="{{ $form->formClass($__data) }}" method="post" action="{!! $form->action($__data) !!}">
+<form
+        id="{{ $form->htmlId($__data) }}"
+        class="{{ $form->formClass($__data) }}"
+        method="{{ $form->formMethod($__data) }}"
+        action="{!! $form->action($__data) !!}"
+        enctype="{{ $form->formEnctype($__data) }}">
   @if ($ajax)
     <ul class="ajax-errors"></ul>
   @endif

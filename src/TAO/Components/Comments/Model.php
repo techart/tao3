@@ -109,6 +109,11 @@ class Model extends \TAO\ORM\Model
 		return $this->renderList($context);
 	}
 
+	public function getCount($material)
+	{
+		return $this->where('material', $material)->count();
+	}
+
 	public function renderError($message)
 	{
 		return view('comments ~ error', ['message' => $message]);

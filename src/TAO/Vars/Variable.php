@@ -137,6 +137,11 @@ class Variable implements \ArrayAccess
 		return '_vars';
 	}
 
+	public function getAttributeValue($key)
+	{
+		return $this->values[$key] ?? null;
+	}
+
 	public function offsetExists($offset)
 	{
 		return isset($this->values[$offset]);

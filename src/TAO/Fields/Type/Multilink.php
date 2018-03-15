@@ -67,6 +67,10 @@ class Multilink extends Field
 		$this->resetAttachedIds();
 	}
 
+	/**
+	 * @param $value
+	 * @return array
+	 */
 	protected function normalizeValue($value)
 	{
 		if (is_null($value)) {
@@ -78,11 +82,17 @@ class Multilink extends Field
 		return array_wrap($value);
 	}
 
+	/**
+	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+	 */
 	public function belongsToMany()
 	{
 		return $this->item->belongsToMany($this->relatedModelClass(), $this->tableRelations(), $this->thisKey(), $this->relatedKey());
 	}
 
+	/**
+	 * @return array
+	 */
 	public function attachedIds()
 	{
 		if (is_null($this->attachedIds)) {
@@ -94,16 +104,26 @@ class Multilink extends Field
 		return $this->attachedIds;
 	}
 
+	/**
+	 *
+	 */
 	protected function resetAttachedIds()
 	{
 		$this->attachedIds = null;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function value()
 	{
 		return $this->attachedIds();
 	}
 
+	/**
+	 * @param $id
+	 * @return bool
+	 */
 	public function isAttached($id)
 	{
 		if (empty($this->item->getKey())) {
@@ -113,6 +133,9 @@ class Multilink extends Field
 		return isset($ids[$id]);
 	}
 
+	/**
+	 * @return null
+	 */
 	public function items()
 	{
 		$items = $this->param('items');
@@ -125,6 +148,9 @@ class Multilink extends Field
 		return $items;
 	}
 
+	/**
+	 * @param Blueprint $table
+	 */
 	public function checkSchema(Blueprint $table)
 	{
 		$relTable = $this->tableRelations();
@@ -140,19 +166,31 @@ class Multilink extends Field
 		}
 	}
 
+	/**
+	 *
+	 */
 	public function setupDefault()
 	{
 	}
 
+	/**
+	 * @param \TAO\Foundation\Request $request
+	 */
 	public function setFromRequest($request)
 	{
 	}
 
+	/**
+	 * @param $request
+	 */
 	public function setFromRequestAfterSave($request)
 	{
 		$this->set($this->getValueFromRequest($request));
 	}
 
+	/**
+	 * @return string
+	 */
 	public function tableRelations()
 	{
 		if (isset($this->data['table_relations'])) {
@@ -166,6 +204,9 @@ class Multilink extends Field
 		return $table;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function thisKey()
 	{
 		if (isset($this->data['this_key'])) {
@@ -174,6 +215,9 @@ class Multilink extends Field
 		return $this->item->getForeignKey();
 	}
 
+	/**
+	 * @return mixed
+	 */
 	public function relatedKey()
 	{
 		if (isset($this->data['related_key'])) {
@@ -182,6 +226,9 @@ class Multilink extends Field
 		return $this->relatedModel()->getForeignKey();
 	}
 
+	/**
+	 * @return null
+	 */
 	public function relatedModelClass()
 	{
 		$model = $this->param('model');
@@ -222,16 +269,26 @@ class Multilink extends Field
 		return $this->relatedItems;
 	}
 
+	/**
+	 * @return Collection
+	 */
 	public function attachedItems()
 	{
 		return $this->relatedItems();
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function attached()
 	{
 		return !empty($this->attachedIds());
 	}
 
+	/**
+	 * @param $id
+	 * @return mixed
+	 */
 	public function select($id)
 	{
 		$key = $this->relatedKey();
@@ -244,11 +301,19 @@ class Multilink extends Field
 		});
 	}
 
+	/**
+	 * @param $id
+	 * @return mixed
+	 */
 	public function find($id)
 	{
 		return $this->relatedModel()->find($id);
 	}
 
+	/**
+	 * @param bool $class
+	 * @return array
+	 */
 	public function relatedLinks($class = false)
 	{
 		$cs = $class ? " class=\"{$class}\"" : '';
@@ -261,6 +326,9 @@ class Multilink extends Field
 		return $out;
 	}
 
+	/**
+	 * @return array
+	 */
 	public function nullValue()
 	{
 		return [];

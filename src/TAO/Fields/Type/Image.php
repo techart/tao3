@@ -4,11 +4,17 @@ namespace TAO\Fields\Type;
 
 class Image extends Upload
 {
+	/**
+	 * @return string
+	 */
 	public function adminPreviewUrl()
 	{
 		return $this->apiUrl('preview', ['_token' => csrf_token(), 'upload_id' => $this->tempId()]) . '&r=' . time() . rand(1111, 9999);
 	}
 
+	/**
+	 * @return string
+	 */
 	public function apiActionPreview()
 	{
 		$tid = app()->request()->get('upload_id');
@@ -32,6 +38,11 @@ class Image extends Upload
 
 	}
 
+	/**
+	 * @param $file
+	 * @param $info
+	 * @return bool|mixed|string
+	 */
 	public function checkUploadedFile($file, &$info)
 	{
 		$check = parent::checkUploadedFile($file, $info);

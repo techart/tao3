@@ -152,6 +152,9 @@ abstract class Field
 		$this->set(!is_null($value) ? $value : $this->nullValue());
 	}
 
+	/**
+	 * @param $requestData
+	 */
 	public function setFromRequestData($requestData)
 	{
 		$this->set(isset($requestData[$this->name]) ? $requestData[$this->name] : $this->nullValue());
@@ -210,6 +213,9 @@ abstract class Field
 		return $this;
 	}
 
+	/**
+	 * @return bool
+	 */
 	protected function itemHasValue()
 	{
 		return !is_null($this->item->getAttributeValue($this->name));
@@ -248,17 +254,23 @@ abstract class Field
 	/**
 	 * @return mixed
 	 */
-
 	public function value()
 	{
 		return $this->prepareValue($this->rawValue());
 	}
 
+	/**
+	 * @return mixed
+	 */
 	public function rawValue()
 	{
 		return $this->item[$this->name];
 	}
 
+	/**
+	 * @param $value
+	 * @return mixed
+	 */
 	protected function prepareValue($value)
 	{
 		if (isset($this->data['prepare_value']) && is_callable($this->data['prepare_value'])) {
@@ -630,12 +642,18 @@ abstract class Field
 		return $this->param(['label_in_admin_form', 'label_in_form', 'label'], $this->name);
 	}
 
+	/**
+	 * @return string
+	 */
 	public function thAttrsInAdminList()
 	{
 		$attrs = trim($this->param('admin_th_attrs', ''));
 		return empty($attrs) ? '' : " {$attrs}";
 	}
 
+	/**
+	 * @return string
+	 */
 	public function tdAttrsInAdminList()
 	{
 		$attrs = trim($this->param('admin_td_attrs', ''));
@@ -703,22 +721,35 @@ abstract class Field
 		return '#';
 	}
 
+	/**
+	 * @return null
+	 */
 	public function publicLabel()
 	{
 		return $this->param('label', $this->item->typeTitle() . ':' . $this->name);
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function isPresent()
 	{
 		return !empty($this->value());
 	}
 
+	/**
+	 * @param $regexp
+	 * @return bool
+	 */
 	public function isMatch($regexp)
 	{
 		$value = $this->value();
 		return empty($value) || \TAO::regexp($regexp, $this->value());
 	}
 
+	/**
+	 * @return bool|null
+	 */
 	public function validate()
 	{
 		if (isset($this->data['required'])) {
@@ -737,6 +768,11 @@ abstract class Field
 		return true;
 	}
 
+	/**
+	 * @param $name
+	 * @param null $default
+	 * @return mixed|null
+	 */
 	public function callParam($name, $default = null)
 	{
 		$cb = $this->param('renderable_entries');

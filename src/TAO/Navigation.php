@@ -5,9 +5,7 @@ namespace TAO;
 class Navigation
 {
 	public $byIds = array();
-
 	public $flags = array();
-
 	public $id;
 	/**
 	 * @var string
@@ -175,6 +173,9 @@ class Navigation
 		}
 	}
 
+	/**
+	 * @return bool|mixed|null
+	 */
 	public function checkAccess()
 	{
 		if (is_null($this->access)) {
@@ -345,11 +346,17 @@ class Navigation
 		return count($this->sub);
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function hasChilds()
 	{
 		return $this->count() > 0;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function hasGrantedChilds()
 	{
 		if (!$this->hasChilds()) {
@@ -497,11 +504,17 @@ class Navigation
 		return false;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function withDivider()
 	{
 		return isset($this->data['divider']) && $this->data['divider'];
 	}
 
+	/**
+	 * @return string
+	 */
 	public function tag()
 	{
 		if ($this->isCurrent()) {
@@ -515,7 +528,10 @@ class Navigation
 		return 'a';
 	}
 
-	public function class()
+	/**
+	 * @return string
+	 */
+	public function tagClass()
 	{
 		$class = 'a';
 		if ($this->isSelected()) {

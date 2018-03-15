@@ -54,7 +54,7 @@ trait Actions
 		);
 		if ($action != 'list') {
 			$data['action'] = $action;
-			if ($this->id >= 1) {
+			if ($this->id >= 1 || (is_string($this->id) && $this->id != '')) {
 				$data['id'] = $this->id;
 			}
 		}

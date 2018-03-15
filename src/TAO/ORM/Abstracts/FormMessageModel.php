@@ -4,6 +4,9 @@ namespace TAO\ORM\Abstracts;
 
 abstract class FormMessageModel extends \TAO\ORM\Model
 {
+	/**
+	 * @return array
+	 */
 	public function calculatedFields()
 	{
 		$fields = $this->fields();
@@ -61,6 +64,9 @@ abstract class FormMessageModel extends \TAO\ORM\Model
 		return app()->taoFields->create($name, $data, $this);
 	}
 
+	/**
+	 * @return array
+	 */
 	public function publicFields()
 	{
 		$fields = [];
@@ -72,19 +78,42 @@ abstract class FormMessageModel extends \TAO\ORM\Model
 		return $fields;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function adminMenuSection()
 	{
 		return 'Формы';
 	}
 
+	/**
+	 * @return string
+	 */
 	public function htmlId($context = [])
 	{
 		return 'tao-form-' . $this->getDatatype();
 	}
 
+	/**
+	 * @return string
+	 */
 	public function formClass($context = [])
 	{
 		return 'tao-form tao-form-' . $this->getDatatype();
+	}
+
+	/**
+	 * @return string
+	 */
+	public function formMethod() {
+		return 'post';
+	}
+
+	/**
+	 * @return string
+	 */
+	public function formEnctype() {
+		return 'application/x-www-form-urlencoded';
 	}
 
 	/**
@@ -140,9 +169,9 @@ abstract class FormMessageModel extends \TAO\ORM\Model
 		return $this->findView("field-{$field}", 'forms ~ field');
 	}
 
-	public function renderInput($field)
+	public function renderInput($field, $forceType = false)
 	{
-		return $this->field($field)->renderInput();
+		return $this->field($field, $forceType)->renderInput();
 	}
 
 	public function templateSubmit($context = [])

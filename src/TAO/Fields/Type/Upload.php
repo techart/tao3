@@ -34,6 +34,9 @@ class Upload extends Field
 		}
 	}
 
+	/**
+	 *
+	 */
 	public function delete()
 	{
 		$file = trim($this->value());
@@ -120,6 +123,9 @@ class Upload extends Field
 		return $this->generateHumanSize($this->size());
 	}
 
+	/**
+	 * @return string
+	 */
 	protected function defaultFileNameTemplate()
 	{
 		return '{datatype}-{field}-{id}.{ext}';
@@ -127,7 +133,7 @@ class Upload extends Field
 
 
 	/**
-	 * @return bool
+	 * @return bool|string
 	 */
 	public function url()
 	{
@@ -138,6 +144,9 @@ class Upload extends Field
 		return \Storage::url($file);
 	}
 
+	/**
+	 * @return string
+	 */
 	public function renderForAdminList()
 	{
 		$url = $this->url();

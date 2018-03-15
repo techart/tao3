@@ -25,7 +25,7 @@ trait Switchable
 				'admin_td_attrs' => 'style="text-align: center;"',
 				'before_tree_title' => true,
 				'render_in_list' => function ($field) {
-					return (bool)$field->value() ? '<img src="/tao/images/accept.png"" width="16" height="16">' : '&nbsp;';
+					return (bool)$field->value() ? '<img src="/tao/images/accept.png" width="16" height="16">' : '&nbsp;';
 				}
 			),
 		]);

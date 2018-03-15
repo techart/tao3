@@ -7,26 +7,42 @@ use TAO\Fields\Field;
 
 class DateInteger extends Field
 {
+	/**
+	 * @param Blueprint $table
+	 * @return mixed
+	 */
 	public function createField(Blueprint $table)
 	{
 		return $table->integer($this->name, false, true)->default(0);
 	}
 
+	/**
+	 * @return int
+	 */
 	public function defaultValue()
 	{
 		return 0;
 	}
 
+	/**
+	 * @return int
+	 */
 	public function nullValue()
 	{
 		return 0;
 	}
 
+	/**
+	 * @return null
+	 */
 	public function withTime()
 	{
 		return $this->param('with_time', false);
 	}
 
+	/**
+	 * @return bool|null
+	 */
 	public function withSeconds()
 	{
 		if (!$this->withTime()) {
@@ -35,12 +51,18 @@ class DateInteger extends Field
 		return $this->param('with_seconds', false);
 	}
 
+	/**
+	 * @return null|string
+	 */
 	public function styleForAdminInput()
 	{
 		$style = parent::styleForAdminInput();
 		return empty($style) ? 'width:200px' : $style;
 	}
 
+	/**
+	 * @return array
+	 */
 	protected function defaultContext()
 	{
 		$context = parent::defaultContext();
@@ -49,11 +71,17 @@ class DateInteger extends Field
 		return $context;
 	}
 
+	/**
+	 * @return string
+	 */
 	protected function defaultTemplate()
 	{
 		return 'fields ~ date_integer.output';
 	}
 
+	/**
+	 * @return string
+	 */
 	public function generateFormat()
 	{
 		if ($this->withTime()) {
@@ -65,11 +93,17 @@ class DateInteger extends Field
 		return 'd.m.Y';
 	}
 
+	/**
+	 * @return string
+	 */
 	public function renderForAdminList()
 	{
 		return $this->render();
 	}
 
+	/**
+	 * @param $value
+	 */
 	public function set($value)
 	{
 		if (trim($value) == '') {

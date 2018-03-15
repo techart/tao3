@@ -12,17 +12,28 @@ class Attaches extends StringField implements \IteratorAggregate
 {
 	use FileField;
 
+	/**
+	 * @param Blueprint $table
+	 * @param bool $column
+	 * @return \Illuminate\Support\Fluent
+	 */
 	public function createField(Blueprint $table, $column = false)
 	{
 		$column = $column? $column : $this->name;
 		return $table->text($column);
 	}
 
+	/**
+	 * @return string
+	 */
 	protected function defaultFileNameTemplate()
 	{
 		return '{translit}.{ext}';
 	}
 
+	/**
+	 * @return array
+	 */
 	public function defaultInfo()
 	{
 		$defs = [];
@@ -32,6 +43,10 @@ class Attaches extends StringField implements \IteratorAggregate
 		return $defs;
 	}
 
+	/**
+	 * @param bool $raw
+	 * @return array
+	 */
 	public function value($raw = false)
 	{
 		$defs = $this->defaultInfo();
@@ -59,26 +74,41 @@ class Attaches extends StringField implements \IteratorAggregate
 		return $out;
 	}
 
+	/**
+	 * @return \ArrayIterator
+	 */
 	public function getIterator()
 	{
 		return new \ArrayIterator($this->value());
 	}
 
+	/**
+	 * @return string
+	 */
 	public function renderFilelistJSON()
 	{
 		return json_encode((object)$this->value(true));
 	}
 
+	/**
+	 * @return null
+	 */
 	public function isSortable()
 	{
 		return $this->param('sortable', false);
 	}
 
+	/**
+	 * @return null
+	 */
 	public function infoFieldsSrc()
 	{
 		return $this->param('info', []);
 	}
 
+	/**
+	 * @return array
+	 */
 	public function infoFields()
 	{
 		$out = [];
@@ -115,52 +145,83 @@ class Attaches extends StringField implements \IteratorAggregate
 		return $out;
 	}
 
+	/**
+	 * @return bool
+	 */
 	public function withInfo()
 	{
 		$fields = $this->infoFields();
 		return !empty($fields);
 	}
 
+	/**
+	 * @param $name
+	 * @return string
+	 */
 	public function infoFieldId($name)
 	{
 		return "ifield_{$this->name}_{$name}";
 	}
 
+	/**
+	 * @return string
+	 */
 	public function templateJS()
 	{
 		return 'js';
 	}
 
+	/**
+	 * @return string
+	 */
 	public function templateEditInfoJS()
 	{
 		return 'js-info';
 	}
 
+	/**
+	 * @return string
+	 */
 	public function templateEntryJS()
 	{
 		return 'js-entry';
 	}
 
+	/**
+	 * @return string
+	 */
 	public function templateFilelistJS()
 	{
 		return 'js-filelist';
 	}
 
+	/**
+	 * @return string
+	 */
 	public function filelistClass()
 	{
 		return 'tao-fields-attaches-filelist';
 	}
 
+	/**
+	 * @return array
+	 */
 	public function extraCSS()
 	{
 		return [];
 	}
 
+	/**
+	 * @return array
+	 */
 	public function extraJS()
 	{
 		return [];
 	}
 
+	/**
+	 * @param $request
+	 */
 	public function setFromRequestAfterSave($request)
 	{
 		$out = [];
@@ -276,11 +337,17 @@ class Attaches extends StringField implements \IteratorAggregate
 		];
 	}
 
+	/**
+	 * @return array
+	 */
 	public function nullValue()
 	{
 		return [];
 	}
 
+	/**
+	 * @return mixed|null
+	 */
 	public function renderableEntries()
 	{
 		return $this->callParam('renderable_entries', function () {
@@ -288,6 +355,9 @@ class Attaches extends StringField implements \IteratorAggregate
 		});
 	}
 
+	/**
+	 * @return mixed|null
+	 */
 	public function renderable()
 	{
 		return $this->callParam('renderable', function () {
@@ -296,21 +366,33 @@ class Attaches extends StringField implements \IteratorAggregate
 		});
 	}
 
+	/**
+	 * @return null
+	 */
 	public function containerClass()
 	{
 		return $this->param('container_class', "b-{$this->type}");
 	}
 
+	/**
+	 * @return null
+	 */
 	public function entryClass()
 	{
 		return $this->param('entry_class', $this->containerClass() . '__entry');
 	}
 
+	/**
+	 * @return string
+	 */
 	public function entryTemplate()
 	{
 		return 'fields ~ attaches.entry';
 	}
 
+	/**
+	 * @return array
+	 */
 	protected function defaultContext()
 	{
 		$context = parent::defaultContext();

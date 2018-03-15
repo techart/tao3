@@ -7,6 +7,11 @@ use TAO\Fields\Field;
 
 class RememberToken extends StringField
 {
+	/**
+	 * @param Blueprint $table
+	 * @param bool $column
+	 * @return \Illuminate\Support\Fluent
+	 */
 	public function createField(Blueprint $table, $column = false)
 	{
 		$column = $column? $column : $this->name;

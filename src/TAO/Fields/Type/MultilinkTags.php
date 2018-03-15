@@ -15,6 +15,9 @@ class MultilinkTags extends Multilink
 		return $style;
 	}
 
+	/**
+	 * @return string
+	 */
 	public function inputValue()
 	{
 		$value = '';
@@ -28,6 +31,9 @@ class MultilinkTags extends Multilink
 		return $value;
 	}
 
+	/**
+	 * @param $request
+	 */
 	public function setFromRequestAfterSave($request)
 	{
 		if ($request->has($this->name)) {

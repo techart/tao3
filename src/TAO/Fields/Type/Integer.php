@@ -7,6 +7,10 @@ use TAO\Fields\Field;
 
 class Integer extends Field
 {
+	/**
+	 * @param Blueprint $table
+	 * @return mixed
+	 */
 	public function createField(Blueprint $table)
 	{
 		$size = $this->typeParamsEnumArg(array('tiny', 'small', 'medium', 'big'));
@@ -15,16 +19,25 @@ class Integer extends Field
 		return $table->$method($this->name, false, $unsigned)->default(0);
 	}
 
+	/**
+	 * @return int
+	 */
 	public function defaultValue()
 	{
 		return 0;
 	}
 
+	/**
+	 * @return int
+	 */
 	public function nullValue()
 	{
 		return 0;
 	}
 
+	/**
+	 * @return null|string
+	 */
 	public function styleForAdminInput()
 	{
 		$style = parent::styleForAdminInput();

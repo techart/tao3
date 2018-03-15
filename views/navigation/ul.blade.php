@@ -1,4 +1,4 @@
-<ul {!! $args !!}>
+<ul {!! $args or '' !!}>
 @foreach ($links as $link)
     @if($link->checkAccess())
         @if ($link->withDivider())

@@ -10,6 +10,11 @@ class StringField extends MultivariantField
 {
 	protected $value_processors = [];
 
+	/**
+	 * @param Blueprint $table
+	 * @param bool $column
+	 * @return mixed
+	 */
 	public function createField(Blueprint $table, $column = false)
 	{
 		$column = $column? $column : $this->name;
@@ -17,6 +22,10 @@ class StringField extends MultivariantField
 		return $table->string($column, $len)->default('');
 	}
 
+	/**
+	 * @param $value
+	 * @return mixed|string
+	 */
 	protected function prepareValue($value)
 	{
 		if (isset($this->data['prepare_value'])) {

@@ -204,6 +204,8 @@ trait Table
 	 */
 	public function treeAction()
 	{
+		$this->initViews();
+		
 		$filter = $this->filter;
 		$filter['max_depth'] = $this->datatype()->adminMaxDepth();
 		$tree = $this->datatype()->buildTree($filter);
@@ -334,5 +336,39 @@ trait Table
 			return 0;
 		});
 		return $fields;
+	}
+
+	protected function titleList()
+	{
+		return $this->datatype()->adminTitleList();
+	}
+
+	protected function perPage()
+	{
+		return $this->datatype()->adminPerPage();
+	}
+
+	protected function currentPage()
+	{
+		return $this->page;
+	}
+
+	protected function filtered()
+	{
+		$builder = $this->datatype()->ordered();
+		return $this->datatype()->applyFilter($builder, $this->filterValues());
+	}
+
+	protected function countRows()
+	{
+		return $this->filtered()->count();
+	}
+
+	protected function selectRows()
+	{
+		return $this->filtered()
+			->limit($this->perPage())
+			->offset(($this->currentPage() - 1) * $this->perPage())
+			->get();
 	}
 }

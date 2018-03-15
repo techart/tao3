@@ -7,6 +7,10 @@ use TAO\Fields\Field;
 
 class Select extends Field
 {
+	/**
+	 * @param Blueprint $table
+	 * @return mixed
+	 */
 	public function createField(Blueprint $table)
 	{
 		$string = false;
@@ -19,7 +23,7 @@ class Select extends Field
 					$string = false;
 				} elseif ($m = \TAO::regexp('{^string(\d+)$}', $arg)) {
 					$string = true;
-					$length - (int)$m[1];
+					$length = (int)$m[1];
 				}
 			}
 		}
@@ -29,12 +33,18 @@ class Select extends Field
 		return $table->integer($this->name, false, false)->default(0);
 	}
 
+	/**
+	 * @return mixed
+	 */
 	public function items()
 	{
 		$src = \TAO::inAdmin() ? $this->param(['admin_items', 'items']) : $this->param('items');
 		return \TAO::itemsForSelect($src);
 	}
 
+	/**
+	 * @return array
+	 */
 	public function defaultInputContext()
 	{
 		$data = parent::defaultInputContext();

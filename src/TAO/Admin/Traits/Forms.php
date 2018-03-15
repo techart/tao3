@@ -15,6 +15,8 @@ trait Forms
 	 */
 	public function editAction()
 	{
+		$this->initViews();
+
 		if (is_null($this->id)) {
 			return \TAO::pageNotFound();
 		}
@@ -50,7 +52,7 @@ trait Forms
 			}
 		}
 
-		return $this->render('table ~ form.edit', $this->formViewParams(array(
+		return $this->render('table.form.edit', $this->formViewParams(array(
 			'id' => $this->id,
 			'item' => $item,
 			'title' => $this->titleEdit(),
@@ -67,6 +69,8 @@ trait Forms
 	 */
 	public function addAction()
 	{
+		$this->initViews();
+
 		$item = $this->datatype()->newInstance();
 		if (!$item || !$item->accessAdd(\Auth::user())) {
 			return \TAO::pageNotFound();
@@ -98,7 +102,7 @@ trait Forms
 			}
 		}
 
-		return $this->render('table ~ form.add', $this->formViewParams(array(
+		return $this->render('table.form.add', $this->formViewParams(array(
 			'id' => null,
 			'title' => $this->titleAdd(),
 			'fields' => $fields,
@@ -158,6 +162,22 @@ trait Forms
 			'tabs' => $tabs,
 			'first_tab' => $firstTab
 		), $params);
+	}
+
+	protected function titleEdit()
+	{
+		$item = empty($this->editItem) ? $this->datatype() : $this->editItem;
+		return $item->adminTitleEdit();
+	}
+
+	protected function titleAdd()
+	{
+		return $this->datatype()->adminTitleAdd();
+	}
+
+	protected function canAdd()
+	{
+		return $this->datatype()->accessAdd(\Auth::user());
 	}
 
 }

@@ -49,6 +49,9 @@ trait FileField
 		return $this->tempId;
 	}
 
+	/**
+	 * @return string
+	 */
 	protected function generateTempId()
 	{
 		return uniqid($this->item->getDatatype() . '_' . $this->name);
@@ -108,6 +111,10 @@ trait FileField
 		return $this->apiUrl('upload', ['_token' => csrf_token(), 'upload_id' => $this->tempId()]);
 	}
 
+	/**
+	 * @param $info
+	 * @return array
+	 */
 	protected function fileNameBinds($info)
 	{
 		if (is_array($info)) {
@@ -126,5 +133,8 @@ trait FileField
 		];
 	}
 
+	/**
+	 * @return mixed
+	 */
 	abstract protected function defaultFileNameTemplate();
 }

@@ -242,10 +242,7 @@ class TAO
 
 	public function addDatatype($name, $class)
 	{
-		$c = $this->datatypeClass($name);
-		if (empty($c)) {
-			$this->datatypes[$name] = $class;
-		}
+		$this->datatypes[$name] = $this->datatypeClass($name, $class);
 		return $this;
 	}
 

@@ -20,6 +20,7 @@ use TAO\Type;
 abstract class MultivariantField extends Field
 {
 	protected $variant = false;
+
 	/**
 	 * Возвращает список вариантов для данного поля или false если оно не мультивариантное
 	 *
@@ -33,6 +34,9 @@ abstract class MultivariantField extends Field
 		return false;
 	}
 
+	/**
+	 * @return array|bool
+	 */
 	public function variantsWithDefault()
 	{
 		$variants = $this->variants();
@@ -46,6 +50,10 @@ abstract class MultivariantField extends Field
 		return $variants;
 	}
 
+	/**
+	 * @param $code
+	 * @return mixed|string
+	 */
 	public function variantValue($code)
 	{
 		$variants = $this->variantsWithDefault();
@@ -69,6 +77,10 @@ abstract class MultivariantField extends Field
 		return parent::checkSchema($table);
 	}
 
+	/**
+	 * @param Blueprint $table
+	 * @return $this
+	 */
 	public function checkVariantsSchema(Blueprint $table)
 	{
 		foreach ($this->variants() as $code => $data) {
@@ -86,6 +98,10 @@ abstract class MultivariantField extends Field
 		return $this;
 	}
 
+	/**
+	 * @param $code
+	 * @param $value
+	 */
 	public function setForVariant($code, $value)
 	{
 		$variants = $this->variantsWithDefault();
@@ -94,6 +110,10 @@ abstract class MultivariantField extends Field
 		}
 	}
 
+	/**
+	 * @param Request $request
+	 * @return $this|void
+	 */
 	public function setFromRequest($request)
 	{
 		if ($variants = $this->variants()) {
@@ -110,6 +130,9 @@ abstract class MultivariantField extends Field
 		return parent::setFromRequest($request);
 	}
 
+	/**
+	 * @return mixed
+	 */
 	public function rawValue()
 	{
 		$variants = $this->variants();
@@ -117,7 +140,7 @@ abstract class MultivariantField extends Field
 			return parent::rawValue();
 		}
 		$variants = $this->variantsWithDefault();
-		$variant = $this->variant? : \TAO::getVariant();
+		$variant = $this->variant ?: \TAO::getVariant();
 		if (!isset($variants[$variant])) {
 			$variant = 'default';
 		}
@@ -125,12 +148,15 @@ abstract class MultivariantField extends Field
 		return $this->item[$column];
 	}
 
+	/**
+	 * @param $code
+	 * @return $this
+	 */
 	public function setVariant($code)
 	{
 		$this->variant = $code;
 		return $this;
 	}
-
 
 	/**
 	 * @param Blueprint $table

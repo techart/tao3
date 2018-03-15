@@ -6,26 +6,41 @@ use Intervention\Image\Exception\NotReadableException;
 
 class Gallery extends Attaches
 {
+	/**
+	 * @return string
+	 */
 	public function inputTemplateFrom()
 	{
 		return 'attaches';
 	}
 
+	/**
+	 * @return string
+	 */
 	public function templateEntryJS()
 	{
 		return 'js-entry-gallery';
 	}
 
+	/**
+	 * @return string
+	 */
 	public function filelistClass()
 	{
 		return 'tao-fields-attaches-filelist tao-fields-gallery-filelist';
 	}
 
+	/**
+	 * @return array
+	 */
 	public function extraCSS()
 	{
 		return ['/tao/styles/admin-gallery.css'];
 	}
 
+	/**
+	 * @return mixed
+	 */
 	public function infoFieldsSrc()
 	{
 		return \TAO::merge([
@@ -33,21 +48,33 @@ class Gallery extends Attaches
 		], $this->param('info', []));
 	}
 
+	/**
+	 * @return null
+	 */
 	public function isSortable()
 	{
 		return $this->param('sortable', true);
 	}
 
+	/**
+	 * @return null
+	 */
 	public function adminPreviewSize()
 	{
 		return $this->param('admin_preview_size', 177);
 	}
 
+	/**
+	 * @return string
+	 */
 	public function adminPreviewUrl()
 	{
 		return $this->apiUrl('preview', ['upload_id' => $this->tempId()]);
 	}
 
+	/**
+	 * @return mixed
+	 */
 	public function apiActionPreview()
 	{
 		if (app()->request()->has('path')) {
@@ -70,16 +97,25 @@ class Gallery extends Attaches
 		return \Image::make(base_path('www/tao/images/exclamation-octagon-frame.png'))->response('png');
 	}
 
+	/**
+	 * @return string
+	 */
 	public function defaultTemplate()
 	{
 		return 'fields ~ gallery.template';
 	}
 
+	/**
+	 * @return string
+	 */
 	public function entryTemplate()
 	{
 		return 'fields ~ gallery.entry';
 	}
 
+	/**
+	 * @return array
+	 */
 	protected function defaultContext()
 	{
 		$context = parent::defaultContext();

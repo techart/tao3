@@ -7,6 +7,11 @@ use TAO\Fields\Field;
 
 class Text extends StringField
 {
+	/**
+	 * @param Blueprint $table
+	 * @param bool $column
+	 * @return mixed
+	 */
 	public function createField(Blueprint $table, $column = false)
 	{
 		$column = $column? $column : $this->name;
@@ -15,6 +20,9 @@ class Text extends StringField
 		return $table->$method($column)->nullable();
 	}
 
+	/**
+	 * @return null|string
+	 */
 	public function styleForAdminInput()
 	{
 		$style = parent::styleForAdminInput();
