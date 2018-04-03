@@ -18,6 +18,11 @@ class Urls
 	 */
 	static $noSendVars = array();
 
+	public static function full_url($path)
+	{
+		return \TAO::isHttps() ? secure_url($path) : url($path);
+	}
+
 	/**
 	 * @param $url
 	 * @return string

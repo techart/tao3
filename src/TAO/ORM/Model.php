@@ -6,6 +6,7 @@ use Illuminate\Database\Query\Builder;
 use Ramsey\Uuid\UuidInterface;
 use TAO\Fields;
 use Ramsey\Uuid\Uuid;
+use TAO\ORM\Exception\NonStrorableObjectSaving;
 use TAO\ORM\Traits\Tree;
 use TAO\Selector;
 use TAO\Type\Collection;
@@ -31,6 +32,11 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 	 * @var array
 	 */
 	public $typeTitle = false;
+
+	/**
+	 * @var bool
+	 */
+	protected $isDatatype = false;
 
 	/**
 	 * @var string
@@ -92,6 +98,16 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 	public function getDatatypeObject()
 	{
 		return \TAO::datatype($this->getDatatype());
+	}
+
+	public function initDatatype()
+	{
+		$this->isDatatype = true;
+	}
+
+	public function isDatatype()
+	{
+		return $this->isDatatype;
 	}
 
 	/**
@@ -183,7 +199,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 	}
 
 	/**
-	 * @return array
+	 * @return Fields\Field[]
 	 * @throws Fields\Exception\UndefinedField
 	 */
 	public function fieldsObjects()
@@ -210,14 +226,14 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 			}
 			$data = $fields[$name];
 			$data['type'] = $forceType;
-			return app()->taoFields->create($name, $data, $this);
+			return app('tao.fields')->create($name, $data, $this);
 		}
 		if (!isset($this->fields[$name])) {
 			$fields = $this->processedFields();
 			if (!isset($fields[$name])) {
 				throw new Fields\Exception\UndefinedField($name, get_class($this));
 			}
-			$this->fields[$name] = app()->taoFields->create($name, $fields[$name], $this);
+			$this->fields[$name] = app('tao.fields')->create($name, $fields[$name], $this);
 		}
 		return $this->fields[$name];
 	}
@@ -388,6 +404,70 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 		return $this->validate();
 	}
 
+	protected function triggerEventForFields($eventName, $data = [])
+	{
+		foreach ($this->fieldsObjects() as $field) {
+			call_user_func_array([$field, $eventName], $data);
+		}
+	}
+
+	public function beforeInsert()
+	{
+		$this->triggerEventForFields('beforeItemInsert');
+	}
+
+	public function afterInsert()
+	{
+		$this->triggerEventForFields('afterItemInsert');
+	}
+
+	public function beforeSave()
+	{
+		$this->triggerEventForFields('beforeItemSave');
+	}
+
+	public function afterSave()
+	{
+		$this->triggerEventForFields('afterItemSave');
+	}
+
+	public function beforeUpdate()
+	{
+		$this->triggerEventForFields('beforeItemUpdate');
+	}
+
+	public function afterUpdate()
+	{
+		$this->triggerEventForFields('afterItemUpdate');
+	}
+
+	public function beforeDelete()
+	{
+		$this->triggerEventForFields('beforeItemDelete');
+	}
+
+	public function afterDelete()
+	{
+		$this->triggerEventForFields('afterItemDelete');
+	}
+
+	public function save(array $options = [])
+	{
+		if (!$this->isStrobale()) {
+			$message = "Аttempt to save non-storable object '" . get_class($this) . "'.";
+			if ($this->isDatatype()) {
+				$message .= " Datatype object can't be saved.";
+			}
+			throw new NonStrorableObjectSaving($message);
+		}
+		return parent::save($options);
+	}
+
+	protected function isStrobale()
+	{
+		return !$this->isDatatype();
+	}
+
 	public function __call($method, $args)
 	{
 		if ($m = \TAO::regexp('{^(.+)_belongs_to_many$}', $method)) {
@@ -397,5 +477,4 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 		}
 		return parent::__call($method, $args);
 	}
-
 }

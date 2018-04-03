@@ -10,6 +10,11 @@ trait Forms
 	 */
 	protected $editItem;
 
+	protected function templateEdit()
+	{
+		return 'table.form.edit';
+	}
+
 	/**
 	 * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
 	 */
@@ -52,7 +57,7 @@ trait Forms
 			}
 		}
 
-		return $this->render('table.form.edit', $this->formViewParams(array(
+		return $this->render($this->templateEdit(), $this->formViewParams(array(
 			'id' => $this->id,
 			'item' => $item,
 			'title' => $this->titleEdit(),
@@ -62,6 +67,11 @@ trait Forms
 			'submit_and_stay_text' => $item->adminEditSubmitAndStayText(),
 			'errors' => $errors,
 		)));
+	}
+
+	protected function templateAdd()
+	{
+		return 'table.form.add';
 	}
 
 	/**
@@ -102,7 +112,7 @@ trait Forms
 			}
 		}
 
-		return $this->render('table.form.add', $this->formViewParams(array(
+		return $this->render($this->templateAdd(), $this->formViewParams(array(
 			'id' => null,
 			'title' => $this->titleAdd(),
 			'fields' => $fields,

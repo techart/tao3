@@ -8,6 +8,6 @@ class Images extends Facade
 {
 	protected static function getFacadeAccessor()
 	{
-		return 'taoImages';
+		return 'tao.images';
 	}
 }

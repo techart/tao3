@@ -41,6 +41,9 @@ trait Access
 		if (!$user) {
 			$user = \Auth::user();
 		}
+		if (!$user) {
+			return false;
+		}
 		if ($user['is_admin'] || $user['is_secondary_admin']) {
 			return true;
 		}
@@ -75,6 +78,9 @@ trait Access
 			$user = \Auth::user();
 		}
 		if (!$this->accessAdmin($user)) {
+			return false;
+		}
+		if (!$user) {
 			return false;
 		}
 		if ($this->groupAdminEdit) {

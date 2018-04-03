@@ -6,23 +6,65 @@ class UrlGenerator extends \Illuminate\Routing\UrlGenerator
 {
 	public function to($path, $extra = [], $secure = null)
 	{
-		if ($uw = \TAO::datatype('urlrewriter', false)) {
-			$url = \TAO\Urls::sortUrl($path);
-			$path = $uw->getReplaced($url);
+		if (\TAO::isDatatypeExists('urlrewriter')) {
+			$urlRewriter = \TAO::datatype('urlrewriter');
+			$url = Urls::sortUrl($path);
+			$path = $urlRewriter->getReplaced($url);
 		}
-		return parent::to($path, $extra, $secure);
+
+		$url = parent::to($path, $extra, $secure);
+		if ($this->hasTrailingSlash($path) && !$this->hasTrailingSlash($url)) {
+			$url = $this->addTrailingSlash($url);
+		}
+		return $url;
 	}
 
-	public function isValidUrl($path)
+	protected function hasTrailingSlash($url)
 	{
-		$v = parse_url($path);
-		if (isset($v['path']) && !empty($v['path'])) {
-			$path = $v['path'];
-			if ($path[0] == '/') {
-				return true;
-			}
-		}
-		return parent::isValidUrl($path);
+		return ends_with(parse_url($url, PHP_URL_PATH), '/');
 	}
 
+	protected function addTrailingSlash($url)
+	{
+		$urlParts = parse_url($url);
+		$urlParts['path'] .= '/';
+		return \URL::gather($urlParts);
+	}
+
+	/**
+	 * Метод, обратный функции parse_url
+	 *
+	 * @param array $urlParts
+	 * @return string
+	 */
+	public function gather($urlParts)
+	{
+		if (!isset($urlParts['path'])) {
+			$urlParts['path'] = '/';
+		}
+
+		$url = $urlParts['scheme'] . '://';
+
+		if(isset($urlParts['user']) && isset($urlParts['pass'])) {
+			$url .= $urlParts['user'] . ':' . $urlParts['pass'] . '@';
+		}
+
+		$url .= $urlParts['host'];
+
+		if(isset($urlParts['port'])) {
+			$url .= ':' . $urlParts['port'];
+		}
+
+		$url .= '/' . ltrim($urlParts['path'], '/');
+
+		if (isset($urlParts['query'])) {
+			$url .= '?' . $urlParts['query'];
+		}
+
+		if (isset($urlParts['fragment'])) {
+			$url .= '#' . $urlParts['fragment'];
+		}
+
+		return $url;
+	}
 }

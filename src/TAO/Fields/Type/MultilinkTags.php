@@ -2,7 +2,7 @@
 
 namespace TAO\Fields\Type;
 
-use TAO\Fields\Exception\InvalidTypeOptions;
+use TAO\ORM\Model\Tag;
 
 class MultilinkTags extends Multilink
 {
@@ -17,22 +17,28 @@ class MultilinkTags extends Multilink
 
 	/**
 	 * @return string
+	 * @throws \TAO\Exception\UnknownDatatype
 	 */
 	public function inputValue()
 	{
-		$value = '';
 		$tags = [];
 		foreach ($this->relatedItems() as $item) {
 			$tag = $item->title();
 			$tags[$tag] = $tag;
 		}
 		sort($tags);
-		$value = implode(', ', $tags);
-		return $value;
+		return implode(', ', $tags);
+	}
+
+	protected function getValueFromRequest($request)
+	{
+		return $request->input($this->name);
 	}
 
 	/**
-	 * @param $request
+	 * @param \Request $request
+	 * @throws \TAO\Exception\UnknownDatatype
+	 * @throws \TAO\ORM\Exception\NonStrorableObjectSaving
 	 */
 	public function setFromRequestAfterSave($request)
 	{
@@ -47,8 +53,11 @@ class MultilinkTags extends Multilink
 			}
 			$this->belongsToMany()->detach();
 			foreach ($tags as $tag) {
-				$tagItem = $this->relatedModel()->findTag($tag);
+				/** @var Tag $tagModel */
+				$tagModel = $this->relatedModel();
+				$tagItem = $tagModel->findTag($tag);
 				if (!$tagItem) {
+					/** @var Tag $tagItem */
 					$tagItem = $this->relatedModel()->newInstance();
 					$tagItem->setTitle($tag);
 					$tagItem->save();

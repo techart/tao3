@@ -10,6 +10,11 @@ class StringField extends MultivariantField
 {
 	protected $value_processors = [];
 
+	public function set($value)
+	{
+		parent::set((string)$value);
+	}
+
 	/**
 	 * @param Blueprint $table
 	 * @param bool $column

@@ -58,4 +58,19 @@ class Kernel extends HttpKernel
 		'guest' => \TAO\App\Http\Middleware\RedirectIfAuthenticated::class,
 		'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
 	];
+
+	public function bootstrap()
+	{
+		$rc = parent::bootstrap();
+		foreach(config('tao.prepend_middleware', []) as $m) {
+			$this->prependMiddleware($m);
+		}
+		foreach(config('tao.push_middleware', []) as $m) {
+			$this->pushMiddleware($m);
+		}
+		foreach(config('tao.route_middleware', []) as $name => $m) {
+			$this->routeMiddleware[$name] = $m;
+		}
+		return $rc;
+	}
 }

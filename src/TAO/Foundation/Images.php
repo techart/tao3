@@ -89,7 +89,7 @@ class Images
 				} elseif ($m = \TAO::regexp('{^(crop|fit|size)(\d+)x(\d+)$}', $item)) {
 					$directive = $m[1];
 					$params = [(int)$m[2], (int)$m[3]];
-				} elseif (in_array($item, ['grayscale', 'invert'])) {
+				} elseif (in_array($item, ['greyscale', 'invert'])) {
 					$directive = $item;
 				}
 				if ($directive) {

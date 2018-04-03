@@ -18,8 +18,14 @@
             padding: 0 3px;
             font-size: 11px;
         }
-        
-        .tao-fields-gallery-filelist .button {
+
+        .tao-fields-gallery-filelist .entry a.file-name {
+            color: #08c;
+            text-decoration: none;
+        }
+
+
+.tao-fields-gallery-filelist .button {
             vertical-align: top;
         }
         

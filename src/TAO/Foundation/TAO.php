@@ -31,7 +31,8 @@ class TAO
 
 	public $layout = 'layouts.app';
 
-	protected $datatypes = null;
+	protected $datatypes = [];
+	protected $datatypeClasses;
 	protected $controller;
 	protected $inAdmin = false;
 	protected $selectors = [];
@@ -68,6 +69,11 @@ class TAO
 	public function inAdmin()
 	{
 		return $this->inAdmin;
+	}
+
+	public function isHttps()
+	{
+		return isset($_SERVER['HTTPS']);
 	}
 
 	public function pageNotFound()
@@ -198,10 +204,10 @@ class TAO
 
 	public function datatypeClasses()
 	{
-		if (!$this->datatypes) {
-			$this->datatypes = config('tao.datatypes', array());
+		if (!$this->datatypeClasses) {
+			$this->datatypeClasses = config('tao.datatypes', array());
 		}
-		return $this->datatypes;
+		return $this->datatypeClasses;
 	}
 
 	/**
@@ -212,37 +218,75 @@ class TAO
 	 */
 	public function datatypeClass($name, $default = null)
 	{
-		$datatypes = $this->datatypeClasses();
-		if (!isset($datatypes[$name])) {
+		$datatypeClasses = $this->datatypeClasses();
+		if (!isset($datatypeClasses[$name])) {
 			if (is_null($default)) {
 				throw new UnknownDatatype($name);
 			}
 			return $default;
 		}
-		return $datatypes[$name];
+		return $datatypeClasses[$name];
 	}
 
 	/**
 	 * @param string $name
-	 * @param Model|null $default
+	 * @param Model|string|null $default
 	 * @return Model
 	 * @throws UnknownDatatype
 	 */
 	public function datatype($name, $default = null)
 	{
-		$class = $this->datatypeClass($name, false);
-		if (empty($class)) {
-			if (is_null($default)) {
-				throw new UnknownDatatype($name);
+		if (isset($this->datatypes[$name])) {
+			return $this->datatypes[$name];
+		}
+
+		$datatype = $this->makeDatatype($name);
+		if (!is_null($datatype)) {
+			return $this->datatypes[$name] = $datatype;
+		}
+		if (!is_null($default) && $default) {
+			if (is_string($default)) {
+				$default = app($default);
 			}
+			$default->initDatatype();
 			return $default;
 		}
-		return app()->make($class);
+
+		throw new UnknownDatatype($name);
+	}
+
+	public function isDatatypeExists($name)
+	{
+		$ret = true;
+		try {
+			if($this->datatypeClass($name)) {
+				$ret = true;
+			}
+		} catch (UnknownDatatype $e) {
+			$ret = false;
+		}
+		return $ret;
+	}
+
+	/**
+	 * @param string $name
+	 * @return Model|null
+	 * @throws UnknownDatatype
+	 */
+	protected function makeDatatype($name)
+	{
+		$datatype = null;
+		if ($this->isDatatypeExists($name)) {
+			/** @var Model $datatype */
+			$datatype = app($this->datatypeClass($name));
+			$datatype->initDatatype();
+		}
+		return $datatype;
 	}
 
 	public function addDatatype($name, $class)
 	{
-		$this->datatypes[$name] = $this->datatypeClass($name, $class);
+		$this->datatypeClasses[$name] = $this->datatypeClass($name, $class);
 		return $this;
 	}
 
@@ -393,12 +437,12 @@ class TAO
 
 	public function render($template, $context = array())
 	{
-		return app()->taoView->render($template, $context);
+		return app('tao.view')->render($template, $context);
 	}
 
 	public function renderWithinLayout($template, $context = array())
 	{
-		return app()->taoView->renderWithinLayout($template, $context);
+		return app('tao.view')->renderWithinLayout($template, $context);
 	}
 
 	public function itemsForSelect($src)

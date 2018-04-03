@@ -1,6 +1,6 @@
 <?php
 
-$dt = app()->taoAdmin->menu();
+$dt = app('tao.admin')->menu();
 
 $site = isset($dt['*site'])? $dt['*site'] : [];
 $site = isset($site['sub'])? $site['sub'] : [];

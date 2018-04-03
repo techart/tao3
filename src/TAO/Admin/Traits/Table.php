@@ -25,6 +25,10 @@ trait Table
 	 */
 	protected $canCopy = false;
 
+	protected $canExport = false;
+
+	protected $canCsv = true;
+
 	/**
 	 * @var Fields\Field[]
 	 */
@@ -122,7 +126,7 @@ trait Table
 	 */
 	protected function makeFilterField($fieldName, $data, $model)
 	{
-		$field = app()->taoFields->create($fieldName, $data, $model);
+		$field = app('tao.fields')->create($fieldName, $data, $model);
 		$field->setupDefault();
 		return $field;
 	}
@@ -156,6 +160,49 @@ trait Table
 		return redirect($this->actionUrl('list'));
 	}
 
+	protected function additionalActions()
+	{
+		$actions = [];
+		if ($this->canCsv && $this->csvFields() && $this->countRows()>0) {
+			$actions['csv'] = [
+				'button' => 'btn btn-info',
+				'icon' => 'icon-share icon-white',
+				'title' => 'Экспорт в CSV',
+				'url' => $this->actionUrl('csv'),
+			];
+		}
+		return $actions;
+	}
+
+	public function csvRow($row, $fields)
+	{
+		$values = [];
+		foreach(array_keys($fields) as $field) {
+			$values[] = $row->field($field)->csvValue();
+		}
+		ob_start();
+		$df = fopen("php://output", 'w');
+		fputcsv($df, $values, ';');
+		fclose($df);
+		return ob_get_clean();
+	}
+
+	public function csvAction()
+	{
+		$rows = $this->filtered()->get();
+		$fields = $this->csvFields();
+		$csv = '';
+		foreach($rows as $row) {
+			$csv .= $this->csvRow($row, $fields);
+		}
+		return response($csv, 200, ['Content-Type' => 'text/x-csv']);
+	}
+
+	protected function templateTable()
+	{
+		return 'table.list.table';
+	}
+
 	/**
 	 * @return mixed
 	 */
@@ -172,7 +219,7 @@ trait Table
 		$count = $this->countRows();
 		$numPages = ceil($count / $this->perPage());
 		$rows = $this->prepareRows();
-		return $this->render('table.list.table', [
+		return $this->render($this->templateTable(), [
 			'title' => $this->titleList(),
 			'datatype' => $this->datatype(),
 			'fields' => $this->listFields(),
@@ -191,12 +238,18 @@ trait Table
 			'reset_filter_url' => $this->actionUrl('list', ['__no_filter' => true, '__no_page' => true]),
 			'sidebar_visible' => !empty($this->filter),
 			'filter_empty' => empty($this->filter),
+			'additional_actions' => $this->additionalActions(),
 			//'sidebar_visible' => true,
 			'with_row_actions' => ($this->canEdit || $this->canDelete || $this->canCopy),
 			'pager_callback' => array($this, 'pageUrl'),
 			'page' => $this->page,
 			'user' => Auth::user()
 		]);
+	}
+
+	protected function templateTree()
+	{
+		return 'table.list.tree';
 	}
 
 	/**
@@ -222,7 +275,7 @@ trait Table
 			}
 		}
 
-		return $this->render('table.list.tree', [
+		return $this->render($this->templateTree(), [
 			'title' => $this->titleList(),
 			'count' => count($tree),
 			'datatype' => $this->datatype(),
@@ -316,17 +369,19 @@ trait Table
 	/**
 	 * @return array
 	 */
-	protected function listFields()
+	protected function generateFields($method)
 	{
+		$validationMethod = "in{$method}";
+		$weightMethod = "weightIn{$method}";
 		$fields = array();
 		foreach ($this->datatype()->fieldsObjects() as $name => $field) {
-			if ($field->inAdminList()) {
+			if ($field->$validationMethod()) {
 				$fields[$name] = $field;
 			}
 		}
-		uasort($fields, function ($f1, $f2) {
-			$w1 = $f1->weightInAdminList();
-			$w2 = $f2->weightInAdminList();
+		uasort($fields, function ($f1, $f2) use ($weightMethod) {
+			$w1 = $f1->$weightMethod();
+			$w2 = $f2->$weightMethod();
 			if ($w1 > $w2) {
 				return 1;
 			}
@@ -337,6 +392,17 @@ trait Table
 		});
 		return $fields;
 	}
+
+	protected function listFields()
+	{
+		return $this->generateFields('AdminList');
+	}
+
+	protected function csvFields()
+	{
+		return $this->generateFields('CSV');
+	}
+
 
 	protected function titleList()
 	{

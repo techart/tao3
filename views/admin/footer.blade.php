@@ -1,0 +1,1 @@
+<p>&copy; Techart {!! date('Y') !!}</p>

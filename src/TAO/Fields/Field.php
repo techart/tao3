@@ -384,7 +384,25 @@ abstract class Field
 		if (isset($this->data['input_template'])) {
 			return $this->data['input_template'];
 		}
-		return "fields ~ {$this->inputTemplateFrom()}.input";
+		return "fields.{$this->inputTemplateFrom()}.input";
+	}
+
+	/**
+	 *
+	 * Имя дефолтного шаблона для рендера инпута в публичной форме
+	 *
+	 * @return string
+	 */
+	public function defaultPublicInputTemplate()
+	{
+		if (isset($this->data['public_input_template'])) {
+			return $this->data['public_input_template'];
+		}
+		$tpl = "fields.{$this->inputTemplateFrom()}.public-input";
+		if (app(\Illuminate\View\Factory::class)->exists($tpl)) {
+			return $tpl;
+		}
+		return $this->defaultInputTemplate();
 	}
 
 	/**
@@ -412,6 +430,17 @@ abstract class Field
 
 	/**
 	 *
+	 * Дефолтный контекст, который передается в шаблон инпута в публичной форме
+	 *
+	 * @return array
+	 */
+	public function defaultPublicInputContext()
+	{
+		return $this->defaultContext();
+	}
+
+	/**
+	 *
 	 * Рендер инпута в форме
 	 *
 	 * @param $arg1 - имя шаблона или контекст (если шаблон стандартный)
@@ -429,6 +458,32 @@ abstract class Field
 		}
 		if ($template) {
 			$context = $this->defaultInputContext();
+			if (is_array($arg1)) {
+				$context = array_merge($context, $arg1);
+			} elseif (is_array($arg2)) {
+				$context = array_merge($context, $arg2);
+			}
+			return view($template, $context);
+		} else {
+			return 'No input template for field ' . get_class($this);
+		}
+	}
+
+	/**
+	 * Рендер инпута для публичной формы если для этого типа поля есть отдельный шаблон
+	 *
+	 * @param bool $arg1
+	 * @param bool $arg2
+	 */
+	public function renderPublicInput($arg1 = false, $arg2 = false)
+	{
+		$template = $this->defaultPublicInputTemplate();
+		if (is_string($arg1)) {
+			$template = $arg1;
+		}
+
+		if ($template) {
+			$context = $this->defaultPublicInputContext();
 			if (is_array($arg1)) {
 				$context = array_merge($context, $arg1);
 			} elseif (is_array($arg2)) {
@@ -532,6 +587,16 @@ abstract class Field
 		return $this->render();
 	}
 
+	public function csvValue()
+	{
+		$cb = $this->param('csv_value', false);
+		if (is_callable($cb)) {
+			return call_user_func($cb, $this);
+		}
+		return $this->render();
+	}
+
+
 	/**
 	 * @return string
 	 */
@@ -587,11 +652,24 @@ abstract class Field
 	}
 
 	/**
-	 * @return null
 	 */
 	public function inAdminList()
 	{
 		return $this->param(['in_admin_list', 'in_list'], false);
+	}
+
+	/**
+	 */
+	public function inCSV()
+	{
+		return $this->param('in_csv', false);
+	}
+
+	/**
+	 */
+	public function weightInCSV()
+	{
+		return $this->param(['weight_in_csv', 'weight_in_admin_list', 'weight_in_list', 'weight'], false);
 	}
 
 	/**
@@ -783,6 +861,38 @@ abstract class Field
 			return Callback::instance($default)->call($this);
 		}
 		return $default;
+	}
+
+	public function beforeItemInsert()
+	{
+	}
+
+	public function afterItemInsert()
+	{
+	}
+
+	public function beforeItemSave()
+	{
+	}
+
+	public function afterItemSave()
+	{
+	}
+
+	public function beforeItemUpdate()
+	{
+	}
+
+	public function afterItemUpdate()
+	{
+	}
+
+	public function beforeItemDelete()
+	{
+	}
+
+	public function afterItemDelete()
+	{
 	}
 
 	/**

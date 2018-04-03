@@ -21,7 +21,7 @@ class Base extends \TAO\Controller
 	 */
 	public function layout()
 	{
-		return app()->taoAdmin->layout();
+		return app('tao.admin')->layout();
 	}
 
 	/**

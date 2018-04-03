@@ -1,0 +1,14 @@
+.b-admin-table-top {
+	height: 100%;
+	overflow: hidden;
+	margin: 15px 0;
+}
+	.b-admin-table-top__header {
+		float: left;
+		margin: 0;
+	}
+
+	.b-admin-table-top__buttons {
+		float: right;
+	}
+	

@@ -43,13 +43,13 @@ trait Schema
 	public function updateSchemaIfNecessary()
 	{
 		$table = $this->getTable();
-		if (app()->taoFields->schemaWasUpdated($table)) {
+		if (app('tao.fields')->schemaWasUpdated($table)) {
 			return $this;
 		}
 		if (app()->tao->classModified($this, false)) {
 			$this->updateSchema();
 		}
-		app()->taoFields->schemaUpdated($table);
+		app('tao.fields')->schemaUpdated($table);
 	}
 
 	/**

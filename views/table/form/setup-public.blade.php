@@ -1,0 +1,7 @@
+@style('/tao/styles/buttons.css')
+@style('/tao/styles/forms.css')
+@style('/tao/styles/form-tabs.css')
+@style('/tao/styles/form-elements.css')
+@style('/tao/styles/admin-table.css')
+@script('/tao/scripts/admin/index.js')
+@script('/tao/scripts/bootstrap.min.js')

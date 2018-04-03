@@ -61,7 +61,7 @@ abstract class FormMessageModel extends \TAO\ORM\Model
 		if (isset($data['type_in_form'])) {
 			$data['type'] = $data['type_in_form'];
 		}
-		return app()->taoFields->create($name, $data, $this);
+		return app('tao.fields')->create($name, $data, $this);
 	}
 
 	/**
@@ -171,7 +171,7 @@ abstract class FormMessageModel extends \TAO\ORM\Model
 
 	public function renderInput($field, $forceType = false)
 	{
-		return $this->field($field, $forceType)->renderInput();
+		return $this->field($field, $forceType)->renderPublicInput();
 	}
 
 	public function templateSubmit($context = [])

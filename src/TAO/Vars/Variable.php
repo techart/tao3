@@ -50,7 +50,7 @@ class Variable implements \ArrayAccess
 	public function field($name)
 	{
 		if (isset($this->fields[$name])) {
-			return app()->taoFields->create($name, $this->fields[$name], $this);
+			return app('tao.fields')->create($name, $this->fields[$name], $this);
 		}
 	}
 

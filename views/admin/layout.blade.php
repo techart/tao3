@@ -1,3 +1,4 @@
+@include('admin.setup')
 <!DOCTYPE html>
 <html>
     
@@ -77,7 +78,7 @@
             
             <hr>
             <footer>
-                <p>&copy; Techart {!! date('Y') !!}</p>
+                @include('admin.footer')
             </footer>
         </div>
 

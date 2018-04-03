@@ -2,73 +2,91 @@
 
 namespace TAO\Fields\Type;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Schema\Blueprint;
+use TAO\Exception\UnknownDatatype;
 use TAO\Fields\Field;
-use TAO\Fields\Model;
+use TAO\ORM\Model;
 
 class Multilink extends Field
 {
-	protected $attachedIds;
+	protected $attachedIds = [];
+	protected $relationsIsLoaded = false;
 	protected $relatedItems;
 
 	/**
-	 * Метод устанавливает связи с переданными ключами, удаляя старые. Если необходимо добавить привязки,
-	 * не удаляя старые, нужно использовать метод attach. Передавать можно как массив, так и единичный ключ.
+	 * Устанавливает переданные привязки, удаляя существующие. Не сохраняет данные в БД до сохранения модели.
 	 *
 	 * @param array|int $ids
 	 */
 	public function set($ids)
 	{
-		$this->sync($this->normalizeValue($ids));
+		$this->resetAttachedIds();
+		$this->addToAttachedIds($ids);
+	}
+
+	/**
+	 * Добавляет указанные привязки к уже существующим. Не сохраняет данные в БД до сохранения модели.
+	 *
+	 * @param array|int $ids
+	 */
+	public function add($ids)
+	{
+		$this->addToAttachedIds($ids);
+	}
+
+	/**
+	 * Удаляет указанные привязки. Не сохраняет данные в БД до сохранения модели.
+	 *
+	 * @param array|int $ids
+	 * @throws UnknownDatatype
+	 */
+	public function delete($ids)
+	{
+		$this->deleteFromAttachedIds($ids);
 	}
 
 	/**
 	 * Добавляет привязки к переданным ключам, не удаляя старые. Передавать можно как массив, так и единичный ключ.
+	 * Изменения сразу сохраняются в БД. Если это нежелательно - используйте метод add.
 	 *
 	 * @param array|int $ids
+	 * @throws UnknownDatatype
 	 */
 	public function attach($ids)
 	{
-		$attachedIds = $this->attachedIds();
-		$ids = $this->normalizeValue($ids);
-		foreach ($ids as $id) {
-			if (!$this->isAttached($id)) {
-				$attachedIds[] = $id;
-			}
-		}
-		$this->sync($attachedIds);
-		$this->resetAttachedIds();
+		$this->add($ids);
+		$this->sync();
 	}
 
 	/**
-	 * Удаляет привязки к переданным ключам. Передавать можно как массив, так и единичный ключ.
+	 * Удаляет привязки к переданным ключам. Передавать можно как массив, так и единичный ключ. Изменения сразу
+	 * сохраняются в БД. Если это нежелательно - используйте метод delete.
 	 *
 	 * @param array|int $ids
+	 * @throws UnknownDatatype
 	 */
 	public function detach($ids)
 	{
-		$ids = $this->normalizeValue($ids);
-		$this->belongsToMany()->detach($ids);
-		$this->resetAttachedIds();
+		$this->deleteFromAttachedIds($ids);
+		$this->sync();
 	}
 
 	/**
-	 * Устанавливает привязки к переданным ключам. При значении $withDetaching=true удаялет старые привязки.
-	 * Передавать можно как массив, так и единичный ключ.
+	 * Сохраняет в БД привязки, которые были установлены в филде.
 	 *
-	 * @param $ids
 	 * @param bool $withDetaching
+	 * @throws UnknownDatatype
 	 */
-	public function sync($ids, $withDetaching = true)
+	public function sync($withDetaching = true)
 	{
-		$ids = $this->normalizeValue($ids);
-		$this->belongsToMany()->sync($ids, $withDetaching);
-		$this->resetAttachedIds();
+		$this->belongsToMany()->sync($this->attachedIds(), $withDetaching);
 	}
 
 	/**
-	 * @param $value
+	 * @param array|int $value
 	 * @return array
 	 */
 	protected function normalizeValue($value)
@@ -79,11 +97,14 @@ class Multilink extends Field
 		if (is_array($value) && !\TAO\Type\Collection::isIndexed($value)) {
 			$value = array_keys($value);
 		}
-		return array_wrap($value);
+		return array_filter(array_wrap($value), function ($val) {
+			return is_numeric($val);
+		});
 	}
 
 	/**
-	 * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+	 * @return BelongsToMany
+	 * @throws UnknownDatatype
 	 */
 	public function belongsToMany()
 	{
@@ -92,28 +113,66 @@ class Multilink extends Field
 
 	/**
 	 * @return array
+	 * @throws UnknownDatatype
 	 */
 	public function attachedIds()
 	{
-		if (is_null($this->attachedIds)) {
-			$this->attachedIds = array();
-			foreach ($this->belongsToMany()->allRelatedIds() as $id) {
-				$this->attachedIds[$id] = $id;
+		if (!$this->relationsIsLoaded) {
+			if ($this->item->getKey()) {
+				$this->set($this->belongsToMany()->allRelatedIds()->toArray());
 			}
+			$this->relationsIsLoaded = true;
 		}
 		return $this->attachedIds;
 	}
 
 	/**
-	 *
+	 * @param array|int $ids
 	 */
+	protected function addToAttachedIds($ids)
+	{
+		foreach($this->normalizeValue($ids) as $id) {
+			$this->attachedIds[$id] = $id;
+		}
+	}
+
+	public function defaultValue()
+	{
+		return [];
+	}
+
+	protected function getValueFromRequest($request)
+	{
+		return array_keys(parent::getValueFromRequest($request));
+	}
+
+	public function setFromRequest($request)
+	{
+		parent::setFromRequest($request);
+		$this->relationsIsLoaded = true;
+	}
+
+	/**
+	 * @param array|int $ids
+	 * @throws UnknownDatatype
+	 */
+	protected function deleteFromAttachedIds($ids)
+	{
+		foreach($this->normalizeValue($ids) as $id) {
+			if ($this->isAttached($id)) {
+				unset($this->attachedIds[$id]);
+			}
+		}
+	}
+
 	protected function resetAttachedIds()
 	{
-		$this->attachedIds = null;
+		$this->attachedIds = $this->nullValue();
 	}
 
 	/**
 	 * @return array
+	 * @throws UnknownDatatype
 	 */
 	public function value()
 	{
@@ -123,18 +182,16 @@ class Multilink extends Field
 	/**
 	 * @param $id
 	 * @return bool
+	 * @throws UnknownDatatype
 	 */
 	public function isAttached($id)
 	{
-		if (empty($this->item->getKey())) {
-			return false;
-		}
-		$ids = $this->attachedIds();
-		return isset($ids[$id]);
+		return isset($this->attachedIds()[$id]);
 	}
 
 	/**
-	 * @return null
+	 * @return array
+	 * @throws UnknownDatatype
 	 */
 	public function items()
 	{
@@ -150,6 +207,7 @@ class Multilink extends Field
 
 	/**
 	 * @param Blueprint $table
+	 * @throws UnknownDatatype
 	 */
 	public function checkSchema(Blueprint $table)
 	{
@@ -167,29 +225,25 @@ class Multilink extends Field
 	}
 
 	/**
-	 *
+	 * @return bool
+	 * @throws UnknownDatatype
 	 */
-	public function setupDefault()
+	protected function itemHasValue()
 	{
+		return $this->item->getKey() && $this->belongsToMany()->count() > 0;
 	}
 
 	/**
-	 * @param \TAO\Foundation\Request $request
+	 * @throws UnknownDatatype
 	 */
-	public function setFromRequest($request)
+	public function afterItemSave()
 	{
-	}
-
-	/**
-	 * @param $request
-	 */
-	public function setFromRequestAfterSave($request)
-	{
-		$this->set($this->getValueFromRequest($request));
+		$this->sync();
 	}
 
 	/**
 	 * @return string
+	 * @throws UnknownDatatype
 	 */
 	public function tableRelations()
 	{
@@ -217,6 +271,7 @@ class Multilink extends Field
 
 	/**
 	 * @return mixed
+	 * @throws UnknownDatatype
 	 */
 	public function relatedKey()
 	{
@@ -227,7 +282,8 @@ class Multilink extends Field
 	}
 
 	/**
-	 * @return null
+	 * @return string
+	 * @throws UnknownDatatype
 	 */
 	public function relatedModelClass()
 	{
@@ -235,7 +291,7 @@ class Multilink extends Field
 		if (!$model) {
 			$datatype = $this->param('datatype');
 			if (!$datatype) {
-				return \TAO\Fields\Dummy\Model::class;
+				return \TAO\ORM\Dummy\Model::class;
 			}
 			$model = \TAO::datatypeClass($datatype);
 		}
@@ -243,13 +299,14 @@ class Multilink extends Field
 	}
 
 	/**
-	 * @return Model
+	 * @return Model|\TAO\ORM\Dummy\Model
+	 * @throws UnknownDatatype
 	 */
 	public function relatedModel()
 	{
 		$class = $this->relatedModelClass();
-		if ($class == \TAO\Fields\Dummy\Model::class) {
-			$model = new \TAO\Fields\Dummy\Model;
+		if ($class == \TAO\ORM\Dummy\Model::class) {
+			$model = new \TAO\ORM\Dummy\Model;
 			$model->code = $this->name;
 			return $model;
 		}
@@ -258,8 +315,8 @@ class Multilink extends Field
 
 	/**
 	 * Возвращает коллекцию связанных объектов
-	 *
 	 * @return Collection
+	 * @throws UnknownDatatype
 	 */
 	public function relatedItems()
 	{
@@ -271,6 +328,7 @@ class Multilink extends Field
 
 	/**
 	 * @return Collection
+	 * @throws UnknownDatatype
 	 */
 	public function attachedItems()
 	{
@@ -279,6 +337,7 @@ class Multilink extends Field
 
 	/**
 	 * @return bool
+	 * @throws UnknownDatatype
 	 */
 	public function attached()
 	{
@@ -288,22 +347,27 @@ class Multilink extends Field
 	/**
 	 * @param $id
 	 * @return mixed
+	 * @throws UnknownDatatype
 	 */
 	public function select($id)
 	{
 		$key = $this->relatedKey();
-		return $this->item->whereHas("{$this->name}_belongs_to_many", function ($query) use ($id, $key) {
-			if (is_array($id)) {
-				$query->whereIn($key, $id);
-			} else {
-				$query->where($key, $id);
+		return $this->item->whereHas("{$this->name}_belongs_to_many",
+			function ($query) use ($id, $key) {
+				/** @var Builder $query */
+				if (is_array($id)) {
+					$query->whereIn($key, $id);
+				} else {
+					$query->where($key, $id);
+				}
 			}
-		});
+		);
 	}
 
 	/**
 	 * @param $id
-	 * @return mixed
+	 * @return Model
+	 * @throws UnknownDatatype
 	 */
 	public function find($id)
 	{
@@ -313,6 +377,7 @@ class Multilink extends Field
 	/**
 	 * @param bool $class
 	 * @return array
+	 * @throws UnknownDatatype
 	 */
 	public function relatedLinks($class = false)
 	{
@@ -321,7 +386,7 @@ class Multilink extends Field
 		foreach ($this->relatedItems() as $item) {
 			$title = $item->title();
 			$url = $item->url();
-			$out[] = "<a href=\"{$url}\"{$cs}>{$title}</a>";
+			$out[] = "<a href=\"{$url}\" {$cs}>{$title}</a>";
 		}
 		return $out;
 	}

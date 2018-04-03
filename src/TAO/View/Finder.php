@@ -21,7 +21,7 @@ class Finder extends FileViewFinder
 	 * @param string $name
 	 * @return string
 	 */
-	public function find($name)
+	public function findPath($name)
 	{
 		if ($name == '~layout') {
 			$name = app()->tao->layout;
@@ -52,6 +52,15 @@ class Finder extends FileViewFinder
 		}
 
 		if ($path = $this->findInTAO($name)) {
+			return $path;
+		}
+
+		return false;
+	}
+
+	public function find($name)
+	{
+		if ($path = $this->findPath($name)) {
 			return $path;
 		}
 

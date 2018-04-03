@@ -15,7 +15,8 @@ abstract class PageModel extends \TAO\ORM\Model
 	use \TAO\ORM\Traits\Switchable,
 		\TAO\ORM\Traits\Addressable,
 		\TAO\ORM\Traits\Title,
-		\TAO\ORM\Traits\Metas;
+		\TAO\ORM\Traits\Metas,
+		\TAO\ORM\Traits\Sitemap;
 
 	/**
 	 * Шаблон урла. Если урл не задан, то при сохранении будет сгенерирован по шаблону.

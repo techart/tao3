@@ -4,6 +4,7 @@ namespace TAO;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use TAO\Components\Sitemap\Manager;
 
 
 class Provider extends ServiceProvider
@@ -46,6 +47,19 @@ class Provider extends ServiceProvider
 		Blade::directive('bottomScript', function ($args) {
 			return "<?php Assets::useBottomScript({$args}); ?>";
 		});
+
+		Blade::directive('block', function ($args) {
+			return "<?php print TAO::frontend()->render({$args}); ?>";
+		});
+
+		if ($this->app->runningInConsole()) {
+			$commands = [];
+			foreach (\File::allFiles(__DIR__ . '/Console/Commands') as $commandFile) {
+				$commandClassName = str_replace('.' . $commandFile->getExtension(), '', $commandFile->getFilename());
+				$commands[] = '\\TAO\\Console\\Commands\\' . $commandClassName;
+			}
+			$this->commands($commands);
+		}
 	}
 
 	public function register()
@@ -83,32 +97,40 @@ class Provider extends ServiceProvider
 			return $tao;
 		});
 
-		$this->app->singleton('taoFields', function () {
+		$this->app->singleton('tao.fields', function () {
 			$fields = app()->make(\TAO\Fields::class);
 			$fields->init();
 			return $fields;
 		});
 
-		$this->app->singleton('taoAdmin', function () {
+		$this->app->singleton('tao.admin', function () {
 			return app()->make(\TAO\Admin::class);
 		});
 
-		$this->app->singleton('taoAssets', function () {
+		$this->app->singleton('tao.assets', function () {
 			$assets = app()->make(\TAO\Foundation\Assets::class);
 			$assets->init();
 			return $assets;
 		});
 
-		$this->app->singleton('taoImages', function () {
+		$this->app->singleton('tao.images', function () {
 			$images = app()->make(\TAO\Foundation\Images::class);
 			$images->init();
 			return $images;
 		});
 
-		$this->app->singleton('taoView', function () {
+		$this->app->singleton('tao.view', function () {
 			$assets = app()->make(\TAO\View::class);
 			$assets->init();
 			return $assets;
+		});
+
+		$this->app->singleton('sitemap.manager', function() {
+			return app()->make(Manager::class);
+		});
+
+		$this->app->singleton('tao.utils', function() {
+			return app()->make(\TAO\Foundation\Utils::class);
 		});
 
 		foreach (array_keys(app()->tao->routers()) as $name) {
