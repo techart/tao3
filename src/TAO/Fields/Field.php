@@ -581,6 +581,9 @@ abstract class Field
 	public function renderForAdminList()
 	{
 		$cb = $this->param(['render_in_admin_list', 'render_in_list'], false);
+		if (is_string($cb)) {
+			$cb = [$this->item, $cb];
+		}
 		if (is_callable($cb)) {
 			return call_user_func($cb, $this);
 		}
