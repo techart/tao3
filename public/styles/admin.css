@@ -262,6 +262,13 @@ fieldset.admin {
   margin: 0;
 }
 
+.navigator-bottom {
+}
+
+  .additional_actions {
+    float: left;
+  }
+  
 .page-navigator {
   text-align: right;
   margin: 20px 0;

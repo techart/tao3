@@ -28,7 +28,9 @@ class Router extends \TAO\Router
 					$this->datatype = $datatype;
 					$this->datatypeCode = $code;
 					$controller = $datatype->adminController();
-					app()->router->any("/admin/datatype/{$code}", $controller);
+					if ($controller) {
+						app()->router->any("/admin/datatype/{$code}", $controller);
+					}
 				}
 			} elseif ($m = app()->tao->regexp('{^vars/([^/]+)$}', $path)) {
 				$group = $m[1];
