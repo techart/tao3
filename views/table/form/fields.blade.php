@@ -26,7 +26,12 @@ $group = false;
     
         <div class="control-group">
             <label class="control-label" for="{{ $field->name }}">{!! $field->labelInAdminForm() !!}</label>
-            <div class="controls">{!! $field->renderInput() !!}</div>
+            <div class="controls">
+                {!! $field->renderInput() !!}
+                @if ($comment = $field->param(['comment_in_admin', 'comment'], false))
+                <p class="comment">{!! $comment !!}</p>
+                @endif
+            </div>
         </div>
     @endif
 @endforeach

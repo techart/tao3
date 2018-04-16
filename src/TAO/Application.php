@@ -75,6 +75,43 @@ class Application extends \Illuminate\Foundation\Application
 	}
 
 	/**
+	 * @param string $extra
+	 * @return string
+	 */
+	public function bootstrapPath($extra = '')
+	{
+		$path = rtrim(realpath(__DIR__.'/../../bootstrap'), '/');
+		if ($extra) {
+			$path .= "/{$extra}";
+		}
+		return $path;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCachedConfigPath()
+	{
+		return base_path('bootstrap/cache/config.php');
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCachedServicesPath()
+	{
+		return base_path('bootstrap/cache/services.php');
+	}
+
+	/**
+	 * @return string
+	 */
+	public function getCachedPackagesPath()
+	{
+		return base_path('bootstrap/cache/packages.php');
+	}
+
+	/**
 	 *
 	 */
 	public function run()

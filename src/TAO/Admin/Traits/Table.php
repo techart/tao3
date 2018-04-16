@@ -126,7 +126,7 @@ trait Table
 	 */
 	protected function makeFilterField($fieldName, $data, $model)
 	{
-		$field = app('tao.fields')->create($fieldName, $data, $model);
+		$field = app('tao.fields')->create($fieldName, $data, $model, 'filter');
 		$field->setupDefault();
 		return $field;
 	}
@@ -367,14 +367,16 @@ trait Table
 	}
 
 	/**
+	 * @param $method
+	 * @param string $mode
 	 * @return array
 	 */
-	protected function generateFields($method)
+	protected function generateFields($method, $mode = 'default')
 	{
 		$validationMethod = "in{$method}";
 		$weightMethod = "weightIn{$method}";
 		$fields = array();
-		foreach ($this->datatype()->fieldsObjects() as $name => $field) {
+		foreach ($this->datatype()->setFieldsMode($mode)->fieldsObjects() as $name => $field) {
 			if ($field->$validationMethod()) {
 				$fields[$name] = $field;
 			}
@@ -395,12 +397,12 @@ trait Table
 
 	protected function listFields()
 	{
-		return $this->generateFields('AdminList');
+		return $this->generateFields('AdminList', 'list');
 	}
 
 	protected function csvFields()
 	{
-		return $this->generateFields('CSV');
+		return $this->generateFields('CSV', 'csv');
 	}
 
 
@@ -437,4 +439,24 @@ trait Table
 			->offset(($this->currentPage() - 1) * $this->perPage())
 			->get();
 	}
+
+	public function fieldsexportAction()
+	{
+		$fields = $this->exportArray($this->datatype()->fields());
+		$groups = $this->exportArray($this->datatype()->adminFormGroups());
+		print "<pre>\tpublic function fields()\n\t{\n\t\treturn {$fields};\n\t}\n\t\n\tpublic function adminFormGroups()\n\t{\n\t\treturn {$groups};\n\t}\n</pre>";
+	}
+
+	protected function exportArray($var)
+	{
+		$var = var_export($var, true);
+		$var = preg_replace('{=>\s+array}ism', '=> array', $var);
+		$var = preg_replace('{array\s+\(}i', 'array(', $var);
+		$out = '';
+		foreach(explode("\n", $var) as $line) {
+			$out .= "\t\t".preg_replace("{\G {2}}","\t", rtrim($line)). "\n";
+		}
+		return trim($out);
+	}
+
 }

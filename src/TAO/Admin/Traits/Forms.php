@@ -2,6 +2,8 @@
 
 namespace TAO\Admin\Traits;
 
+use TAO\ORM\Model;
+
 trait Forms
 {
 
@@ -17,6 +19,7 @@ trait Forms
 
 	/**
 	 * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+	 * @throws \TAO\ORM\Exception\NonStrorableObjectSaving
 	 */
 	public function editAction()
 	{
@@ -26,6 +29,7 @@ trait Forms
 			return \TAO::pageNotFound();
 		}
 
+		/** @var Model $item */
 		$item = $this->datatype()->find($this->id);
 		if (!$item || !$item->accessEdit(\Auth::user())) {
 			return \TAO::pageNotFound();
@@ -34,17 +38,14 @@ trait Forms
 		$this->editItem = $item;
 		$fields = $item->adminFormFields();
 
-		$errors = array();
-
+		$errors = [];
 		$request = \Request::getFacadeRoot();
 		if ($request->method() == 'POST') {
 			foreach ($fields as $field) {
 				$field->setFromRequest($request);
 			}
+			$item->validateForAdmin();
 			$errors = $item->errors();
-			if (!is_array($errors)) {
-				$errors = array();
-			}
 			if (count($errors) == 0) {
 				$item->save();
 				foreach ($fields as $field) {
@@ -56,7 +57,6 @@ trait Forms
 				return redirect($this->actionUrl('list'));
 			}
 		}
-
 		return $this->render($this->templateEdit(), $this->formViewParams(array(
 			'id' => $this->id,
 			'item' => $item,
@@ -95,6 +95,7 @@ trait Forms
 			foreach ($fields as $field) {
 				$field->setFromRequest($request);
 			}
+			$item->validateForAdmin();
 			$errors = $item->errors();
 			if (!is_array($errors)) {
 				$errors = array();

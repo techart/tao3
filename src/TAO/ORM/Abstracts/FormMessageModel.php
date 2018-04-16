@@ -288,7 +288,7 @@ abstract class FormMessageModel extends \TAO\ORM\Model
 
 	public function validateForPublic()
 	{
-		return $this->validate();
+		return $this->validate('public');
 	}
 
 	public function ajaxError($errors, $context = [])
@@ -315,42 +315,35 @@ abstract class FormMessageModel extends \TAO\ORM\Model
 		if (!empty($key)) {
 			$info = \Session::get($key, $info);
 		}
-
 		list($template, $context) = $this->validateArgs($info[0], $info[1]);
-
-		$fields = $this->publicFields();
-		$errors = [];
-
-
+		$item = $this->newInstance();
+		$fields = $item->publicFields();
 		if ($request->method() == 'POST') {
 			foreach ($fields as $field) {
 				$field->setFromRequest($request);
 			}
-			$this->validateForPublic();
-			$errors = $this->errors();
+			$item->validateForPublic();
+			$errors = $item->errors();
 			if (!is_array($errors)) {
 				$errors = array();
 			}
 			if (count($errors) == 0) {
-				if (!empty($key)) {
-					$info = \Session::forget($key);
-				}
-				$this->save();
+				$item->save();
 				foreach ($fields as $field) {
 					$field->setFromRequestAfterSave($request);
 				}
 				if ($request->ajax()) {
-					return response($this->ajaxOk($context));
+					return response($item->ajaxOk($context));
 				} else {
-					$url = $this->redirectUrl($context);
+					$url = $item->redirectUrl($context);
 					$url = empty($url) ? '/' : $url;
 					return redirect($url);
 				}
 			} else {
 				if ($request->ajax()) {
-					return response($this->ajaxError($errors, $context));
+					return response($item->ajaxError($errors, $context));
 				} else {
-					$context['form'] = $this;
+					$context['form'] = $item;
 					$context['errors'] = $errors;
 					$econtext['errors'] = $errors;
 					$econtext['form_template'] = $template;

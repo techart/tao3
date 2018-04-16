@@ -67,7 +67,7 @@ class DateInteger extends Field
 	{
 		$context = parent::defaultContext();
 		$context['format'] = 'd.m.Y';
-		$context['with_datepicker'] = isset($this->data['datepicker']) && $this->data['datepicker'];
+		$context['with_datepicker'] = $this->param('datepicker', true);
 		return $context;
 	}
 

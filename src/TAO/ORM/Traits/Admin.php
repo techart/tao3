@@ -63,7 +63,7 @@ trait Admin
 	{
 		$add = !$this->exists;
 		$fields = array();
-		foreach ($this->fieldsObjects() as $name => $field) {
+		foreach ($this->setFieldsMode('form')->fieldsObjects() as $name => $field) {
 			$method = $add ? 'inAdminAddForm' : 'inAdminEditForm';
 			if ($field->$method()) {
 				$fields[$name] = $field;
@@ -88,7 +88,7 @@ trait Admin
 	 */
 	public function adminFormGroups()
 	{
-		return false;
+		return method_exists($this, 'groupsHelper')? $this->groupsHelper() : false;
 	}
 
 	/**
@@ -206,6 +206,12 @@ trait Admin
 
 	public function filter()
 	{
-		return false;
+		$filterFields = [];
+		foreach ($this->fields() as $fieldName => $fieldData) {
+			if (isset($fieldData['in_filter']) && $fieldData['in_filter']) {
+				$filterFields[$fieldName] = $fieldData;
+			}
+		}
+		return $filterFields;
 	}
 }

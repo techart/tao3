@@ -68,6 +68,11 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 	 */
 	protected $errors = array();
 
+	/**
+	 * @var string
+	 */
+	protected $fieldsMode;
+
 
 	/**
 	 * Model constructor.
@@ -199,6 +204,20 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 	}
 
 	/**
+	 * @param $mode
+	 * @return $this
+	 */
+	public function setFieldsMode($mode) {
+		$this->resetFields();
+		$this->fieldsMode = $mode;
+		return $this;
+	}
+
+	protected function resetFields() {
+		$this->fields = [];
+	}
+
+	/**
 	 * @return Fields\Field[]
 	 * @throws Fields\Exception\UndefinedField
 	 */
@@ -206,7 +225,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 	{
 		$fields = array();
 		foreach (array_keys($this->calculatedFields()) as $name) {
-			$fields[$name] = $this->field($name);
+			$fields[$name] = $this->field($name, false, $this->fieldsMode);
 		}
 		return $fields;
 	}
@@ -226,14 +245,14 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 			}
 			$data = $fields[$name];
 			$data['type'] = $forceType;
-			return app('tao.fields')->create($name, $data, $this);
+			return app('tao.fields')->create($name, $data, $this, $this->fieldsMode);
 		}
 		if (!isset($this->fields[$name])) {
 			$fields = $this->processedFields();
 			if (!isset($fields[$name])) {
 				throw new Fields\Exception\UndefinedField($name, get_class($this));
 			}
-			$this->fields[$name] = app('tao.fields')->create($name, $fields[$name], $this);
+			$this->fields[$name] = app('tao.fields')->create($name, $fields[$name], $this, $this->fieldsMode);
 		}
 		return $this->fields[$name];
 	}
@@ -379,20 +398,20 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 		return $selector;
 	}
 
-	public function validateField($name)
+	public function validateField($name, $context = null)
 	{
 		$cname = ucfirst(camel_case($name));
 		$method = "validateField{$cname}";
 		if (method_exists($this, $method)) {
-			return $this->$method();
+			return $this->$method($context);
 		}
-		return $this->field($name)->validate();
+		return $this->field($name)->validate($context);
 	}
 
-	public function validate()
+	public function validate($context = null)
 	{
 		foreach ($this->calculatedFields() as $name => $data) {
-			$v = $this->validateField($name);
+			$v = $this->validateField($name, $context);
 			if (is_string($v)) {
 				$this->error($v, $name);
 			}
@@ -401,7 +420,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 
 	public function validateForAdmin()
 	{
-		return $this->validate();
+		return $this->validate('admin');
 	}
 
 	protected function triggerEventForFields($eventName, $data = [])

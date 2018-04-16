@@ -307,6 +307,11 @@ td.admin-tree-title {}
     vertical-align: middle;
     cursor: pointer;
   }
+    .controls .comment {
+        margin: 0;
+        font-size: 12px;
+        color: #888;
+    }
 
     .controls a.p1 {
       left: -43px;

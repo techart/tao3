@@ -832,9 +832,10 @@ abstract class Field
 	}
 
 	/**
+	 * @param string|null $context
 	 * @return bool|null
 	 */
-	public function validate()
+	public function validate($context = null)
 	{
 		if (isset($this->data['required'])) {
 			$req = $this->data['required'];

@@ -81,6 +81,7 @@ class Images
 		foreach (explode(',', $srcMods) as $item) {
 			$item = strtolower(trim($item));
 			if (!empty($item)) {
+				$item = $item == 'grayscale'? 'greyscale' : $item;
 				$directive = false;
 				$params = [];
 				if ($m = \TAO::regexp('{^(width|height|blur|brightness|contrast|opacity|pixelate|sharpen)(\d+)$}', $item)) {

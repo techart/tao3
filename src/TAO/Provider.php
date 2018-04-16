@@ -54,10 +54,19 @@ class Provider extends ServiceProvider
 
 		if ($this->app->runningInConsole()) {
 			$commands = [];
-			foreach (\File::allFiles(__DIR__ . '/Console/Commands') as $commandFile) {
-				$commandClassName = str_replace('.' . $commandFile->getExtension(), '', $commandFile->getFilename());
-				$commands[] = '\\TAO\\Console\\Commands\\' . $commandClassName;
+			$paths = \TAO::merge([
+				'\TAO' => __DIR__ . '/Console/Commands',
+				'\App' => app_path('Console/Commands'),
+			], config('app.artisan.paths', []));
+			foreach ($paths as $namespace => $path) {
+				if (is_dir($path)) {
+					foreach (\File::allFiles($path) as $commandFile) {
+						$commandClassName = str_replace('.' . $commandFile->getExtension(), '', $commandFile->getFilename());
+						$commands[] = $namespace.'\\Console\\Commands\\' . $commandClassName;
+					}
+				}
 			}
+			$commands = \TAO::merge($commands, config('app.artisan.commands', []));
 			$this->commands($commands);
 		}
 	}

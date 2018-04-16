@@ -45,9 +45,9 @@ class Select extends Field
 	/**
 	 * @return array
 	 */
-	public function defaultInputContext()
+	public function defaultContext()
 	{
-		$data = parent::defaultInputContext();
+		$data = parent::defaultContext();
 		$data['items'] = $this->items();
 		return $data;
 	}

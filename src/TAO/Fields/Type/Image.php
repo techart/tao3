@@ -57,4 +57,20 @@ class Image extends Upload
 		$info['preview'] = $this->adminPreviewUrl();
 		return true;
 	}
+
+	public function url($mods = false)
+	{
+		$path = $this->value();
+		if (!$mods && empty($path)) {
+			return parent::url();
+		}
+		$modified = app('tao.images')->modify($path, $mods);
+		return \Storage::url($modified);
+	}
+
+	public function publicUrl($mods = false)
+	{
+		$mods = $this->param('mods', false);
+		return $this->url($mods);
+	}
 }

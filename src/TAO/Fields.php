@@ -4,7 +4,6 @@ namespace TAO;
 
 use TAO\Fields\Exception\SyntaxErrorInType;
 use TAO\Fields\Exception\UndefinedType;
-use Illuminate\Contracts\View\Factory as ViewFactory;
 
 class Fields
 {
@@ -48,8 +47,9 @@ class Fields
 		return $class;
 	}
 
-	public function create($name, $data, $item)
+	public function create($name, $data, $item, $mode = null)
 	{
+		$data = $this->prepareData($data, $mode);
 		$typeSrc = isset($data['type']) ? $data['type'] : 'input';
 		$typeParsed = $this->parseType($typeSrc);
 		$type = $typeParsed['type']['name'];
@@ -118,5 +118,17 @@ class Fields
 			'extra' => $extra,
 			'args' => $args,
 		);
+	}
+
+	protected function prepareData($data, $mode = null)
+	{
+		if (!is_null($mode)) {
+			foreach ($data as $paramName => $paramData) {
+				if ($paramName == "in_$mode" && is_array($paramData)) {
+					$data = \TAO::merge($data, $paramData);
+				}
+			}
+		}
+		return $data;
 	}
 }
