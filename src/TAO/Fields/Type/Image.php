@@ -85,6 +85,9 @@ class Image extends Upload
 		}
 		$mods = $this->param(['in_admin_list_mods', 'in_list_mods'], 'fit100x100');
 		$url = $this->url();
+		if (!$url) {
+			return '';
+		}
 		$murl = $this->url($mods);
 		$value = "<img src='{$murl}'>";
 		return "<a href='{$url}'>{$value}</a>";
