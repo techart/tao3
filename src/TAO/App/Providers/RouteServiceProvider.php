@@ -51,7 +51,7 @@ class RouteServiceProvider extends ServiceProvider
 	{
 		Route::middleware('web')
 			->namespace($this->namespace)
-			->group(base_path('vendor/techart/tao3/routes/web.php'));
+			->group($this->webRoutesPath());
 	}
 
 	/**
@@ -65,6 +65,32 @@ class RouteServiceProvider extends ServiceProvider
 	{
 		Route::middleware('api')
 			->namespace($this->namespace)
-			->group(base_path('vendor/techart/tao3/routes/api.php'));
+			->group($this->apiRoutesPath());
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function apiRoutesPath()
+	{
+		return $this->packageRoutesPath() . '/api.php';
+	}
+
+	/**
+	 * @return string
+	 */
+	protected function webRoutesPath()
+	{
+		return $this->packageRoutesPath() . '/web.php';
+	}
+
+	protected function packageRoutesPath()
+	{
+		if (\App::environment('testing')) {
+			$path = realpath('./routes');
+		} else {
+			$path = base_path('vendor/techart/tao3/routes');
+		}
+		return $path;
 	}
 }

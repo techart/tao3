@@ -34,7 +34,7 @@ class Fields
 	public function getClass($type)
 	{
 		$type = strtolower(trim($type));
-		$class = config("tao.fileds.{$type}");
+		$class = config("tao.fields.{$type}");
 
 		if (is_null($class) && isset($this->classes[$type])) {
 			$class = $this->classes[$type];

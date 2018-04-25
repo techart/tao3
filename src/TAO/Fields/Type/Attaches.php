@@ -42,7 +42,12 @@ class Attaches extends StringField implements \IteratorAggregate
 		}
 		return $defs;
 	}
-
+	
+	protected function createEntry($data)
+	{
+		return new Entry($data);
+	}
+	
 	/**
 	 * @param bool $raw
 	 * @return array
@@ -65,8 +70,7 @@ class Attaches extends StringField implements \IteratorAggregate
 					if ($raw) {
 						$out[$key] = $data;
 					} else {
-						$out[$key] = new Entry($data);
-
+						$out[$key] = $this->createEntry($data);
 					}
 				}
 			}
@@ -235,7 +239,7 @@ class Attaches extends StringField implements \IteratorAggregate
 				$name = $data['name'];
 				$path = $data['path'];
 				$new = isset($data['new']) ? $data['new'] : false;
-
+				
 				if ($new) {
 					$newPath = "{$dir}/{$name}";
 					if (\Storage::exists($newPath)) {
@@ -245,14 +249,16 @@ class Attaches extends StringField implements \IteratorAggregate
 					\Storage::delete($path);
 					$data['path'] = $newPath;
 				}
-
+				
 				unset($data['url']);
 				unset($data['new']);
 				unset($data['error']);
 				unset($data['key']);
-
+				
+				$this->checkWidthAndHeight($data);
+				
 				$exists[$name] = $name;
-
+				
 				$out[$key] = $data;
 			}
 		}
@@ -353,6 +359,11 @@ class Attaches extends StringField implements \IteratorAggregate
 		return $this->callParam('renderable_entries', function () {
 			return $this->value();
 		});
+	}
+	
+	public function countRenderableEntries()
+	{
+		return count($this->renfderableEntries());
 	}
 
 	/**

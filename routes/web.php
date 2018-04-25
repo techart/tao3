@@ -6,7 +6,8 @@ Route::get('/', function () {
 if (config('sitemap.dynamic')) {
 	Route::get(config('sitemap.url'), '\\TAO\\Components\\Sitemap\\Controller@generate');
 }
-
-include base_path('routes/web.php');
+if (!\App::environment('testing')) {
+	include base_path('routes/web.php');
+}
 
 TAO::routes();

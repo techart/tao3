@@ -10,6 +10,10 @@ trait Admin
 
 
 	/**
+	 * Возвращает админский контроллер и точку входа в него для данного дататайпа
+	 * как строку вида "\Класс\Админского\Контроллера@имяМетода" (формат, используемый в стандартном роутинге)
+	 * Метод следует переопределять если не устраивает стандартный админский контроллер, и вы создаете свой
+	 *
 	 * @return string
 	 */
 	public function adminController()
@@ -17,12 +21,25 @@ trait Admin
 		return '\\TAO\\Admin\\Controller\\Table@entryPointAction';
 	}
 
+	/**
+	 * Возвращает пункт админского меню первого уровня, т.е. секцию меню, в которую будет помещен пункт меню второго уровня для данного дататайпа
+	 * По умолчанию - "Материалы". Если, например, будет возвращена строка "Документы", то в админском меню появится такая секция.
+	 * Для лаконичности рекомендуется переопределять не этот метод, а переменную класса public $adminMenuSection
+	 * Если не хотите, чтобы данный дататайп светитлся в админском меню, то верните здесь false
+	 *
+	 * @return string
+	 */
 	public function adminMenuSection()
 	{
 		return $this->adminMenuSection;
 	}
 
 	/**
+	 * Заголовок (человеческое название) типа в админской части.
+	 * По умолчанию, строка, возвращаемая этим методом используется в качестве названия ссылки в админском меню,
+	 * а также как заголовок страницы админского контроллера
+	 * Для лаконичности рекомендуется переопределять не этот метод, а переменную класса public $adminTitle
+	 *
 	 * @return string
 	 */
 	public function adminTitle()
@@ -31,6 +48,9 @@ trait Admin
 	}
 
 	/**
+	 * Количество записей на одной странице в админском табличном контроллере. Для древовидных дататайпов это значение игнорируется (все выводятся на одной странице)
+	 * Для лаконичности рекомендуется переопределять не этот метод, а переменную класса public $adminPerPage
+	 *
 	 * @return int
 	 */
 	public function adminPerPage()
@@ -39,6 +59,9 @@ trait Admin
 	}
 
 	/**
+	 * Список вкладок на многовкладочных формах.
+	 * Обычно вкладки формируются на основании метода adminFormGroups, поэтому переопределять этот метод рекомендуется в совсем уж страшных случаях.
+	 *
 	 * @return array|bool
 	 */
 	public function adminFormTabs()
@@ -57,6 +80,20 @@ trait Admin
 	}
 
 	/**
+	 * Список групп полей для админской формы.
+	 * На основании этого списка формируется список вкладок и блоков внутри вкладок
+	 *
+	 * @return bool
+	 */
+	public function adminFormGroups()
+	{
+		return method_exists($this, 'groupsHelper')? $this->groupsHelper() : false;
+	}
+
+	/**
+	 * Список полей для админской формы.
+	 * В обычных случаях переопределение этого метода не требуется, т.к. отсортированнй список формируется на основании параметров, возвращаемых методом fields()
+	 *
 	 * @return array
 	 */
 	public function adminFormFields()
@@ -84,14 +121,8 @@ trait Admin
 	}
 
 	/**
-	 * @return bool
-	 */
-	public function adminFormGroups()
-	{
-		return method_exists($this, 'groupsHelper')? $this->groupsHelper() : false;
-	}
-
-	/**
+	 * Путь к дополнительному каталогу с шаблонами для админки. Если он указан, то шаблоны будут сначала искаться там.
+	 *
 	 * @return bool
 	 */
 	public function adminViewsPath()
@@ -100,6 +131,8 @@ trait Admin
 	}
 
 	/**
+	 * Название пункта меню в админке. Если не указан, то будет использован adminTitle
+	 *
 	 * @return string
 	 */
 	public function adminMenuTitle()
@@ -108,6 +141,8 @@ trait Admin
 	}
 
 	/**
+	 * Заголовок страницы со списком записей в админке. Если не указан, то будет использован adminTitle
+	 *
 	 * @return string
 	 */
 	public function adminTitleList()
@@ -116,6 +151,9 @@ trait Admin
 	}
 
 	/**
+	 * Заголовок страницы редактирования в админке.
+	 * Если не указан, то будет сгенерирован автоматически на основе adminTitle
+	 *
 	 * @return string
 	 */
 	public function adminTitleEdit()
@@ -124,6 +162,9 @@ trait Admin
 	}
 
 	/**
+	 * Заголовок страницы добавления в админке.
+	 * Если не указан, то будет сгенерирован автоматически на основе adminTitle
+	 *
 	 * @return string
 	 */
 	public function adminTitleAdd()
@@ -132,6 +173,7 @@ trait Admin
 	}
 
 	/**
+	 * Действия над записью, совершаемые перед показом в админском списке
 	 *
 	 */
 	public function prepareForAdminList()
@@ -139,6 +181,9 @@ trait Admin
 	}
 
 	/**
+	 * Текст кнопки перехода на форму добавления.
+	 * По умолчанию - "Добавить"
+	 *
 	 * @return string
 	 */
 	public function adminAddButtonText()
@@ -147,6 +192,9 @@ trait Admin
 	}
 
 	/**
+	 * Текст сабмит-кнопки на форме добавления
+	 * По умолчанию равен тексту кнопки перехода на форму добавления
+	 *
 	 * @return string
 	 */
 	public function adminAddSubmitText()
@@ -155,6 +203,9 @@ trait Admin
 	}
 
 	/**
+	 * Текст кнопки "Добавить и остаться".
+	 * По умолчанию генерируется автоматически на основе текста кнопки "Добавить"
+	 *
 	 * @return string
 	 */
 	public function adminAddSubmitAndStayText()
@@ -163,6 +214,9 @@ trait Admin
 	}
 
 	/**
+	 * Текст сабмит-кнопки на форме редактирования.
+	 * По умолчанию - "Изменить"
+	 *
 	 * @return string
 	 */
 	public function adminEditSubmitText()
@@ -171,6 +225,9 @@ trait Admin
 	}
 
 	/**
+	 * Текст кнопки "Изменить и остаться".
+	 * По умолчанию генерируется автоматически на основе текста кнопки "Изменить"
+	 *
 	 * @return string
 	 */
 	public function adminEditSubmitAndStayText()
@@ -179,6 +236,8 @@ trait Admin
 	}
 
 	/**
+	 * Текст кнопки "Вернуться к списку"
+	 *
 	 * @return string
 	 */
 	public function adminReturnToListText()
@@ -187,6 +246,8 @@ trait Admin
 	}
 
 	/**
+	 * Текст сообщения когда нет ни одной записи
+	 *
 	 * @return string
 	 */
 	public function adminEmptyListText()
@@ -194,16 +255,34 @@ trait Admin
 		return 'Нет ни одной записи';
 	}
 
+	/**
+	 * Заголовок записи, используемый при формировании списков в админке
+	 *
+	 * @return mixed
+	 */
 	public function titleForAdminList()
 	{
 		return $this->title();
 	}
 
+	/**
+	 * Заголовок записи, используемый при формировании дерева в админке древовидных данных
+	 * В метод передается номер уровня (начиная с нуля)
+	 *
+	 * @param int $level
+	 * @return mixed
+	 */
 	public function titleForTreeAdmin($level = 0)
 	{
 		return $this->titleForAdminList();
 	}
 
+	/**
+	 * Список полей, используемых в фильтре.
+	 * По умолчанию формируется на основе метода fields(), но зачастую требует переопределения в случае сложных фильтров
+	 *
+	 * @return array
+	 */
 	public function filter()
 	{
 		$filterFields = [];

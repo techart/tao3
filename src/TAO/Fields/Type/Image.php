@@ -73,4 +73,20 @@ class Image extends Upload
 		$mods = $this->param('mods', false);
 		return $this->url($mods);
 	}
+	
+	public function renderForAdminList()
+	{
+		$cb = $this->param(['render_in_admin_list', 'render_in_list'], false);
+		if (is_string($cb)) {
+			$cb = [$this->item, $cb];
+		}
+		if (is_callable($cb)) {
+			return call_user_func($cb, $this);
+		}
+		$mods = $this->param(['in_admin_list_mods', 'in_list_mods'], 'fit100x100');
+		$url = $this->url();
+		$murl = $this->url($mods);
+		$value = "<img src='{$murl}'>";
+		return "<a href='{$url}'>{$value}</a>";
+	}
 }

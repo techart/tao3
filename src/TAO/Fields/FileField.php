@@ -132,6 +132,33 @@ trait FileField
 			'translit' => \TAO\Text::process($nameWithoutExt, 'translit_for_url'),
 		];
 	}
+	
+	protected function isImage($path)
+	{
+		return \TAO::regexp('{\.(jpe?g|gif|png)$}i', $path);
+	}
+	
+	protected function getImageSize($path)
+	{
+		$image = \Image::make(\Storage::get($path));
+		if ($image) {
+			$size = $image->getSize();
+			return [
+				'width' => $size->width,
+				'height' => $size->height,
+			];
+		}
+	}
+	
+	protected function checkWidthAndHeight(&$data)
+	{
+		if (isset($data['path']) && $this->isImage($data['path'])) {
+			$size = $this->getImageSize($data['path']);
+			if (is_array($size)) {
+				$data = \TAO::merge($data, $size);
+			}
+		}
+	}
 
 	/**
 	 * @return mixed

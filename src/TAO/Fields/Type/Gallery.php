@@ -3,9 +3,15 @@
 namespace TAO\Fields\Type;
 
 use Intervention\Image\Exception\NotReadableException;
+use TAO\Fields\Type\Gallery\Entry;
 
 class Gallery extends Attaches
 {
+	protected function createEntry($data)
+	{
+		return new Entry($data);
+	}
+	
 	/**
 	 * @return string
 	 */

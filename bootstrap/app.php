@@ -1,11 +1,16 @@
 <?php
 
-$app_path = realpath(__DIR__.'/../../../../');
+if (is_null($appPath)) {
+	$appPath = realpath(__DIR__ . '/../../../../');
+}
+if (is_null($vendorPath)) {
+	$vendorPath = $appPath . '/vendor';
+}
 
-require $app_path.'/vendor/autoload.php';
+require $vendorPath . '/autoload.php';
 require 'cfg.php';
 
-$app = new \TAO\Application($app_path);
+$app = new \TAO\Application($appPath);
 
 $app->singleton(
     Illuminate\Contracts\Http\Kernel::class,

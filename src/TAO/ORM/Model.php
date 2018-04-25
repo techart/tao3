@@ -93,6 +93,8 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 	}
 
 	/**
+	 * Возвращает мнемокод дататайпа для этой модели
+	 *
 	 * @return mixed
 	 */
 	public function getDatatype()
@@ -100,6 +102,12 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 		return \TAO::datatypeCodeByClass(get_class($this));
 	}
 
+	/**
+	 * Возвращает объект дататайпа для этой модели.
+	 * По сути - создает пустой объект записи
+	 *
+	 * @return mixed
+	 */
 	public function getDatatypeObject()
 	{
 		return \TAO::datatype($this->getDatatype());
@@ -116,6 +124,9 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 	}
 
 	/**
+	 * Возвращает список ошибок данной записи если она не валидна.
+	 * По умолчанию возвращает ранее сформированный список, но можно также добавить в этот метод дополнительную проверку.
+	 *
 	 * @return array
 	 */
 	public function errors()
@@ -124,6 +135,9 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 	}
 
 	/**
+	 * Добавляет ошибку в список ошибок.
+	 * Если ошибка относится к конкретному полю, то кроме текста сообщения можно указать также и имя поля
+	 *
 	 * @param $message
 	 * @param null $column
 	 */
@@ -137,6 +151,8 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 	}
 
 	/**
+	 * Возвращает список полей дататайпа. Метод обязательно делжен быть определен.
+	 *
 	 * @return mixed
 	 */
 	abstract public function fields();
@@ -231,6 +247,8 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 	}
 
 	/**
+	 * Возвращает объект контейнера поля по его имени
+	 *
 	 * @param $name
 	 * @param bool $forceType
 	 * @return Fields\Field
@@ -268,6 +286,8 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 	}
 
 	/**
+	 * Генерируеет идентификатор для новой записи в случае если идентификатор не автоинкрементный
+	 *
 	 * @return UuidInterface
 	 */
 	public function generateNewId()
@@ -275,12 +295,20 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 		return Uuid::uuid4();
 	}
 
+	/**
+	 * Возвращает заголовок записи.
+	 * По умолчанию - значение поля title если оно есть или id в противном случае
+	 *
+	 * @return mixed
+	 */
 	public function title()
 	{
 		return isset($this->attributes['title']) ? $this->attributes['title'] : $this->getKey();
 	}
 
 	/**
+	 * Применяет значения фильтра к переданному в метод билдеру (Illuminate\Database\Query\Builder)
+	 *
 	 * @param $builder
 	 * @param $filter
 	 * @return $this
@@ -299,6 +327,9 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 	}
 
 	/**
+	 * Возвращает билдер (Illuminate\Database\Query\Builder) с отсортированными записями
+	 * По умолчанию - сртировки по id. Если нужна другая сортировка по умолчанию, то переопределите метод.
+	 *
 	 * @return Builder
 	 */
 	public function ordered()
@@ -307,6 +338,9 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 	}
 
 	/**
+	 * Формирует на основании списка записей этого типа список, используемый в селектах, радио, мультилинках и пр.
+	 * В качестве аргумента передаются возможные модификаторы
+	 *
 	 * @param bool $args
 	 * @return array
 	 */
@@ -340,6 +374,11 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 		return 'datatypes/' . $this->getDatatype() . "/{$p1}/{$p2}";
 	}
 
+	/**
+	 * Путь к персональному каталогу записи в публичной части (доступной по HTTP)
+	 *
+	 * @return bool|string
+	 */
 	public function getHomeDir()
 	{
 		$sub = $this->getHomeSubDir();
@@ -353,6 +392,11 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 		return $dir;
 	}
 
+	/**
+	 * Путь к персональному каталогу записи в закрытой части (не доступной по HTTP)
+	 *
+	 * @return bool|string
+	 */
 	public function getPrivateHomeDir()
 	{
 		$dir = $this->getHomeSubDir();
@@ -374,7 +418,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 	}
 
 	/**
-	 * Возвращает список итемов (query), доступных для чтения текущему пользователю
+	 * Возвращает список итемов (Illuminate\Database\Query\Builder), доступных для чтения текущему пользователю
 	 *
 	 * @param array $data
 	 * @return Builder
@@ -384,11 +428,22 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 		return $this->ordered();
 	}
 
+	/**
+	 * Заголовок (человеческое название) типа.
+	 * Для лаконичности рекомендуется переопределять не этот метод, а переменную класса public $typeTitle
+	 *
+	 * @return array|string
+	 */
 	public function typeTitle()
 	{
 		return $this->typeTitle;
 	}
 
+	/**
+	 * Возвращает объект селектора по умолчанию.
+	 *
+	 * @return mixed
+	 */
 	public function selector()
 	{
 		$selector = app()->make(Selector::class);
@@ -398,6 +453,15 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 		return $selector;
 	}
 
+	/**
+	 * Валидация одного поля.
+	 * По умолчанию вызывается метод validateField<ИмяПоля>, а если его нет, то метод validate для контейнера поля.
+	 * В случае обнаружения ошибки рекомендуется вызвать метод error для добавления ее в список
+	 *
+	 * @param $name
+	 * @param null $context
+	 * @return bool|null
+	 */
 	public function validateField($name, $context = null)
 	{
 		$cname = ucfirst(camel_case($name));
@@ -408,6 +472,12 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 		return $this->field($name)->validate($context);
 	}
 
+	/**
+	 * Валидация записи.
+	 * По умолчанию последовательно вызывается валидация для каждого поля
+	 *
+	 * @param null $context
+	 */
 	public function validate($context = null)
 	{
 		foreach ($this->calculatedFields() as $name => $data) {
@@ -418,6 +488,10 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 		}
 	}
 
+	/**
+	 * Валидация записи в админской форме
+	 *
+	 */
 	public function validateForAdmin()
 	{
 		return $this->validate('admin');

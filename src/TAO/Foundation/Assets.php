@@ -78,7 +78,7 @@ class Assets
 			unset($fileParams['scope']);
 		}
 
-		if (!preg_match('{^http://}', $path) && !preg_match('{^/}', $path)) {
+		if (!preg_match('{^http(s)?://}', $path) && !preg_match('{^/}', $path)) {
 			$path = "/{$path}";
 		}
 		$fileParams['path'] = $path;

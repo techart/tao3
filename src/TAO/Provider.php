@@ -148,16 +148,17 @@ class Provider extends ServiceProvider
 				$router->register();
 			}
 		}
-
-		$www = \TAO::publicPath();
-		$link = "{$www}/tao";
-		if (!is_link($link)) {
-			$assets = str_replace('/src/TAO', '', __DIR__) . '/public';
-			symlink($assets, $link);
-		}
-		$link = "{$www}/storage";
-		if (!is_link($link)) {
-			symlink(storage_path('app/public'), $link);
+		if (!\App::environment('testing')) {
+			$www = \TAO::publicPath();
+			$link = "{$www}/tao";
+			if (!is_link($link)) {
+				$assets = str_replace('/src/TAO', '', __DIR__) . '/public';
+				symlink($assets, $link);
+			}
+			$link = "{$www}/storage";
+			if (!is_link($link)) {
+				symlink(storage_path('app/public'), $link);
+			}
 		}
 	}
 

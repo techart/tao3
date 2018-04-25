@@ -38,6 +38,9 @@ trait Schema
 	}
 
 	/**
+	 * Проводит проверку и обновление схемы БД в случае если это необходимо. Т.е. если PHP-файл модели обновился или кеш был сброшен.
+	 * Если вам не нужно автоматическое обновление схемы для конкретной модели, то измение этот метод.
+	 *
 	 * @return $this
 	 */
 	public function updateSchemaIfNecessary()
@@ -46,13 +49,16 @@ trait Schema
 		if (app('tao.fields')->schemaWasUpdated($table)) {
 			return $this;
 		}
-		if (app()->tao->classModified($this, false)) {
+		if (app()->tao->classModified($this, false) || \App::environment('testing')) {
 			$this->updateSchema();
 		}
 		app('tao.fields')->schemaUpdated($table);
+		return $this;
 	}
 
 	/**
+	 * Возвращает экземпляр конструктора схемы БД для данной модели (с нужным подключением к БД)
+	 *
 	 * @return mixed
 	 */
 	public function dbSchema()
@@ -61,6 +67,9 @@ trait Schema
 	}
 
 	/**
+	 * Работа с таблицей. В качестве аргумента передаем замыкание, в котором производятся нужные манипуляции
+	 * Blueprint будет передан в замыкание.
+	 *
 	 * @param \Closure $closure
 	 * @return mixed
 	 */
@@ -70,8 +79,10 @@ trait Schema
 	}
 
 	/**
+	 * Имеется ли в таблице колонка с таким именем
+	 *
 	 * @param $name
-	 * @return mixed
+	 * @return bool
 	 */
 	public function hasColumn($name)
 	{
@@ -79,6 +90,8 @@ trait Schema
 	}
 
 	/**
+	 * Имеется ли в таблице набор колонок с такими именами
+	 *
 	 * @param array $columns
 	 * @return mixed
 	 */
@@ -88,6 +101,8 @@ trait Schema
 	}
 
 	/**
+	 * Возвращает тип колонки в таблице
+	 *
 	 * @param $name
 	 * @return mixed
 	 */
@@ -97,8 +112,10 @@ trait Schema
 	}
 
 	/**
+	 * Возвращает информацию об индексе в таблице
+	 *
 	 * @param $name
-	 * @return null
+	 * @return mixed
 	 */
 	public function getIndexInfo($name)
 	{
@@ -107,6 +124,7 @@ trait Schema
 	}
 
 	/**
+	 * Выполняет безусловное обновление схемы
 	 *
 	 */
 	public function updateSchema()
@@ -140,7 +158,7 @@ trait Schema
 	 * @param Blueprint $table
 	 * @return $this
 	 */
-	public function checkFieldsSchema(Blueprint $table)
+	protected function checkFieldsSchema(Blueprint $table)
 	{
 		foreach ($this->calculatedFields() as $name => $data) {
 			$field = $this->field($name);
