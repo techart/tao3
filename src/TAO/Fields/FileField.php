@@ -17,9 +17,13 @@ trait FileField
 	 */
 	public function destinationFileName($info)
 	{
-		$cb = $this->param('generate_file_name', false);
-		if (is_callable($cb)) {
-			return call_user_func($cb, $info);
+		if (is_array($info)) {
+			$info = (object)$info;
+		}
+
+		$fileName = $this->callableParam('generate_file_name', null, [$info]);
+		if (!is_null($fileName)) {
+			return $fileName;
 		}
 
 		$fileNameTemplate = $this->param('file_name_template', $this->defaultFileNameTemplate());
@@ -74,11 +78,7 @@ trait FileField
 	 */
 	public function checkUploadedFile($file, &$info)
 	{
-		$cb = $this->param('check_uploaded_file', false);
-		if (is_callable($cb)) {
-			return call_user_func($cb, $file);
-		}
-		return true;
+		return $this->callableParam('check_uploaded_file', true, [$file]);
 	}
 
 	/**
@@ -112,15 +112,11 @@ trait FileField
 	}
 
 	/**
-	 * @param $info
+	 * @param object $info
 	 * @return array
 	 */
 	protected function fileNameBinds($info)
 	{
-		if (is_array($info)) {
-			$info = (object)$info;
-		}
-
 		$nameWithoutExt = str_replace(".{$info->ext}", '', $info->name);
 		return [
 			'ext' => !empty($info->ext) ? strtolower($info->ext) : '',

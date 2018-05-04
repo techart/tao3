@@ -43,7 +43,7 @@ class StringTemplate
 	/**
 	 * @param string $template
 	 * @param array $binds
-	 * @param null $delimiters
+	 * @param array $delimiters
 	 * @param null $flags
 	 * @return StringTemplate
 	 */
@@ -102,14 +102,12 @@ class StringTemplate
 	}
 
 	/**
-	 * @param string|array $delimiters
+	 * @param array $delimiters
 	 * @throws Exception
 	 */
 	public function configureDelimiters($delimiters)
 	{
-		if (is_string($delimiters)) {
-			$this->startVarDelimiter = $this->endVarDelimiter = $delimiters;
-		} else if (is_array($delimiters) && count($delimiters) == 2) {
+		if (is_array($delimiters) && count($delimiters) == 2) {
 			$this->startVarDelimiter = $delimiters[0];
 			$this->endVarDelimiter = $delimiters[1];
 		} else {

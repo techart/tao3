@@ -3,11 +3,36 @@
 namespace TAO\Foundation;
 
 use TAO\Callback;
+use TAO\Text\StringTemplate;
 
 class Images
 {
+	protected $userMods;
+	protected $extraMods = [];
+	protected $regexpMods = [];
+
 	public function init()
 	{
+	}
+
+	public function modifier($name, $callback)
+	{
+		$this->extraMods[$name] = $callback;
+	}
+
+	protected function initMods()
+	{
+		if (is_null($this->userMods)) {
+			foreach (config('tao.images.modifiers', []) as $name => $callback) {
+				$this->modifier($name, $callback);
+			}
+			$this->userMods = $this->extraMods;
+			foreach ($this->userMods as $mod => $directive) {
+				if (starts_with($mod, '{')) {
+					$this->regexpMods[$mod] = $directive;
+				}
+			}
+		}
 	}
 
 	public function modify($path, $mods)
@@ -29,6 +54,35 @@ class Images
 		return $path;
 	}
 
+	public function size($path)
+	{
+		$image = \Image::make(\Storage::get($path));
+		if ($image) {
+			return $image->getSize();
+		}
+	}
+
+	public function show($path, $mods = false, $tpl = '<img src="{url}" width="{width}" height="{height}">')
+	{
+		if ($mods) {
+			$path = $this->modify($path, $mods);
+		}
+		$width = 0;
+		$height = 0;
+		$url = \Storage::url($path);
+		if (strpos($tpl, '{width}') || strpos($tpl, '{height}')) {
+			$size = $this->size($path);
+			$width = $size->width;
+			$height = $size->height;
+		}
+		return StringTemplate::process($tpl, [
+			'url' => $url,
+			'width' => $width,
+			'height' => $height,
+		]);
+
+	}
+
 	public function modifyImage($path, $dest, $mods)
 	{
 		$mods = $this->parseMods($mods);
@@ -39,7 +93,12 @@ class Images
 				$image = Callback::instance($mods['mods'])->call($image);
 			} else {
 				foreach ($mods['mods'] as $mod) {
-					$image = call_user_func_array([$image, $mod['directive']], $mod['params']);
+					if (Callback::isValidCallback($mod['directive'])) {
+						$params = [$image, $mod['params']];
+						$image = Callback::instance($mod['directive'])->args($params)->call();
+					} else {
+						$image = Callback::instance([$image, $mod['directive']])->args($mod['params'])->call();
+					}
 					if (!$image) {
 						return $path;
 					}
@@ -71,41 +130,73 @@ class Images
 
 	}
 
+	public function userMod($mod)
+	{
+		$mod = trim($mod);
+		if (isset($this->userMods[$mod])) {
+			$directive = $this->userMods[$mod];
+			return [
+				'directive' => $directive,
+				'params' => [],
+			];
+		} elseif (Callback::isValidCallback($mod)) {
+			return [
+				'directive' => $mod,
+				'params' => [],
+			];
+		}
+		foreach ($this->regexpMods as $re => $directive) {
+			if ($m = \TAO::regexp($re, $mod)) {
+				return [
+					'directive' => $directive,
+					'params' => $m,
+				];
+			}
+		}
+	}
+
 	public function parseMods($srcMods)
 	{
+		$this->initMods();
 		if (!is_string($srcMods)) {
 			return $srcMods;
 		}
 		$mods = [];
 		$src = false;
 		foreach (explode(',', $srcMods) as $item) {
-			$item = strtolower(trim($item));
 			if (!empty($item)) {
-				$item = $item == 'grayscale'? 'greyscale' : $item;
-				$directive = false;
-				$params = [];
-				if ($m = \TAO::regexp('{^(width|height|blur|brightness|contrast|opacity|pixelate|sharpen)(\d+)$}', $item)) {
-					$directive = $m[1];
-					$params = [(int)$m[2]];
-				} elseif ($m = \TAO::regexp('{^(crop|fit|size)(\d+)x(\d+)$}', $item)) {
-					$directive = $m[1];
-					$params = [(int)$m[2], (int)$m[3]];
-				} elseif (in_array($item, ['greyscale', 'invert'])) {
-					$directive = $item;
-				}
-				if ($directive) {
+				$mod = $this->userMod($item);
+				if ($mod) {
+					$mods[] = $mod;
 					$src .= empty($src) ? '' : ',';
-					$src .= $directive . implode('x', $params);
+					$src .= trim(preg_replace('{[^a-z0-9:_-]+}i', '.', $item), '.');
+				} else {
+					$item = strtolower(trim($item));
+					$item = $item == 'grayscale' ? 'greyscale' : $item;
+					$directive = false;
+					$params = [];
+					if ($m = \TAO::regexp('{^(width|height|blur|brightness|contrast|opacity|pixelate|sharpen)(-?\d+)$}', $item)) {
+						$directive = $m[1];
+						$params = [(int)$m[2]];
+					} elseif ($m = \TAO::regexp('{^(crop|fit|resize)(\d+)x(\d+)$}', $item)) {
+						$directive = $m[1];
+						$params = [(int)$m[2], (int)$m[3]];
+					} elseif (in_array($item, ['greyscale', 'invert'])) {
+						$directive = $item;
+					}
+					if ($directive) {
+						$src .= empty($src) ? '' : ',';
+						$src .= $directive . implode('x', $params);
 
-					$directive = str_replace('width', 'widen', $directive);
-					$directive = str_replace('height', 'heighten', $directive);
+						$directive = str_replace('width', 'widen', $directive);
+						$directive = str_replace('height', 'heighten', $directive);
 
-					$mods[] = array(
-						'directive' => $directive,
-						'params' => $params,
-					);
+						$mods[] = array(
+							'directive' => $directive,
+							'params' => $params,
+						);
+					}
 				}
-
 			}
 		}
 		if (empty($mods)) {

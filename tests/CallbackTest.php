@@ -1,8 +1,10 @@
 <?php
+
 namespace TaoTests;
 
 use TAO\Callback;
 use TaoTests\Utils\Callback\Datatype;
+use TaoTests\Utils\SimpleDatatype;
 
 class CallbackTest extends TestCase
 {
@@ -34,6 +36,10 @@ class CallbackTest extends TestCase
 			$arg1 + $arg2,
 			Callback::instance([$this, 'methodForTestArgs'])->call($arg1, $arg2)
 		);
+		$this->assertEquals(
+			$arg1 + $arg2,
+			Callback::instance([$this, 'methodForTestArgs'])->args([$arg1, $arg2])->call()
+		);
 	}
 
 	public function testValidationCallback()
@@ -54,8 +60,56 @@ class CallbackTest extends TestCase
 
 		$this->assertEquals(
 			\TAO::datatype('callbackTest')->callbackTest(),
-			 Callback::instance('datatype.callbackTest::callbackTest')->call()
+			Callback::instance('datatype.callbackTest::callbackTest')->call()
 		);
+	}
+
+	// Testing arguments
+
+	public function testValidationCallbackWithArguments()
+	{
+		require 'Utils/Callback/function.php';
+
+		$this->assertTrue(Callback::isValidCallback(['callbackTest', [1, 2]]));
+		$this->assertTrue(Callback::isValidCallback([[self::class, 'methodForTesting'], [1]]));
+		$this->assertTrue(Callback::isValidCallback([[$this, 'methodForTesting'], [1, 2, 3]]));
+		$this->assertFalse(Callback::isValidCallback(['nonexistentFunction', [1, 2, 3]]));
+		$this->assertFalse(Callback::isValidCallback([[self::class, 'nonexistentMethod'], [1]]));
+		$this->assertFalse(Callback::isValidCallback([[$this, 'nonexistentMethod'], [1, 2]]));
+	}
+
+	public function testFunctionWithArgsCall()
+	{
+		require 'Utils/Callback/function.php';
+
+		$this->assertEquals(3, Callback::instance(['callbackTestWithArgs', [1, 2]])->call());
+		$this->assertEquals(3, Callback::instance('callbackTestWithArgs')->call(1, 2));
+	}
+
+	public function testMethodWithArgsCall()
+	{
+		$args = [1, 3];
+		$this->assertEquals(
+			self::methodForTestArgs($args[0], $args[1]),
+			Callback::instance([[self::class, 'methodForTestArgs'], $args])->call()
+		);
+		$this->assertEquals(
+			self::methodForTestArgs($args[0], $args[1]),
+			Callback::instance([self::class, 'methodForTestArgs'])->call($args[0], $args[1])
+		);
+		$this->assertEquals(
+			self::methodForTestArgs($args[0], $args[1]),
+			Callback::instance([[$this, 'methodForTestArgs'], $args])->call()
+		);
+		$this->assertEquals(
+			self::methodForTestArgs($args[0], $args[1]),
+			Callback::instance([$this, 'methodForTestArgs'])->call($args[0], $args[1])
+		);
+	}
+
+	public function testDatatypeMethodsWithArgsCall()
+	{
+		$this->assertTrue(Callback::isValidCallback('datatype.callbackTest::callbackTest'));
 
 		$arg1 = 2;
 		$arg2 = 3;
@@ -63,7 +117,18 @@ class CallbackTest extends TestCase
 			\TAO::datatype('callbackTest')->callbackArgumentsTest($arg1, $arg2),
 			Callback::instance('datatype.callbackTest::callbackArgumentsTest')->call($arg1, $arg2)
 		);
+
+		$this->assertEquals(
+			\TAO::datatype('callbackTest')->callbackArgumentsTest($arg1, $arg2),
+			Callback::instance(['datatype.callbackTest::callbackArgumentsTest', [$arg1, $arg2]])->call()
+		);
 	}
+
+	public function testUnknownMethodInClassWithMagicMethodCall()
+	{
+		$this->assertFalse(Callback::instance([new SimpleDatatype(), 'unknownMethod'])->isValid());
+	}
+
 
 	// Utility methods
 	public static function methodForTesting()

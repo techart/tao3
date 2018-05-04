@@ -23,7 +23,7 @@ class Text
 		}
 
 		foreach ($processors as $key => $value) {
-			if (is_array($value)) {
+			if (!is_numeric($key) && is_array($value)) {
 				$processor = $key;
 				$processorOptions = $value;
 			} else {

@@ -1,4 +1,5 @@
 <?php
+
 namespace TaoTests\Utils\Callback;
 
 use TAO\ORM\Model;
@@ -17,6 +18,6 @@ class Datatype extends Model
 
 	public function callbackArgumentsTest($arg1, $arg2)
 	{
-		return $arg1 * $arg2;
+		return array_sum(func_get_args());
 	}
 }

@@ -149,15 +149,12 @@ class Upload extends Field
 	 */
 	public function renderForAdminList()
 	{
-		$cb = $this->param(['render_in_admin_list', 'render_in_list'], false);
-		if (is_string($cb)) {
-			$cb = [$this->item, $cb];
+		$render = $this->callableParam(['render_in_admin_list', 'render_in_list'], null, [$this], $this->item);
+		if (is_null($render)) {
+			$url = $this->url();
+			$value = $this->value();
+			$render = "<a href='{$url}'>{$value}</a>";
 		}
-		if (is_callable($cb)) {
-			return call_user_func($cb, $this);
-		}
-		$url = $this->url();
-		$value = $this->value();
-		return "<a href='{$url}'>{$value}</a>";
+		return $render;
 	}
 }

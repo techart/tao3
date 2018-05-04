@@ -8,6 +8,6 @@
 	name="{{ $field->name }}"
 	class="date_input_{{ $field->name }} input string {{ $field->classForInput() }}"
 	style="{!! $field->styleForInput() !!}"
-	value="{{ $item[$field->name]==0? '' : date($field->generateFormat(), $item[$field->name]) }}"
+	value="{{ $item[$field->name]==$field->nullValue()? '' : app('tao.utils')->date($field->generateFormat(), $item[$field->name]) }}"
 	{!! $field->renderAttrs() !!}
 >

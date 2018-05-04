@@ -2,6 +2,7 @@
 
 namespace TAO\Fields\Type;
 
+use Carbon\Carbon;
 use Illuminate\Database\Schema\Blueprint;
 use TAO\Fields\Field;
 
@@ -108,13 +109,14 @@ class DateInteger extends Field
 	{
 		if (trim($value) == '') {
 			$value = 0;
-		} elseif ($m = \TAO::regexp('{^(\d+)\.(\d+)\.(\d+)$}', $value)) {
-			$value = mktime(0, 0, 0, $m[2], $m[1], $m[3]);
-		} elseif ($m = \TAO::regexp('{^(\d+)\.(\d+)\.(\d+)\s*-\s*(\d+):(\d+)$}', $value)) {
-			$value = mktime($m[4], $m[5], 0, $m[2], $m[1], $m[3]);
-		} elseif ($m = \TAO::regexp('{^(\d+)\.(\d+)\.(\d+)\s*-\s*(\d+):(\d+):(\d+)$}', $value)) {
-			$value = mktime($m[4], $m[5], $m[6], $m[2], $m[1], $m[3]);
+		} elseif (is_string($value)) {
+			$value = app('tao.utils')->dateTime($value)->getTimestamp();
 		}
 		$this->item[$this->name] = $value;
+	}
+
+	public function carbon()
+	{
+		return app('tao.utils')->carbon($this->value());
 	}
 }

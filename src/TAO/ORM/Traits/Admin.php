@@ -293,4 +293,21 @@ trait Admin
 		}
 		return $filterFields;
 	}
+	
+	public function titleForFilter($name, $datatype = false)
+	{
+		if (request()->has('filter')) {
+			$filter = request()->get('filter');
+			if (isset($filter[$name])) {
+				$value =  $filter[$name];
+				if ($datatype) {
+					if ($item = \TAO::datatype($datatype)->find($value)) {
+						return $item->title();
+					}
+					return;
+				}
+				return $value;
+			}
+		}
+	}
 }

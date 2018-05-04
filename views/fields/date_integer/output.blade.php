@@ -1,1 +1,1 @@
-{{ date($format, $field->value()) }}
+{{ $field->value()==$field->nullValue()? '' : app('tao.utils')->date($format, $field->value()) }}

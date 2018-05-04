@@ -109,10 +109,9 @@ trait SchemaHelper
 				$fdata = $form[$field] ?? ['type' => 'dummy', 'in_form' => false];
 				$fdata['in_list'] = true;
 				$fdata['weight_in_list'] = $data['weight'];
-				$label = $data['label'] ?? ($fdata['label'] ?? $field);
-				if (isset($fdata['label']) && $label != $fdata['label']) {
-					$fdata['label_in_list'] = $label;
-				}
+				if (isset($data['label'])) {
+					$fdata['label_in_list'] = $data['label'];
+				} 
 				if (isset($data['render'])) {
 					$fdata['render_in_admin_list'] = $data['render'];
 				}
@@ -121,6 +120,11 @@ trait SchemaHelper
 				}
 				if (isset($data['td'])) {
 					$fdata['admin_td_attrs'] = $data['td'];
+				}
+				foreach(['link_in_list'] as $key) {
+					if (isset($data[$key])) {
+						$fdata[$key] = $data[$key];
+					}
 				}
 				$form[$field] = $fdata;
 			}
@@ -202,7 +206,11 @@ trait SchemaHelper
 		$th = '';
 		foreach($this->parseString($line) as $key => $value) {
 			if (!is_numeric($key)) {
-				$data[$key] = $value;
+				if ($key == 'link') {
+					$data['link_in_list'] = $value;
+				} else {
+					$data[$key] = $value;
+				}
 			} elseif ($m = \TAO::regexp('{^(\d+)(px|\%)$}', $value)) {
 				$th .= "width: {$value};";
 			} elseif ($value == 'th-center' || $value == 'th-right') {

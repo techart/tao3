@@ -8,6 +8,7 @@ use TAO\Callback;
 use TAO\Foundation\Request;
 use TAO\ORM\Model;
 use TAO\Schema\Index\Builder;
+use TAO\Text\StringTemplate;
 use TAO\Type;
 
 /**
@@ -208,7 +209,22 @@ abstract class Field
 	public function setupDefault()
 	{
 		if (!$this->itemHasValue()) {
-			$this->set($this->data['default'] ?? $this->defaultValue());
+			$value = $this->defaultValue();
+			if (isset($this->data['default'])) {
+				$def = $this->data['default'];
+				if ($m = \TAO::regexp('{^filter\[([a-z0-9_]+)\]$}', $def)) {
+					$key = trim($m[1]);
+					if (request()->has('filter')) {
+						$filter = request()->get('filter');
+						if (isset($filter[$key])) {
+							$value = $filter[$key];
+						}
+					}
+				} else {
+					$value = $def;
+				}
+			}
+			$this->set($value);
 		}
 		return $this;
 	}
@@ -273,8 +289,8 @@ abstract class Field
 	 */
 	protected function prepareValue($value)
 	{
-		if (isset($this->data['prepare_value']) && is_callable($this->data['prepare_value'])) {
-			$value = call_user_func_array($this->data['prepare_value'], [$value, $this]);
+		if (isset($this->data['prepare_value']) && Type::isCallable($this->data['prepare_value'])) {
+			$value = Callback::instance($this->data['prepare_value'])->call($value, $this);
 		}
 		return $value;
 	}
@@ -288,7 +304,7 @@ abstract class Field
 	public function isEmpty()
 	{
 		if (isset($this->data['is_empty']) && Type::isCallable($this->data['is_empty'])) {
-			return call_user_func_array($this->data['is_empty'], [$this, $this->item]);
+			return Callback::instance($this->data['is_empty'])->call($this, $this->item);
 		}
 		return $this->checkEmpty();
 	}
@@ -368,10 +384,14 @@ abstract class Field
 			}
 			return view($template, $context);
 		} else {
-			return $this->value();
+			return $this->renderWithoutTemplate();
 		}
 	}
 
+	public function renderWithoutTemplate()
+	{
+		return $this->value();
+	}
 
 	/**
 	 *
@@ -523,6 +543,39 @@ abstract class Field
 	}
 
 	/**
+	 * Метод предназначен для получения значений параметров, которые могут быть представлены в виде callback. Если
+	 * параметр задан и он исполняемый, то возвращается результат выполнения данного callback, в обратном случае
+	 * возвращается значение. Если параметр не задан, но передано значение по умолчанию, то вышеописанный алгоритм
+	 * применяется к этому значению.
+	 *
+	 * Аргументы, переданные в параметре $args будут отправлены в коллбэк. В метод они должны приходить в виде массива,
+	 * в callback будут переданы в виде списка аргументов.
+	 *
+	 * Переданный контекст будет использован если значение параметра $name будет строкой и не будет являться выполняемым
+	 * значениемй. В этом случае будет проверяться есть ли метод $name у контекста. Если да, то будет вызван он.
+	 *
+	 * @param string $name
+	 * @param mixed $default
+	 * @param array $args
+	 * @param mixed $probableContext
+	 * @return mixed
+	 */
+	public function callableParam($name, $default = null, $args = [], $probableContext = null)
+	{
+		$value = $this->param($name);
+		$value = is_null($value) ? $default : $value;
+		if (!is_null($value)) {
+			if (is_string($value) && !is_null($probableContext) && Type::isCallable([$probableContext, $value])) {
+				$value = [$probableContext, $value];
+			}
+			if (Type::isCallable($value)) {
+				return Callback::instance($value)->args($args)->call();
+			}
+		}
+		return $value;
+	}
+
+	/**
 	 * @return mixed
 	 */
 	public function typeParamsArgs()
@@ -580,26 +633,26 @@ abstract class Field
 	 */
 	public function renderForAdminList()
 	{
-		$cb = $this->param(['render_in_admin_list', 'render_in_list'], false);
-		if (is_string($cb)) {
-			$cb = [$this->item, $cb];
+		$render = $this->callableParam(['render_in_admin_list', 'render_in_list'], null, [$this], $this->item);
+		if (is_null($render)) {
+			$render = $this->render();
 		}
-		if (is_callable($cb)) {
-			return call_user_func($cb, $this);
+		if (isset($this->data['link_in_list'])) {
+			$url = $this->callableParam('link_in_list', null, [$this], $this->item);
+			$url = StringTemplate::process($url, ['id' => $this->item->getKey()]);
+			$render = empty($render) ? 'empty' : trim($render);
+			$render = "<a href=\"{$url}\">{$render}</a>";
 		}
-		return $this->render();
+		return $render;
 	}
 
 	public function csvValue()
 	{
-		$cb = $this->param('csv_value', false);
-		if (is_string($cb)) {
-			$cb = [$this->item, $cb];
+		$render = $this->callableParam('csv_value', null, [$this], $this->item);
+		if (is_null($render)) {
+			$render = $this->render();
 		}
-		if (is_callable($cb)) {
-			return call_user_func($cb, $this);
-		}
-		return $this->render();
+		return $render;
 	}
 
 
@@ -860,7 +913,7 @@ abstract class Field
 	 */
 	public function callParam($name, $default = null)
 	{
-		$cb = $this->param('renderable_entries');
+		$cb = $this->param($name);
 		if (Callback::isValidCallback($cb)) {
 			return Callback::instance($cb)->call($this);
 		}

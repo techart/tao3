@@ -2,6 +2,7 @@
 
 namespace TAO\Foundation;
 
+use TAO\Callback;
 use TAO\Exception\UnknownSelector;
 use TAO\Frontend\Manager;
 use TAO\Navigation;
@@ -9,6 +10,8 @@ use TAO\ORM\Model;
 use TAO\ORM\Model\User;
 use TAO\Router;
 use TAO\Exception\UnknownDatatype;
+use TAO\Type;
+use TAO\Type\Collection;
 
 class TAO
 {
@@ -457,11 +460,13 @@ class TAO
 				$args = trim($m[2]);
 			}
 			if ($m = \TAO::regexp('{^datatype:(.+)$}', $src)) {
-				return \TAO::datatype(trim($m[1]))->itemsForSelect($args);
+				$datatypeCode = trim($m[1]);
+				$callback = "datatype.$datatypeCode::itemsForSelect";
+				$src = $args ? [$callback, [Collection::parseString($args)]] : $callback;
 			}
 		}
-		if (is_callable($src)) {
-			return call_user_func($src);
+		if (Type::isCallable($src)) {
+			return Callback::instance($src)->call();
 		}
 		return array();
 	}
@@ -494,12 +499,12 @@ class TAO
 	{
 		$user = \Auth::user();
 		if (is_object($user)) {
-			if (is_callable($callback)) {
-				return call_user_func($callback);
+			if (Type::isCallable($callback)) {
+				return Callback::instance($callback)->call();
 			}
 			return true;
 		} else {
-			if (is_callable($callback)) {
+			if (Type::isCallable($callback)) {
 				return redirect('/users/login/');
 			}
 			return false;

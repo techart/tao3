@@ -4,6 +4,7 @@ namespace TAO\ORM;
 
 use Illuminate\Database\Query\Builder;
 use Ramsey\Uuid\UuidInterface;
+use TAO\Callback;
 use TAO\Fields;
 use Ramsey\Uuid\Uuid;
 use TAO\ORM\Exception\NonStrorableObjectSaving;
@@ -341,12 +342,11 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 	 * Формирует на основании списка записей этого типа список, используемый в селектах, радио, мультилинках и пр.
 	 * В качестве аргумента передаются возможные модификаторы
 	 *
-	 * @param bool $args
+	 * @param array $args
 	 * @return array
 	 */
-	public function itemsForSelect($args = false)
+	public function itemsForSelect($args = [])
 	{
-		$args = Collection::parseString($args);
 		if ($this->checkIfTree()) {
 			/** @var Tree $this */
 			return $this->treeForSelect($args);
@@ -500,7 +500,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 	protected function triggerEventForFields($eventName, $data = [])
 	{
 		foreach ($this->fieldsObjects() as $field) {
-			call_user_func_array([$field, $eventName], $data);
+			Callback::instance([$field, $eventName])->call($data);
 		}
 	}
 

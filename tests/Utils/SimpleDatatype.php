@@ -1,4 +1,5 @@
 <?php
+
 namespace TaoTests\Utils;
 
 use TAO\ORM\Model;

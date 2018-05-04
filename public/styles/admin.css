@@ -262,6 +262,15 @@ fieldset.admin {
   margin: 0;
 }
 
+.navigator-top {
+}
+
+.rows-count {
+  float: left;
+  font-size: 12px;
+  color: #888;
+}
+
 .navigator-bottom {
 }
 

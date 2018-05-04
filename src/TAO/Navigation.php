@@ -112,8 +112,10 @@ class Navigation
 				$this->id = $data['id'];
 				$this->url = $data['url'];
 				$this->title = $data['title'];
-				$this->parent = $data['parent'];
-				$this->level = $this->parent->level + 1;
+				if (isset($data['parent'])) {
+					$this->parent = $data['parent'];
+					$this->level = $this->parent->level + 1;
+				}
 
 				if (isset($data['flag'])) {
 					$this->flag = $data['flag'];
@@ -141,11 +143,11 @@ class Navigation
 				unset($data['parent']);
 				$this->byIds[$this->id] = $this;
 				if (isset($data['sub'])) {
-					$sub = $data['sub'];
-					if (\TAO::isIterable($sub)) {
-						$this->addArray($sub);
-					} elseif (is_callable($sub)) {
-						$this->addArray(call_user_func($sub, $this, $data));
+					if (Type::isCallable($data['sub'])) {
+						$this->addArray(Callback::instance($data['sub'])->call($this, $data));
+					} else if (\TAO::isIterable($data['sub'])) {
+
+						$this->addArray($data['sub']);
 					}
 					unset($data['sub']);
 				}
@@ -405,8 +407,8 @@ class Navigation
 	public function isSelected($defTrue = true, $defFalse = false)
 	{
 		if (!is_null($this->selected)) {
-			if (is_callable($this->selected)) {
-				return call_user_func($this->selected, $this) ? $defTrue : $defFalse;
+			if (Type::isCallable($this->selected)) {
+				return Callback::instance($this->selected)->call($this) ? $defTrue : $defFalse;
 			}
 			return $this->selected ? $defTrue : $defFalse;
 		}

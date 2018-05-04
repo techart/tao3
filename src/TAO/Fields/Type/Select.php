@@ -51,4 +51,9 @@ class Select extends Field
 		$data['items'] = $this->items();
 		return $data;
 	}
+
+	public function renderWithoutTemplate()
+	{
+		return $this->items()[$this->value()] ?? '';
+	}
 }

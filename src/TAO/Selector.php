@@ -60,8 +60,8 @@ class Selector
 	public function routeBase($url, $data = [])
 	{
 		$base = isset($data['base']) ? $data['base'] : '/' . $this->mnemocode . '/';
-		if (is_callable($base)) {
-			$args = call_user_func($base, $url, $this);
+		if (Type::isCallable($base)) {
+			$args = Callback::instance($base)->call($url, $this);
 			if ($args) {
 				$this->args = $args;
 				return true;

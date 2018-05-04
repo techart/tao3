@@ -76,20 +76,37 @@ class Image extends Upload
 	
 	public function renderForAdminList()
 	{
-		$cb = $this->param(['render_in_admin_list', 'render_in_list'], false);
-		if (is_string($cb)) {
-			$cb = [$this->item, $cb];
+		$render = $this->callableParam(['render_in_admin_list', 'render_in_list'], null, [$this], $this->item);
+		if (is_null($render)) {
+			$mods = $this->param(['in_admin_list_mods', 'in_list_mods'], 'fit100x100');
+			$url = $this->url();
+			if ($url) {
+				$murl = $this->url($mods);
+				$value = "<img src='{$murl}'>";
+				$render = "<a href='{$url}'>{$value}</a>";
+			}
 		}
-		if (is_callable($cb)) {
-			return call_user_func($cb, $this);
+		if (is_null($render)) {
+			$render = '';
 		}
-		$mods = $this->param(['in_admin_list_mods', 'in_list_mods'], 'fit100x100');
-		$url = $this->url();
-		if (!$url) {
+		return $render;
+	}
+
+	public function imageSize()
+	{
+		$path = $this->value();
+		if (empty($path)) {
+			return null;
+		}
+		return app('tao.images')->size($path);
+	}
+
+	public function show($mods = false, $tpl = '<img src="{url}" width="{width}" height="{height}">')
+	{
+		$path = $this->value();
+		if (empty($path)) {
 			return '';
 		}
-		$murl = $this->url($mods);
-		$value = "<img src='{$murl}'>";
-		return "<a href='{$url}'>{$value}</a>";
+		return app('tao.images')->show($path, $mods, $tpl);
 	}
 }

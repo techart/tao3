@@ -8,6 +8,7 @@ if (is_null($vendorPath)) {
 }
 
 require $vendorPath . '/autoload.php';
+require 'helpers.php';
 require 'cfg.php';
 
 $app = new \TAO\Application($appPath);

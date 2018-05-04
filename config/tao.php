@@ -11,6 +11,7 @@
 		'string' => \TAO\Fields\Type\StringField::class,
 		'remember_token' => \TAO\Fields\Type\RememberToken::class,
 		'date_integer' => \TAO\Fields\Type\DateInteger::class,
+		'date_sql' => \TAO\Fields\Type\DateSQL::class,
 		'integer' => \TAO\Fields\Type\Integer::class,
 		'text' => \TAO\Fields\Type\Text::class,
 		'checkbox' => \TAO\Fields\Type\Checkbox::class,

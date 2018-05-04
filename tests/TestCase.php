@@ -38,7 +38,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 	}
 
 
-
 	protected function resolveApplication()
 	{
 		$appPath = $this->getBasePath();
@@ -75,9 +74,9 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 	{
 		$app['config']->set('database.default', 'testbench');
 		$app['config']->set('database.connections.testbench', [
-			'driver'   => 'sqlite',
+			'driver' => 'sqlite',
 			'database' => ':memory:',
-			'prefix'   => '',
+			'prefix' => '',
 		]);
 	}
 }

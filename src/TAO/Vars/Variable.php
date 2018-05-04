@@ -2,6 +2,9 @@
 
 namespace TAO\Vars;
 
+use TAO\Callback;
+use TAO\Type;
+
 class Variable implements \ArrayAccess
 {
 	public $scope;
@@ -47,7 +50,7 @@ class Variable implements \ArrayAccess
 		return $this->fields;
 	}
 
-	public function field($name)
+	public function field($name = 'value')
 	{
 		if (isset($this->fields[$name])) {
 			return app('tao.fields')->create($name, $this->fields[$name], $this);
@@ -76,8 +79,8 @@ class Variable implements \ArrayAccess
 
 	public function render()
 	{
-		if (is_callable($this->render)) {
-			return call_user_func($this->render, $this);
+		if (Type::isCallable($this->render)) {
+			return Callback::instance($this->render)->call();
 		}
 		$fields = array_keys($this->values);
 		$field = array_shift($fields);
@@ -86,8 +89,8 @@ class Variable implements \ArrayAccess
 
 	public function renderForAdminList()
 	{
-		if (is_callable($this->adminRender)) {
-			return call_user_func($this->adminRender, $this);
+		if (Type::isCallable($this->adminRender)) {
+			return Callback::instance($this->adminRender)->call();
 		}
 		$fields = array_keys($this->values);
 		$field = array_shift($fields);
@@ -178,5 +181,10 @@ class Variable implements \ArrayAccess
 	public function __toString()
 	{
 		return (string)$this->render();
+	}
+
+	public function value($name = 'value')
+	{
+		return $this->field($name)->value();
 	}
 }

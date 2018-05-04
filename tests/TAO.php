@@ -33,7 +33,7 @@ class TAO extends TestCase
 	public function testItemsForSelectFromDatatype()
 	{
 		$count = 10;
-		factory(SimpleDatatype::class, $count, function() {
+		factory(SimpleDatatype::class, $count, function () {
 			return [
 				'title' => 'Заголовок'
 			];
@@ -51,5 +51,21 @@ class TAO extends TestCase
 		$datatype->setItems($items);
 
 		$this->assertEquals($items, \TAO::itemsForSelect('datatype:itemsForSelectRedefined'));
+	}
+
+	public function testParamsInCallbackForItemsForSelect()
+	{
+		$count = 10;
+		factory(SimpleDatatype::class, $count, function() {
+			return [
+				'title' => 'Заголовок'
+			];
+		})->create();
+
+		$items = \TAO::itemsForSelect('datatype:simple/0=default&100000=last&assoc=assoc');
+		$this->assertEquals($count + 2, count($items));
+		$this->assertEquals('default', $items[0]);
+		$this->assertEquals('last', $items[100000]);
+		$this->assertFalse(isset($items['assoc']));
 	}
 }
