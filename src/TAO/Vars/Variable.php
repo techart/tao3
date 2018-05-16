@@ -90,7 +90,7 @@ class Variable implements \ArrayAccess
 	public function renderForAdminList()
 	{
 		if (Type::isCallable($this->adminRender)) {
-			return Callback::instance($this->adminRender)->call();
+			return Callback::instance($this->adminRender)->args([$this])->call();
 		}
 		$fields = array_keys($this->values);
 		$field = array_shift($fields);

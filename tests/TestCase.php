@@ -2,8 +2,6 @@
 
 namespace TaoTests;
 
-use TAO\App\Providers\RouteServiceProvider;
-
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
 	protected $appConfig;
@@ -24,7 +22,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 	{
 		parent::resolveApplicationConfiguration($app);
 
-		$path = './config';
+		$path = realpath(__DIR__ . '/../config');
 		if ($handle = opendir($path)) {
 			while (false !== ($entry = readdir($handle))) {
 				if ($entry != "." && $entry != "..") {
@@ -41,8 +39,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 	protected function resolveApplication()
 	{
 		$appPath = $this->getBasePath();
-		$vendorPath = realpath(__DIR__ . '/../vendor');
-		$app = require './bootstrap/app.php';
+		$vendorPath = $this->vendorPath();
+		$app = require realpath(__DIR__ . '/../bootstrap/app.php');
 
 		return tap($app, function ($app) {
 			$app->bind(
@@ -65,7 +63,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 	protected function appConfig($configName = null)
 	{
 		if (is_null($this->appConfig)) {
-			$this->appConfig = include './config/app.php';
+			$this->appConfig = include realpath(__DIR__ . '/../config/app.php');
 		}
 		return is_null($configName) ? $this->appConfig : $this->appConfig[$configName];
 	}
@@ -78,5 +76,10 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 			'database' => ':memory:',
 			'prefix' => '',
 		]);
+	}
+
+	protected function vendorPath()
+	{
+		return realpath(__DIR__ . '/../vendor');
 	}
 }

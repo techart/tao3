@@ -4,6 +4,8 @@ namespace TAO\Frontend;
 
 class Renderer extends \Techart\Frontend\Templates\Renderer
 {
+	protected $globals = [];
+	
 	public function render($name, $params = array())
 	{
 		$params = $this->defaultParams($name, $params);
@@ -19,7 +21,15 @@ class Renderer extends \Techart\Frontend\Templates\Renderer
 	{
 		$params = parent::defaultParams($path, $params);
 		$params['renderer'] = $this;
+		foreach($this->globals as $name => $value) {
+			$params[$name] = $params[$name] ?? $value;
+		}
 		return $params;
+	}
+	
+	public function addGlobal($name, $value)
+	{
+		$this->globals[$name] = $value;
 	}
 
 }

@@ -67,8 +67,8 @@ class DateInteger extends Field
 	protected function defaultContext()
 	{
 		$context = parent::defaultContext();
-		$context['format'] = 'd.m.Y';
-		$context['with_datepicker'] = $this->param('datepicker', true);
+		$context['format'] = $this->generateFormat();
+		$context['with_datepicker'] = $this->param('with_datepicker', true);
 		return $context;
 	}
 

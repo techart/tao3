@@ -1,7 +1,7 @@
-<div class="navigator-top">
+<div class="navigator-top row-fluid">
 
 	@if ($count>0)
-		<div class="rows-count">
+		<div class="rows-count span2">
 			@include('table ~ list.count')
 		</div>
 	@endif

@@ -3,6 +3,7 @@
 namespace TAO\Fields\Type;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Http\File;
 use TAO\Fields\Field;
 use TAO\Fields;
 
@@ -14,12 +15,17 @@ class Upload extends Field
 {
 	use Fields\FileField;
 
+	protected $newFile = false;
+
 	/**
 	 * @param Blueprint $table
 	 * @return \Illuminate\Support\Fluent
 	 */
 	public function createField(Blueprint $table)
 	{
+		if ($this->isBase64()) {
+			return $table->text($this->name);
+		}
 		return $table->string($this->name, 250)->default('');
 	}
 
@@ -32,6 +38,11 @@ class Upload extends Field
 			$this->delete();
 			$this->item[$this->name] = '';
 		}
+	}
+
+	public function isBase64()
+	{
+		return $this->param('base64', false);
 	}
 
 	/**
@@ -55,14 +66,72 @@ class Upload extends Field
 		if (\Storage::exists("{$path}/file") && \Storage::exists("{$path}/info.json")) {
 			$info = json_decode(\Storage::get("{$path}/info.json"));
 			$this->delete();
-			$dest = $this->destinationPath($info);
-			if (\Storage::exists($dest)) {
-				\Storage::delete($dest);
-			}
-			\Storage::copy("{$path}/file", $dest);
+			$filePath = "{$path}/file";
+
+			$dest = $this->setFile($filePath, $info);
+
 			\Storage::delete("{$path}/info.json");
-			\Storage::delete("{$path}/file");
+			\Storage::delete($filePath);
+			$this->oldValue = $this->item[$this->name];
 			$this->item[$this->name] = $dest;
+			$this->item->where($this->item->getKeyName(), $this->item->getKey())->update([$this->name => $dest]);
+		}
+	}
+
+	public function setFile($path, $info)
+	{
+		$dest = $this->destinationPath($info);
+		if (\Storage::exists($dest)) {
+			\Storage::delete($dest);
+		}
+		if ($this->isBase64()) {
+			$content = is_file($path)? file_get_contents($path) : \Storage::get($path);
+			$dest = "data:{$info->mime};base64,".base64_encode($content);
+		} else {
+			if (is_file($path)) {
+				list($dir, $file) = $this->destinationDirAndName($info);
+				\Storage::putFileAs($dir, new File($path), $file);
+			} else {
+				\Storage::copy($path, $dest);
+			}
+		}
+		return $dest;
+	}
+
+	public function setDefault($value)
+	{
+		return parent::set($value);
+	}
+
+	public function set($path)
+	{
+		$this->newFile = $path;
+	}
+
+	public function processAfterSet()
+	{
+		if ($this->newFile) {
+			$name = $this->newFile;
+			$ext = '';
+			if ($m = \TAO::regexp('{/([^/]+)$}', $name)) {
+				$name = $m[1];
+			}
+			if ($m = \TAO::regexp('{\.([^.]+)$}', $name)) {
+				$ext = $m[1];
+			}
+			$info = new \StdClass;
+			$info->name = $name;
+			$info->ext = $ext;
+			$dest = $this->setFile($this->newFile, $info);
+			$this->newFile = false;
+			return $dest;
+		}
+	}
+
+	public function afterItemSave()
+	{
+		parent::afterItemSave();
+		if ($dest = $this->processAfterSet()) {
 			$this->item->where($this->item->getKeyName(), $this->item->getKey())->update([$this->name => $dest]);
 		}
 	}
@@ -112,6 +181,10 @@ class Upload extends Field
 		if (empty($file)) {
 			return 0;
 		}
+		if (starts_with($file, 'data:')) {
+			$file = preg_replace('{^.+;base64,}', '', $file);
+			return strlen(base64_decode($file));
+		}
 		return \Storage::size($file);
 	}
 
@@ -140,6 +213,9 @@ class Upload extends Field
 		$file = $this->value();
 		if (empty($file)) {
 			return false;
+		}
+		if (starts_with($file, 'data:')) {
+			return $file;
 		}
 		return \Storage::url($file);
 	}

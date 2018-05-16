@@ -6,6 +6,9 @@ class UrlGenerator extends \Illuminate\Routing\UrlGenerator
 {
 	public function to($path, $extra = [], $secure = null)
 	{
+		if (starts_with($path, 'data:')) {
+			return $path;
+		}
 		if (\TAO::isDatatypeExists('urlrewriter')) {
 			$urlRewriter = \TAO::datatype('urlrewriter');
 			$url = Urls::sortUrl($path);

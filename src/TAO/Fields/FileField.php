@@ -37,9 +37,19 @@ trait FileField
 	 */
 	public function destinationPath($info)
 	{
+		list($dir, $file) = $this->destinationDirAndName($info);
+		return "{$dir}/{$file}";
+	}
+
+	/**
+	 * @param $info
+	 * @return string
+	 */
+	public function destinationDirAndName($info)
+	{
 		$dir = $this->param('private', false) ? $this->item->getPrivateHomeDir() : $this->item->getHomeDir();
 		$file = $this->destinationFilename($info);
-		return "{$dir}/{$file}";
+		return [$dir, $file];
 	}
 
 	/**

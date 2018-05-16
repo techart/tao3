@@ -263,6 +263,7 @@ fieldset.admin {
 }
 
 .navigator-top {
+  margin: 20px 0;
 }
 
 .rows-count {
@@ -280,7 +281,6 @@ fieldset.admin {
   
 .page-navigator {
   text-align: right;
-  margin: 20px 0;
 }
 
 td.admin-tree-title {}

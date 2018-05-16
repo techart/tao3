@@ -23,10 +23,14 @@ class Image extends Upload
 			\Log::debug("$path !!!!!");
 			$path = trim($this->value());
 		}
-		if (empty($path) || !\Storage::exists($path)) {
-			return 'Image not found';
+		if (starts_with($path, 'data:')) {
+			$image = \Image::make(base64_decode(preg_replace('{^.+;base64,}', '', $path)));
+		} else {
+			if (empty($path) || !\Storage::exists($path)) {
+				return 'Image not found';
+			}
+			$image = \Image::make(\Storage::get($path));
 		}
-		$image = \Image::make(\Storage::get($path));
 		if ($m = \TAO::regexp('{^image/(gif|png|jpeg)$}', $image->mime)) {
 			$ext = str_replace('jpeg', 'jpg', $m[1]);
 			return $image->resize(100, 100, function ($c) {
@@ -61,10 +65,13 @@ class Image extends Upload
 	public function url($mods = false)
 	{
 		$path = $this->value();
-		if (!$mods && empty($path)) {
+		if (empty($path) || !$mods) {
 			return parent::url();
 		}
 		$modified = app('tao.images')->modify($path, $mods);
+		if (starts_with($modified, 'data:')) {
+			return $modified;
+		}
 		return \Storage::url($modified);
 	}
 

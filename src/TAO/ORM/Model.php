@@ -436,7 +436,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 	 */
 	public function typeTitle()
 	{
-		return $this->typeTitle;
+		return empty($this->typeTitle)? $this->mnemocode : $this->typeTitle;
 	}
 
 	/**

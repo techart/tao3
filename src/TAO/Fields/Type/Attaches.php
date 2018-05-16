@@ -344,14 +344,6 @@ class Attaches extends StringField implements \IteratorAggregate
 	}
 
 	/**
-	 * @return array
-	 */
-	public function nullValue()
-	{
-		return [];
-	}
-
-	/**
 	 * @return mixed|null
 	 */
 	public function renderableEntries()

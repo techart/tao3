@@ -224,9 +224,14 @@ abstract class Field
 					$value = $def;
 				}
 			}
-			$this->set($value);
+			$this->setDefault($value);
 		}
 		return $this;
+	}
+
+	public function setDefault($value)
+	{
+		return $this->set($value);
 	}
 
 	/**

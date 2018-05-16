@@ -51,12 +51,25 @@ class Images
 			}
 			return $this->modifyImage($path, $dest, $mods);
 		}
+		if (starts_with($path, 'data:')) {
+			return $this->modifyImage($path, false, $mods);
+		}
 		return $path;
+	}
+
+	public function make($path)
+	{
+		if ($m = \TAO::regexp('{^data:.+;base64,(.+)$}', $path)) {
+			$content = base64_decode($m[1]);
+		} else {
+			$content = \Storage::get($path);
+		}
+		return \Image::make($content);
 	}
 
 	public function size($path)
 	{
-		$image = \Image::make(\Storage::get($path));
+		$image = $this->make($path);
 		if ($image) {
 			return $image->getSize();
 		}
@@ -80,13 +93,12 @@ class Images
 			'width' => $width,
 			'height' => $height,
 		]);
-
 	}
 
 	public function modifyImage($path, $dest, $mods)
 	{
 		$mods = $this->parseMods($mods);
-		$image = \Image::make(\Storage::get($path));
+		$image = $this->make($path);
 		if ($image) {
 			$ext = $this->ext($path);
 			if (Callback::isValidCallback($mods['mods'])) {
@@ -103,6 +115,9 @@ class Images
 						return $path;
 					}
 				}
+			}
+			if (!$dest) {
+				return 'data:image/png;base64,' . base64_encode($image->encode('png', 90));
 			}
 			$encoded = $image->encode($ext, 90);
 			\Storage::put($dest, $encoded);
