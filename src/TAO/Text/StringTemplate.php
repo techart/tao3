@@ -2,7 +2,7 @@
 
 namespace TAO\Text;
 
-use TAO\Exception;
+use TAO\Callback;
 
 /**
  * Class StringTemplate
@@ -20,51 +20,50 @@ use TAO\Exception;
  */
 class StringTemplate
 {
-	protected $template;
-	protected $binds = [];
+	protected $text;
+	protected $values = [];
 
-	protected $regexpFlags = 'U';
-	protected $startVarDelimiter = '{';
-	protected $endVarDelimiter = '}';
+	protected $regexp = '/\{(.+?)\}/';
+	protected $regexpIndex = 1;
 
 	/**
 	 * StringTemplate constructor.
 	 * @param string $text
-	 * @param array $binds
+	 * @param array $values
 	 */
-	public function __construct($text, $binds = [])
+	public function __construct($text, $values = [])
 	{
 		$this->text = $text;
-		if (!empty($binds)) {
-			$this->bind($binds);
+		if (!empty($values)) {
+			$this->setValues($values);
 		}
 	}
 
 	/**
 	 * @param string $template
-	 * @param array $binds
-	 * @param array $delimiters
-	 * @param null $flags
+	 * @param array|callback $values
+	 * @param string $regexp
+	 * @param int $regexpIndex
 	 * @return StringTemplate
 	 */
-	public static function process($template, $binds = [], $delimiters = null, $flags = null)
+	public static function process($template, $values = [], $regexp = null, $regexpIndex = null)
 	{
-		$obj = new self($template, $binds);
-		if (!is_null($delimiters)) {
-			$obj->configureDelimiters($delimiters);
+		$obj = new self($template, $values);
+		if (!is_null($regexp)) {
+			$obj->setRegexp($regexp);
 		}
-		if (!is_null($flags)) {
-			$obj->configureRegexpFlags($flags);
+		if (!is_null($regexpIndex)) {
+			$obj->setRegexpIndex($regexpIndex);
 		}
-		return $obj;
+		return $obj->asString();
 	}
 
 	/**
-	 * @param array $binds
+	 * @param array $values
 	 */
-	public function bind($binds)
+	public function setValues($values)
 	{
-		$this->binds = array_replace($this->binds, $binds);
+		$this->values = $values;
 	}
 
 	/**
@@ -72,7 +71,31 @@ class StringTemplate
 	 */
 	public function asString()
 	{
-		return preg_replace($this->regexps(), $this->binds, $this->text);
+		return preg_replace_callback($this->regexp, [$this, 'replaceVarCallback'], $this->text);
+	}
+
+	public function replaceVarCallback($matches)
+	{
+		if (isset($matches[$this->regexpIndex])) {
+			$value = $this->getValue($matches[$this->regexpIndex]);
+			if (!is_null($value)) {
+				return $value;
+			}
+		}
+		return $matches[0];
+	}
+
+	public function getValue($valueName)
+	{
+		$value = null;
+		if (\TAO\Type::isCallable($this->values)) {
+			$value = Callback::instance($this->values)->call($valueName);
+		} else {
+			if (isset($this->values[$valueName])) {
+				$value = $this->values[$valueName];
+			}
+		}
+		return $value;
 	}
 
 	public function __toString()
@@ -81,45 +104,18 @@ class StringTemplate
 	}
 
 	/**
-	 * @return array
+	 * @param string $regexp
 	 */
-	protected function regexps()
+	public function setRegexp($regexp)
 	{
-		$regexps = [];
-		foreach (array_keys($this->binds) as $bindName) {
-			$regexps[] = $this->makeRegexp($bindName);
-		}
-		return $regexps;
+		$this->regexp = $regexp;
 	}
 
 	/**
-	 * @param string $name
-	 * @return string
+	 * @param int $index
 	 */
-	protected function makeRegexp($name)
+	public function setRegexpIndex($index)
 	{
-		return '~' . $this->startVarDelimiter . $name . $this->endVarDelimiter . '~' . $this->regexpFlags;
-	}
-
-	/**
-	 * @param array $delimiters
-	 * @throws Exception
-	 */
-	public function configureDelimiters($delimiters)
-	{
-		if (is_array($delimiters) && count($delimiters) == 2) {
-			$this->startVarDelimiter = $delimiters[0];
-			$this->endVarDelimiter = $delimiters[1];
-		} else {
-			throw new Exception('Incorrect delimiters for StringTemplates: expected string or array with two element');
-		}
-	}
-
-	/**
-	 * @param string $flags
-	 */
-	public function configureRegexpFlags($flags)
-	{
-		$this->regexpFlags = $flags;
+		$this->regexpIndex = $index;
 	}
 }

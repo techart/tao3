@@ -11,6 +11,7 @@ class Assets
 	protected $originalRequest;
 	protected $needRedirectTo;
 	protected $needRedirectType;
+	protected $vars = array();
 
 	public function init()
 	{
@@ -30,6 +31,17 @@ class Assets
 			$this->setMeta($metaName, $metaValue);
 		}
 	}
+	
+	public function setVar($name, $value)
+	{
+		$this->vars[$name] = $value;
+	}
+	
+	public function getVar($name)
+	{
+		return $this->vars[$name] ?? null;
+	}
+	
 
 	public function renderMeta()
 	{

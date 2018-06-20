@@ -111,6 +111,13 @@ class Upload extends Field
 	public function processAfterSet()
 	{
 		if ($this->newFile) {
+			$temp = false;
+			if (\TAO::regexp('{^https?://}', $this->newFile)) {
+				$dir = 'temp/'.uniqid();
+				\Storage::makeDirectory($dir);
+				$temp = app('tao.http')->saveFile($this->newFile, $dir);
+				$this->newFile = $temp;
+			}
 			$name = $this->newFile;
 			$ext = '';
 			if ($m = \TAO::regexp('{/([^/]+)$}', $name)) {
@@ -124,6 +131,12 @@ class Upload extends Field
 			$info->ext = $ext;
 			$dest = $this->setFile($this->newFile, $info);
 			$this->newFile = false;
+
+			if ($temp) {
+				\Storage::delete($temp);
+				\Storage::deleteDirectory($dir);
+			}
+
 			return $dest;
 		}
 	}

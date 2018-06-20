@@ -2,6 +2,8 @@
 
 namespace TAO\ORM\Traits;
 
+use TAO\Foundation\Request;
+
 trait Sitemap
 {
 	public function inSitemap()

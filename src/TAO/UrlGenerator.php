@@ -29,8 +29,11 @@ class UrlGenerator extends \Illuminate\Routing\UrlGenerator
 
 	protected function addTrailingSlash($url)
 	{
+		if ($url == '/') {
+			return $url;
+		}
 		$urlParts = parse_url($url);
-		$urlParts['path'] .= '/';
+		$urlParts['path'] = ($urlParts['path'] ?? '') . '/';
 		return \URL::gather($urlParts);
 	}
 

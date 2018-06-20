@@ -520,7 +520,7 @@ class Navigation
 	public function tag()
 	{
 		if ($this->isCurrent()) {
-			$check = config('tao.navigation.check_tag');
+			$check = config('tao.navigation.check_tag', true);
 			if ($check) {
 				if (substr($this->url, 0, 6) != '/admin') {
 					return 'div';

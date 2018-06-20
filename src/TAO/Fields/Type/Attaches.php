@@ -7,6 +7,7 @@ use TAO\Callback;
 use TAO\Fields\Field;
 use TAO\Fields\FileField;
 use TAO\Fields\Type\Attaches\Entry;
+use Illuminate\Http\File;
 
 class Attaches extends StringField implements \IteratorAggregate
 {
@@ -19,7 +20,7 @@ class Attaches extends StringField implements \IteratorAggregate
 	 */
 	public function createField(Blueprint $table, $column = false)
 	{
-		$column = $column? $column : $this->name;
+		$column = $column ? $column : $this->name;
 		return $table->text($column);
 	}
 
@@ -42,12 +43,12 @@ class Attaches extends StringField implements \IteratorAggregate
 		}
 		return $defs;
 	}
-	
+
 	protected function createEntry($data)
 	{
 		return new Entry($data);
 	}
-	
+
 	/**
 	 * @param bool $raw
 	 * @return array
@@ -239,7 +240,7 @@ class Attaches extends StringField implements \IteratorAggregate
 				$name = $data['name'];
 				$path = $data['path'];
 				$new = isset($data['new']) ? $data['new'] : false;
-				
+
 				if ($new) {
 					$newPath = "{$dir}/{$name}";
 					if (\Storage::exists($newPath)) {
@@ -249,16 +250,16 @@ class Attaches extends StringField implements \IteratorAggregate
 					\Storage::delete($path);
 					$data['path'] = $newPath;
 				}
-				
+
 				unset($data['url']);
 				unset($data['new']);
 				unset($data['error']);
 				unset($data['key']);
-				
+
 				$this->checkWidthAndHeight($data);
-				
+
 				$exists[$name] = $name;
-				
+
 				$out[$key] = $data;
 			}
 		}
@@ -271,6 +272,53 @@ class Attaches extends StringField implements \IteratorAggregate
 		}
 
 		$this->item->where($this->item->getKeyName(), $this->item->getKey())->update([$this->name => serialize($out)]);
+	}
+
+	/**
+	 * Добавление файла в список (для вызова из скрипта)
+	 *
+	 * @param $path
+	 * @param array $info
+	 */
+	public function add($path, $info = [])
+	{
+		$ext = 'bin';
+		$fileName = strtolower(preg_replace('{^.*/}', '', $path));
+		if ($m = \TAO::regexp('{\.([a-z0-9]+)$}', $fileName)) {
+			$ext = $m[1];
+		}
+		$files = unserialize($this->item[$this->name]);
+		$files = is_array($files) ? $files : [];
+		foreach (array_keys($files) as $key) {
+			$name = $files[$key]['name'];
+			if ($name == $fileName) {
+				unset($files[$key]);
+			}
+		}
+		$key = 'f' . md5($path);
+		$dir = $this->param('private', false) ? $this->item->getPrivateHomeDir() : $this->item->getHomeDir();
+		$dir = "{$dir}/{$this->name}";
+		$dest = "{$dir}/{$fileName}";
+
+		$data = array(
+			'path' => $dest,
+			'name' => $fileName,
+			'info' => \TAO::merge($this->defaultInfo(), $info),
+		);
+
+		if (\Storage::exists($dest)) {
+			\Storage::delete($dest);
+		}
+
+		if (\TAO::regexp('{^https?://}', $path)) {
+			app('tao.http')->saveFile($fileName, $dir);
+		} elseif (is_file($path)) {
+			\Storage::putFileAs($dir, new File($path), $fileName);
+		} else {
+			\Storage::copy($path, "{$dir}/{$fileName}");
+		}
+		$files[$key] = $data;
+		$this->item->where($this->item->getKeyName(), $this->item->getKey())->update([$this->name => serialize($files)]);
 	}
 
 
@@ -352,7 +400,7 @@ class Attaches extends StringField implements \IteratorAggregate
 			return $this->value();
 		});
 	}
-	
+
 	public function countRenderableEntries()
 	{
 		return count($this->renfderableEntries());

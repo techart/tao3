@@ -16,6 +16,16 @@ class Model implements \ArrayAccess
 		return ':dummy';
 	}
 
+	public function getTableName()
+	{
+		return $this->getTable();
+	}
+
+	public function getTableDatabase()
+	{
+		return false;
+	}
+
 	public function getForeignKey()
 	{
 		if ($this->code) {

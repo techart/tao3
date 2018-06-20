@@ -45,14 +45,14 @@ trait Schema
 	 */
 	public function updateSchemaIfNecessary()
 	{
-		$table = $this->getTable();
-		if (app('tao.fields')->schemaWasUpdated($table)) {
+		$class = get_class($this);
+		if (app('tao.fields')->schemaWasUpdated($class)) {
 			return $this;
 		}
 		if (app()->tao->classModified($this, false) || \App::environment('testing')) {
 			$this->updateSchema();
 		}
-		app('tao.fields')->schemaUpdated($table);
+		app('tao.fields')->schemaUpdated($class);
 		return $this;
 	}
 

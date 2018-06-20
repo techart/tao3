@@ -31,4 +31,9 @@ class Text extends StringField
 		}
 		return $style;
 	}
+	
+	public function tabKeyClass()
+	{
+		return $this->param('tab_key', false)? ' use-tab-key' : '';
+	}
 }

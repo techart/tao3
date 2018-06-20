@@ -5,7 +5,7 @@ namespace TAO;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use TAO\Components\Sitemap\Manager;
-
+use TAO\Foundation\HTTP;
 
 class Provider extends ServiceProvider
 {
@@ -62,7 +62,7 @@ class Provider extends ServiceProvider
 				if (is_dir($path)) {
 					foreach (\File::allFiles($path) as $commandFile) {
 						$commandClassName = str_replace('.' . $commandFile->getExtension(), '', $commandFile->getFilename());
-						$commands[] = $namespace.'\\Console\\Commands\\' . $commandClassName;
+						$commands[] = $namespace . '\\Console\\Commands\\' . $commandClassName;
 					}
 				}
 			}
@@ -75,6 +75,10 @@ class Provider extends ServiceProvider
 	{
 		$this->app->bind('view.finder', function ($app) {
 			return new \TAO\View\Finder($app['files'], $app['config']['view.paths']);
+		});
+
+		$this->app->bind('tao.http', function ($app) {
+			return app()->make(HTTP::class);
 		});
 
 		$this->app->singleton('url', function ($app) {
@@ -134,11 +138,11 @@ class Provider extends ServiceProvider
 			return $assets;
 		});
 
-		$this->app->singleton('sitemap.manager', function() {
+		$this->app->singleton('sitemap.manager', function () {
 			return app()->make(Manager::class);
 		});
 
-		$this->app->singleton('tao.utils', function() {
+		$this->app->singleton('tao.utils', function () {
 			return app()->make(\TAO\Foundation\Utils::class);
 		});
 
@@ -159,6 +163,21 @@ class Provider extends ServiceProvider
 			if (!is_link($link)) {
 				symlink(storage_path('app/public'), $link);
 			}
+		}
+
+		$this->link_tinymce();
+	}
+
+	/**
+	 * Создание симлинка на tinyMCE
+	 */
+	protected function link_tinymce()
+	{
+		$scripts_dir = \TAO::publicPath() . '/tao/scripts';
+		$link_name = $scripts_dir . '/tinymce';
+
+		if (is_dir($scripts_dir) && !is_link($link_name)) {
+			symlink(base_path('vendor/tinymce/tinymce'), $link_name);
 		}
 	}
 

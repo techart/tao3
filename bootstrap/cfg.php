@@ -3,7 +3,13 @@
 if (!function_exists('tao_cfg')) {
 	function tao_cfg($name, $values = [])
 	{
-		$path = realpath(__DIR__ . '/../config') . "/{$name}.php";
+		if (preg_match('/^(.+?):(.+?)$/', $name, $m)) {
+			// from composer package
+			$path = realpath(__DIR__ . '/../../' . $m[1]) . "/config/{$m[2]}.php";
+		} else {
+			// from tao3
+			$path = realpath(__DIR__ . '/../config') . "/{$name}.php";
+		}
 		if (is_file($path)) {
 			$out = include($path);
 			$out = tao_cfg_merge($out, $values);

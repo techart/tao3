@@ -402,6 +402,9 @@ trait Table
 
 	protected function csvFields()
 	{
+		if (method_exists($this->datatype(), 'csvFields')) {
+			return $this->datatype()->csvFields();
+		}
 		return $this->generateFields('CSV', 'csv');
 	}
 

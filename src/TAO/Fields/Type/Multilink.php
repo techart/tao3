@@ -119,7 +119,8 @@ class Multilink extends Field
 	{
 		if (!$this->relationsIsLoaded) {
 			if ($this->item->getKey()) {
-				$this->set($this->belongsToMany()->allRelatedIds()->toArray());
+				$ids = $this->belongsToMany()->allRelatedIds();
+				$this->set(is_array($ids)? $ids : $ids->toArray());
 			}
 			$this->relationsIsLoaded = true;
 		}
@@ -149,6 +150,12 @@ class Multilink extends Field
 	public function setFromRequest($request)
 	{
 		parent::setFromRequest($request);
+		$this->relationsIsLoaded = true;
+	}
+
+	public function setFromFilter($request)
+	{
+		parent::setFromFilter($request);
 		$this->relationsIsLoaded = true;
 	}
 

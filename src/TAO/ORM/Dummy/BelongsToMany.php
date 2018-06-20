@@ -30,6 +30,11 @@ class BelongsToMany
 			$this->attach($id);
 		}
 	}
+	
+	public function count()
+	{
+		return count($this->values);
+	}
 }
 
 

@@ -1,9 +1,9 @@
 <?php
 
-if (is_null($appPath)) {
+if (empty($appPath)) {
 	$appPath = realpath(__DIR__ . '/../../../../');
 }
-if (is_null($vendorPath)) {
+if (empty($vendorPath)) {
 	$vendorPath = $appPath . '/vendor';
 }
 

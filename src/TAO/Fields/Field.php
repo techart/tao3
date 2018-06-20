@@ -380,6 +380,7 @@ abstract class Field
 		} elseif (isset($this->data['template'])) {
 			$template = $this->data['template'];
 		}
+
 		if ($template) {
 			$context = $this->defaultContext();
 			if (is_array($arg1)) {
@@ -644,9 +645,18 @@ abstract class Field
 		}
 		if (isset($this->data['link_in_list'])) {
 			$url = $this->callableParam('link_in_list', null, [$this], $this->item);
-			$url = StringTemplate::process($url, ['id' => $this->item->getKey()]);
+			$url = StringTemplate::process($url, function($key) {
+				if ($key == 'id') {
+					return $this->item->getKey();
+				}
+				return (string)$this->item->field($key)->value();
+			});
 			$render = empty($render) ? 'empty' : trim($render);
 			$render = "<a href=\"{$url}\">{$render}</a>";
+		}
+		$method = 'adminListValuePreprocess';
+		if (method_exists($this->item, $method)) {
+			return $this->item->$method($render, $this);
 		}
 		return $render;
 	}

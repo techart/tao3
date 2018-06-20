@@ -76,7 +76,7 @@ class TAO
 
 	public function isHttps()
 	{
-		return isset($_SERVER['HTTPS']);
+		return request()->isSecure();
 	}
 
 	public function pageNotFound()
@@ -223,6 +223,15 @@ class TAO
 	{
 		$datatypeClasses = $this->datatypeClasses();
 		if (!isset($datatypeClasses[$name])) {
+			$callbacks = config('tao.get_datatype_class', []);
+			$callbacks = is_string($callbacks)? [$callbacks] : $callbacks;
+			foreach($callbacks as $cb) {
+				if (\TAO\Callback::isValidCallback($cb)) {
+					if ($class = \TAO\Callback::instance($cb)->args([$name])->call($this)) {
+						return $class;
+					}
+				}
+			}
 			if (is_null($default)) {
 				throw new UnknownDatatype($name);
 			}
@@ -461,7 +470,12 @@ class TAO
 			}
 			if ($m = \TAO::regexp('{^datatype:(.+)$}', $src)) {
 				$datatypeCode = trim($m[1]);
-				$callback = "datatype.$datatypeCode::itemsForSelect";
+				$method = 'itemsForSelect';
+				if ($m = \TAO::regexp('{^(.+)::(.+)$}', $datatypeCode)) {
+					$datatypeCode = trim($m[1]);
+					$method = trim($m[2]);
+				}
+				$callback = "datatype.{$datatypeCode}::{$method}";
 				$src = $args ? [$callback, [Collection::parseString($args)]] : $callback;
 			}
 		}

@@ -1,5 +1,6 @@
 <?php
 namespace TAO\Components\Sitemap;
+
 use Roumen\Sitemap\Sitemap;
 use TAO\Urls;
 
@@ -56,8 +57,8 @@ class Manager
 	 */
 	public function registerDefaultSources()
 	{
-		$this->registerDatatypes();
 		$this->registerSourcesFromConfig();
+		$this->registerDatatypes();
 	}
 
 	/**
@@ -142,6 +143,7 @@ class Manager
 	public function normalizeLink($link)
 	{
 		$link = is_string($link) ? ['loc' => $link] : $link;
+		$link['loc'] = url($link['loc']);
 		if (isset($link['changefreq'])) {
 			$link['freq'] = $link['changefreq'];
 		}
@@ -216,7 +218,7 @@ class Manager
 	{
 		$sitemapName = 'sitemap' . $index;
 		$this->storeLinksWithGenerator($links, $generator, $sitemapName);
-		$generator->addSitemap(Urls::full_url($sitemapName . '.xml'));
+		$generator->addSitemap(url($sitemapName . '.xml'));
 		$generator->model->resetItems();
 	}
 

@@ -56,4 +56,26 @@ class Utils
 	{
 		return Carbon::instance($this->dateTime($date));
 	}
+	
+	public function dataEncode($data)
+	{
+		$data = serialize($data);
+		$data = base64_encode($data);
+		$data = preg_replace('{==$}', '(2)', $data);
+		$data = preg_replace('{=$}', '(1)', $data);
+		$data = str_replace('+', '(p)', $data);
+		$data = str_replace('/', '(s)', $data);
+		return $data;
+	}
+	
+	public function dataDecode($data)
+	{
+		$data = str_replace('(s)', '/', $data);
+		$data = str_replace('(p)', '+', $data);
+		$data = str_replace('(1)', '=', $data);
+		$data = str_replace('(2)', '==', $data);
+		$data = base64_decode($data);
+		$data = unserialize($data);
+		return $data;
+	}
 }

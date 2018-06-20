@@ -3,6 +3,7 @@
 namespace TAO\Support;
 
 use Illuminate\Support\ServiceProvider;
+use TAO\Config\ConfigFileGenerator;
 
 abstract class ComponentServiceProvider extends ServiceProvider
 {
@@ -14,12 +15,17 @@ abstract class ComponentServiceProvider extends ServiceProvider
 
 	public function viewsPath()
 	{
-		return $this->packageDir() . '/views';
+		return $this->packageDir() . '/resources/views';
 	}
 
 	public function routesPath()
 	{
 		return $this->packageDir() . '/routes';
+	}
+
+	public function configPath()
+	{
+		return $this->packageDir() . '/config';
 	}
 
 	public function commandsPath()
@@ -35,8 +41,16 @@ abstract class ComponentServiceProvider extends ServiceProvider
 	public function boot()
 	{
 		$this->loadViews();
-		$this->loadRoutes();
-		$this->loadCommands();
+		if (!$this->isPublished()) {
+			$this->loadConfig();
+			$this->setPublished();
+		}
+		if ($this->routesAutoloadEnabled()) {
+			$this->loadRoutes();
+		}
+		if ($this->app->runningInConsole()) {
+			$this->loadCommands();
+		}
 		$this->loadTranslations();
 	}
 
@@ -54,9 +68,36 @@ abstract class ComponentServiceProvider extends ServiceProvider
 		$path = $this->routesPath();
 		if ($path && is_dir($path)) {
 			foreach (\File::allFiles($path) as $file) {
-				$this->loadRoutesFrom($file);
+				switch ($file->getFilename()) {
+					case 'web.php':
+						\Route::middleware('web')->group((string)$file);
+						break;
+					case 'api.php':
+						\Route::middleware('api')->group((string)$file);
+						break;
+					default:
+						$this->loadRoutesFrom($file);
+				}
 			}
 		}
+	}
+
+	protected function loadConfig()
+	{
+		foreach ($this->getConfigFiles() as $file) {
+			$configName = $file->getBasename('.' . $file->getExtension());
+			ConfigFileGenerator::run($configName, $this->mnemocode());
+		}
+	}
+
+	protected function getConfigFiles()
+	{
+		$files = [];
+		$path = $this->configPath();
+		if ($path && is_dir($path)) {
+			$files = \File::allFiles($path);
+		}
+		return $files;
 	}
 
 	protected function loadCommands()
@@ -66,7 +107,7 @@ abstract class ComponentServiceProvider extends ServiceProvider
 		if ($path && file_exists($path)) {
 			if (is_dir($path)) {
 				foreach (\File::allFiles($path) as $file) {
-					$commandClassName = str_replace('.' . $file->getExtension(), '', $file->getFilename());
+					$commandClassName = $file->getBasename('.' . $file->getExtension());
 					$commands[] = $this->namespace() . '\\Commands\\' . $commandClassName;
 				}
 			}
@@ -82,5 +123,25 @@ abstract class ComponentServiceProvider extends ServiceProvider
 		if ($path && is_dir($path)) {
 			$this->loadTranslationsFrom($path, $this->mnemocode());
 		}
+	}
+
+	protected function isPublished()
+	{
+		return \Cache::get($this->cachePublishedKey());
+	}
+
+	protected function setPublished()
+	{
+		return \Cache::set($this->cachePublishedKey(), 1);
+	}
+
+	protected function cachePublishedKey()
+	{
+		return $this->mnemocode() . '.published';
+	}
+
+	protected function routesAutoloadEnabled()
+	{
+		return config($this->mnemocode() . '.routes_autoload', true);
 	}
 }

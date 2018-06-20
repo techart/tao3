@@ -7,5 +7,12 @@ return [
 		'lifetime' => 60
 	],
 	'limit' => 50000,
-	'sources' => []
+	'sources' => [
+		\TAO\Components\Sitemap\MainPageSource::class
+	],
+	'main_page' => [
+		'url' => '/',
+		'changefreq' => 'daily',
+		'priority' => 1,
+	]
 ];

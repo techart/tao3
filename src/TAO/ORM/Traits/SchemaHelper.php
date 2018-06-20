@@ -231,6 +231,11 @@ trait SchemaHelper
 		$data['weight'] = (++$this->weightInList)*1000;
 		return $data;
 	}
+	
+	protected function parseType($type)
+	{
+		return ['type' => $type];
+	}
 
 	protected function parseFormField($m, $tabgroup)
 	{
@@ -243,14 +248,18 @@ trait SchemaHelper
 			$type = str_replace('+', ' ', $m[2]);
 		}
 		$width = false;
-		$data = ['type' => $type];
+		$data = $this->parseType($type);
 		if ($tabgroup) {
 			$data['group'] = $tabgroup;
 		}
 		$style = '';
 		foreach($this->parseString($line) as $key => $value) {
 			if (!is_numeric($key)) {
-				$data[$key] = $value;
+				if ($key == 'style') {
+					$style = trim($style, ';') . ";{$value}";
+				} else {
+					$data[$key] = $value;
+				}
 			} elseif ($value == '!form') {
 				$in_form = false;
 			} elseif ($m = \TAO::regexp('{^(\d+)(px|\%)$}', $value)) {

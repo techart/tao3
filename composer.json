@@ -1,7 +1,7 @@
 {
     "name": "techart/tao3",
     "description": "Techart extensions for Laravel",
-    "version" : "3.1.19",
+    "version" : "3.1.20",
     "license": "Apache-2.0",
     "authors": [
         {
@@ -24,7 +24,9 @@
         "laravel/tinker": "~1.0",
         "rcrowe/twigbridge": "^0.9.4",
         "roumen/sitemap": "^2.7",
-        "intervention/image": "^2.3"
+        "intervention/image": "^2.3",
+        "mews/purifier": "^2.1",
+        "tinymce/tinymce": "^4.7"
     },
     "extra": {
         "laravel": {
