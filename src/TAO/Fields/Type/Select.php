@@ -56,4 +56,14 @@ class Select extends Field
 	{
 		return $this->items()[$this->value()] ?? '';
 	}
+
+	public function dataExportValue()
+	{
+		return $this->value();
+	}
+
+	public function dataImport($src)
+	{
+		$this->set(((int)$src));
+	}
 }

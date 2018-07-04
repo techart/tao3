@@ -276,11 +276,13 @@ class Attaches extends StringField implements \IteratorAggregate
 
 	/**
 	 * Добавление файла в список (для вызова из скрипта)
+	 * Если передан параметр $body, то тело файла будет взято из него, а из $path - только имя для сохранения
 	 *
 	 * @param $path
 	 * @param array $info
+	 * @param $body
 	 */
-	public function add($path, $info = [])
+	public function add($path, $info = [], $body = false)
 	{
 		$ext = 'bin';
 		$fileName = strtolower(preg_replace('{^.*/}', '', $path));
@@ -310,7 +312,9 @@ class Attaches extends StringField implements \IteratorAggregate
 			\Storage::delete($dest);
 		}
 
-		if (\TAO::regexp('{^https?://}', $path)) {
+		if ($body) {
+			\Storage::put("{$dir}/{$fileName}", $body);
+		} elseif (\TAO::regexp('{^https?://}', $path)) {
 			app('tao.http')->saveFile($fileName, $dir);
 		} elseif (is_file($path)) {
 			\Storage::putFileAs($dir, new File($path), $fileName);
@@ -318,6 +322,7 @@ class Attaches extends StringField implements \IteratorAggregate
 			\Storage::copy($path, "{$dir}/{$fileName}");
 		}
 		$files[$key] = $data;
+		$this->item[$this->name] = serialize($files);
 		$this->item->where($this->item->getKeyName(), $this->item->getKey())->update([$this->name => serialize($files)]);
 	}
 
@@ -452,4 +457,53 @@ class Attaches extends StringField implements \IteratorAggregate
 		$context['container_class'] = $this->containerClass();
 		return $context;
 	}
+
+	public function dataExportValue()
+	{
+		$out = '';
+		foreach ($this->value() as $data) {
+			$name = $data['name'] ?? false;
+			$path = $data['path'] ?? false;
+			$info = $data['info'] ?? [];
+			if ($name && $path && \Storage::exists($path)) {
+				$out .= "\n*name={$name}";
+				$out .= "\n*info=" . base64_encode(serialize($info));
+				$out .= "\n*file";
+				$out .= "\n" . trim(chunk_split(base64_encode(\Storage::get($path))));
+				$out .= "\n*endfile";
+			}
+		}
+		return $out;
+	}
+
+	public function dataImport($src)
+	{
+		foreach (explode('*endfile', $src) as $part) {
+			if ($path = trim($part)) {
+				$name = false;
+				$info = [];
+				$fileSrc = '';
+				foreach (explode("\n", $part) as $line) {
+					if ($line = trim($line)) {
+						if ($m = \TAO::regexp('{^\*(name|info)=(.+)$}', $line)) {
+							$key = $m[1];
+							$value = trim($m[2]);
+							if ($key == 'name') {
+								$name = $value;
+							} elseif ($key == 'info') {
+								$info = unserialize(base64_decode($value));
+							}
+						} elseif (!starts_with($line, '*')) {
+							$fileSrc .= $line;
+						}
+					}
+				}
+
+				if ($name && $fileSrc) {
+					$this->add($name, $info, base64_decode($fileSrc));
+				}
+			}
+		}
+	}
+
 }

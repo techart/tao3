@@ -246,4 +246,50 @@ class Upload extends Field
 		}
 		return $render;
 	}
+
+	public function dataExportValue()
+	{
+		$value = $this->value();
+		if (starts_with($value, 'data:')) {
+			return chunk_split($value);
+		}
+		$path = $value;
+		if (\Storage::exists($path)) {
+			$name = preg_replace('{^.*/}', '', $value);
+			return ":{$name}\n".chunk_split(base64_encode(\Storage::get($path)));
+		}
+	}
+
+	public function dataImport($src)
+	{
+		$name = false;
+		$src = trim($src);
+		$p = strpos($src, "\n");
+		if ($p>0) {
+			$line = trim(substr($src, 0,  $p));
+			if ($m = \TAO::regexp('{^:(.+)$}', $line)) {
+				$name = trim($m[1]);
+				$src = trim(substr($src, $p));
+			}
+		}
+		$src = preg_replace('{\s+}sm', '', $src);
+		if (starts_with($src, 'data:')) {
+
+		} else {
+			if ($name) {
+				$ext = 'bin';
+				$content = base64_decode($src);
+				if ($m = \TAO::regexp('{\.([^.]+)$}', $name)) {
+					$ext = $m[1];
+				}
+				$info = new \StdClass;
+				$info->name = $name;
+				$info->ext = $ext;
+				$dest = $this->destinationPath($info);
+				list($dir, $file) = $this->destinationDirAndName($info);
+				\Storage::put($dest, $content);
+				$this->item[$this->name] = $dest;
+			}
+		}
+	}
 }

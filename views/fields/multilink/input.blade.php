@@ -1,6 +1,6 @@
-<div class="multilink-items">
+<div class="multilink-items {!! $field->classForAdminInput() !!}" style="{!! $field->styleForAdminInput() !!}">
     @foreach($field->items() as $id => $title)
-        <div class="multilink-item">
+        <label class="multilink-item">
             <input
                 type="checkbox"
                 name="{{ $field->name }}[{{ $id }}]"
@@ -11,7 +11,8 @@
                 @endif
                 {!! $field->renderAttrs() !!}
             >
+            <span class="multilink-item-custom-checkbox"></span>
             <span class="multilink-item-label">{{ $title }}</span>
-        </div>
+        </label>
     @endforeach
 </div>

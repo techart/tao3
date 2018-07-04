@@ -14,4 +14,9 @@ class SimpleDatatype extends Model
 			]
 		];
 	}
+
+	public function addField($name, $data)
+	{
+		$this->processedFields[$name] = $data;
+	}
 }

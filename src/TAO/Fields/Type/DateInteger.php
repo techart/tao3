@@ -119,4 +119,14 @@ class DateInteger extends Field
 	{
 		return app('tao.utils')->carbon($this->value());
 	}
+
+	public function dataExportValue()
+	{
+		return $this->value();
+	}
+
+	public function dataImport($src)
+	{
+		$this->set($src);
+	}
 }

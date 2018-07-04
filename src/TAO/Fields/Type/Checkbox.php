@@ -39,4 +39,14 @@ class Checkbox extends Field
 	{
 		return 0;
 	}
+
+	public function dataExportValue()
+	{
+		return (int)$this->value();
+	}
+
+	public function dataImport($src)
+	{
+		$this->set(((int)$src));
+	}
 }

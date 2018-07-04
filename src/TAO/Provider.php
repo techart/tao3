@@ -37,11 +37,11 @@ class Provider extends ServiceProvider
 		});
 
 		Blade::directive('style', function ($args) {
-			return "<?php Assets::useFile({$args}); ?>";
+			return "<?php Assets::useStyle({$args}); ?>";
 		});
 
 		Blade::directive('script', function ($args) {
-			return "<?php Assets::useFile({$args}); ?>";
+			return "<?php Assets::useScript({$args}); ?>";
 		});
 
 		Blade::directive('bottomScript', function ($args) {

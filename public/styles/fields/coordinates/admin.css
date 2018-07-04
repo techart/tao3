@@ -1,0 +1,11 @@
+.b-field-coordinates {
+}
+
+.b-field-coordinates__inputs {
+	display: flex;
+}
+
+.b-field-coordinates__map {
+	height: 300px;
+	width: 600px;
+}

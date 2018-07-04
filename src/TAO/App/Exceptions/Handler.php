@@ -6,6 +6,7 @@ use Exception;
 use Illuminate\Auth\AuthenticationException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Contracts\View\Factory as ViewFactory;
+use TAO\ErrorsNotifier;
 
 
 class Handler extends ExceptionHandler
@@ -30,11 +31,15 @@ class Handler extends ExceptionHandler
 	 * This is a great spot to send exceptions to Sentry, Bugsnag, etc.
 	 *
 	 * @param  \Exception $exception
-	 * @return void
+	 * @return mixed
+	 * @throws Exception
 	 */
 	public function report(Exception $exception)
 	{
-		parent::report($exception);
+		if ($this->shouldReport($exception)) {
+			$this->notify($exception);
+		}
+		return parent::report($exception);
 	}
 
 	/**
@@ -44,7 +49,7 @@ class Handler extends ExceptionHandler
 	 * @param  \Exception $exception
 	 * @return \Illuminate\Http\Response
 	 */
-	public function render($request, Exception $exception)
+	public function render($request, \Exception $exception)
 	{
 		if ($this->isHttpException($exception)) {
 			$status = $exception->getStatusCode();
@@ -63,6 +68,7 @@ class Handler extends ExceptionHandler
 	 * @param  \Illuminate\Http\Request $request
 	 * @param  \Illuminate\Auth\AuthenticationException $exception
 	 * @return \Illuminate\Http\Response
+	 * @throws \TAO\Exception\UnknownDatatype
 	 */
 	protected function unauthenticated($request, AuthenticationException $exception)
 	{
@@ -71,5 +77,14 @@ class Handler extends ExceptionHandler
 		}
 
 		return redirect()->guest(\TAO::datatype('users')->loginUrl());
+	}
+
+	/**
+	 * @param \Exception $exception
+	 * @return void
+	 */
+	protected function notify($exception)
+	{
+		app(ErrorsNotifier::class)->run($exception);
 	}
 }

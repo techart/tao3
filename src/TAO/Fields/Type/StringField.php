@@ -42,4 +42,16 @@ class StringField extends MultivariantField
 		}
 		return $value;
 	}
+
+	public function dataExportValue()
+	{
+		return chunk_split(base64_encode($this->item[$this->name]));
+	}
+
+	public function dataImport($src)
+	{
+		$src = preg_replace('{\s+}sm', '', $src);
+		$src = base64_decode($src);
+		$this->set($src);
+	}
 }

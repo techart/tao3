@@ -28,6 +28,7 @@
 		'radio' => \TAO\Fields\Type\Radio::class,
 		'multicheckbox' => \TAO\Fields\Type\MultiCheckbox::class,
 		'html' => \TAO\Fields\Type\Html::class,
+		"coordinates" => \TAO\Fields\Type\Coordinates::class,
 	],
 
 	'text' => [

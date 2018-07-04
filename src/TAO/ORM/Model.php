@@ -561,6 +561,16 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 		return !$this->isDatatype();
 	}
 
+	public function dataExport()
+	{
+		$out = "\n@{$this->id}";
+		foreach($this->fieldsObjects() as $field) {
+			$out .= $field->dataExport();
+		}
+		$out .= "\n@@\n";
+		return $out;
+	}
+
 	public function __call($method, $args)
 	{
 		if ($m = \TAO::regexp('{^(.+)_belongs_to_many$}', $method)) {

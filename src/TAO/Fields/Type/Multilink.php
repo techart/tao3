@@ -405,4 +405,21 @@ class Multilink extends Field
 	{
 		return [];
 	}
+
+	public function dataExportValue()
+	{
+		return implode(',', array_keys($this->attachedIds()));
+	}
+
+	public function dataImport($src)
+	{
+		$ids = [];
+		foreach (explode(',', $src) as $id) {
+			$id = (int)trim($id);
+			if ($id>0) {
+				$ids[] = $id;
+			}
+		}
+		$this->attach($ids);
+	}
 }

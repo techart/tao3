@@ -31,17 +31,17 @@ class Assets
 			$this->setMeta($metaName, $metaValue);
 		}
 	}
-	
+
 	public function setVar($name, $value)
 	{
 		$this->vars[$name] = $value;
 	}
-	
+
 	public function getVar($name)
 	{
 		return $this->vars[$name] ?? null;
 	}
-	
+
 
 	public function renderMeta()
 	{
@@ -110,9 +110,28 @@ class Assets
 		return $this;
 	}
 
+	public function useScript($file)
+	{
+		$this->useFile($file, [
+			'scope' => 'scripts',
+			'type' => 'js'
+		]);
+	}
+
 	public function useBottomScript($file)
 	{
-		$this->useFile($file, 'bottom_scripts');
+		$this->useFile($file, [
+			'scope' => 'bottom_scripts',
+			'type' => 'js'
+		]);
+	}
+
+	public function useStyle($file)
+	{
+		$this->useFile($file, [
+			'scope' => 'styles',
+			'type' => 'css'
+		]);
 	}
 
 	public function renderFile($file)
@@ -121,11 +140,10 @@ class Assets
 			return '';
 		}
 		$path = $file['path'];
-		$type = false;
-		if ($m = \TAO::regexp('{\.([a-z]+)$}i', $path)) {
+		$type = $file['type'] ?? false;
+		if (!$type && $m = \TAO::regexp('{\.([a-z]+)$}i', $path)) {
 			$type = strtolower($m[1]);
 		}
-
 		$time = '';
 		$fpath = $path[0] == '/' ? rtrim($_SERVER['DOCUMENT_ROOT'], '/') . $path : false;
 		if ($fpath && is_file($fpath)) {

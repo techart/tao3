@@ -278,7 +278,7 @@ fieldset.admin {
   .additional_actions {
     float: left;
   }
-  
+
 .page-navigator {
   text-align: right;
 }
@@ -404,23 +404,23 @@ td.admin-tree-title {}
       margin: 0 0 0 0;
       padding: 2px 2px 2px 5px;
     }
-    
+
     .tao-fields-attaches-filelist .attaches-entry {
       display: inline-block;
       background-color: #eee;
     }
-    
+
     .tao-fields-attaches-filelist .documents-entry {
       position: relative;
       display: block;
       padding: 5px 50px 5px 5px;
       border-bottom: 1px dotted #eee;
     }
-    
+
     .tao-fields-attaches-filelist .documents-entry:hover {
       background-color: #efefef;
     }
-    
+
       .tao-fields-attaches-filelist .documents-entry .date {
         display: inline-block;
         background-color: #888;
@@ -441,7 +441,7 @@ td.admin-tree-title {}
         top: 5px;
         right: 25px;
       }
-      
+
       .tao-fields-attaches-filelist .entry a.delete {
         display: inline-block;
         margin: 0 0 0 3px;
@@ -501,7 +501,7 @@ td.admin-tree-title {}
         .tao-fields-attaches__iform .text {
             width: 95%;
         }
-        
+
         .tao-fields-attaches__iform .cb {
             border: 1px solid #888;
             display: block;
@@ -515,6 +515,20 @@ td.admin-tree-title {}
     background-color: #fff;
 }
 
+
+.multilink-items.scrollable {
+	height: 150px;
+	overflow-y: scroll;
+}
+
+.multilink-item {
+	display: block;
+}
+
+	.multilink-item-label {
+		vertical-align: middle;
+	}
+
 .unvisible {
   display: none;
 }
@@ -522,9 +536,35 @@ td.admin-tree-title {}
 form.tao-filter {
 }
 
-  form.tao-filter .field-container {
-    margin: 10px 0;
-  }
+	form.tao-filter .field-container {
+		margin: 10px 0;
+	}
+
+		form.tao-filter .field-container .input.string {
+			width: 90%;
+		}
+
+		form.tao-filter .field-container .multilink-item .checkbox {
+			vertical-align: top;
+			margin: 0;
+		}
+
+		form.tao-filter .field-container .multilink-item {
+			margin: 0;
+			padding: 0;
+		}
+
+		form.tao-filter .field-container .multilink-item:hover {
+			background-color: #fafafa;
+		}
+
+		form.tao-filter .field-container .multilink-item-label {
+			display: inline-block;
+			width: 80%;
+			padding: 4px 0 0 0;
+			font-size: 12px;
+		}
+
 
 .tao-reset-filter-button {
   float: right;
@@ -589,4 +629,9 @@ form.tao-filter {
   background-image: linear-gradient(to bottom, #0088cc, #0077b3);
   background-repeat: repeat-x;
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ff0088cc', endColorstr='#ff0077b3', GradientType=0);
+}
+
+.b-field-comments {
+	font-size: 0.8em;
+	font-style: italic;
 }

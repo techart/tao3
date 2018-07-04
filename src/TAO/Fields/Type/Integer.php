@@ -43,4 +43,14 @@ class Integer extends Field
 		$style = parent::styleForAdminInput();
 		return empty($style) ? 'width:200px' : $style;
 	}
+
+	public function dataExportValue()
+	{
+		return $this->value();
+	}
+
+	public function dataImport($src)
+	{
+		$this->set(((int)$src));
+	}
 }

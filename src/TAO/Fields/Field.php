@@ -147,10 +147,19 @@ abstract class Field
 	public function setFromRequest($request)
 	{
 		$value = null;
-		if ($request->has($this->name)) {
+		if ($this->hasRequestValue($request)) {
 			$value = $this->getValueFromRequest($request);
 		}
 		$this->set(!is_null($value) ? $value : $this->nullValue());
+	}
+
+	/**
+	 * @param Request $request
+	 * @return bool
+	 */
+	protected function hasRequestValue($request)
+	{
+		return $request->has($this->name);
 	}
 
 	/**
@@ -919,6 +928,26 @@ abstract class Field
 			}
 		}
 		return true;
+	}
+	protected function dataExportValue()
+	{
+		return '';
+	}
+
+	public function dataExport()
+	{
+		if ($value = trim($this->dataExportValue())) {
+			if (strlen($value)>60 || strpos($value, "\n")!==false) {
+				return "\n!{$this->name}\n{$value}\n!!";
+			} else {
+				return "\n!{$this->name}={$value}";
+			}
+		}
+		return '';
+	}
+
+	public function dataImport($src)
+	{
 	}
 
 	/**

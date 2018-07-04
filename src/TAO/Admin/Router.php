@@ -11,10 +11,11 @@ class Router extends \TAO\Router
 
 	public function route($request)
 	{
-
-		app()->router->get('admin/login', '\\TAO\\Admin\\Controller\\Login@showLoginForm');
-		app()->router->post('admin/login', '\\TAO\\Admin\\Controller\\Login@login');
-		app()->router->post('admin/logout', '\\TAO\\Admin\\Controller\\Login@logout');
+		if (config('tao.std_routes.admin_login', true)) {
+			app()->router->get('admin/login', '\\TAO\\Admin\\Controller\\Login@showLoginForm');
+			app()->router->post('admin/login', '\\TAO\\Admin\\Controller\\Login@login');
+			app()->router->post('admin/logout', '\\TAO\\Admin\\Controller\\Login@logout');
+		}
 		app()->router->any('admin', '\\TAO\\Admin\\Controller\\Dashboard@index');
 		app()->router->any('tao/fields/api', '\\TAO\\Fields\\Controllers\\API@index');
 
