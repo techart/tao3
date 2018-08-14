@@ -28,6 +28,10 @@
 @if ($with_row_actions)
     <td class="actions">
     
+        @if ($can_view && $row->accessView($user))
+            <a class="btn btn-success" href="{{ url($controller->actionUrl('view', ['id' => $row->getKey() ])) }}"><i class="icon-eye-open icon-white"></i></a>
+        @endif
+    
         @if ($can_edit && $row->accessEdit($user))
             <a class="btn btn-primary" href="{{ url($controller->actionUrl('edit', ['id' => $row->getKey() ])) }}"><i class="icon-pencil icon-white"></i></a>
         @endif

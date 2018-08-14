@@ -135,6 +135,8 @@ trait FileField
 			'field' => $this->name,
 			'id' => $this->item->getKey(),
 			'filename' => $info->name,
+			'time' => time(),
+			'uniqid' => uniqid(),
 			'translit' => \TAO\Text::process($nameWithoutExt, 'translit_for_url'),
 		];
 	}

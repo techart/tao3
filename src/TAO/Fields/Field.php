@@ -69,6 +69,16 @@ abstract class Field
 
 	/**
 	 *
+	 * Здесь хранится значение поля если оно не предназначено для хранения в БД. В другом случае значение
+	 * хранится в атрибутах модели.
+	 *
+	 * @var mixed
+	 */
+	protected $value;
+
+
+	/**
+	 *
 	 * Проверка существования поля (полей) в таблице БД. Если поля нет, то оно создается
 	 * Чаще всего переопределение требуется в случае сложного поля (создание сопутствующих таблиц и т.п.)
 	 *
@@ -77,15 +87,27 @@ abstract class Field
 	 */
 	public function checkSchema(Blueprint $table)
 	{
-		if (!$this->item->hasColumn($this->name)) {
-			$this->createField($table);
-		} else {
-			$f = $this->createField($table);
-			if ($f) {
-				$f->change();
+		if ($this->isCreateFieldRequired()) {
+			if (!$this->item->hasColumn($this->name)) {
+				$this->createField($table);
+			} else {
+				$f = $this->createField($table);
+				if ($f) {
+					$f->change();
+				}
 			}
 		}
 		return $this;
+	}
+
+	protected function isCreateFieldRequired()
+	{
+		return $this->isStorable();
+	}
+
+	protected function isStorable()
+	{
+		return $this->param('storable', true);
 	}
 
 	/**
@@ -138,7 +160,11 @@ abstract class Field
 	 */
 	public function set($value)
 	{
-		$this->item[$this->name] = $value;
+		if ($this->isStorable()) {
+			$this->item[$this->name] = $value;
+		} else {
+			$this->value = $value;
+		}
 	}
 
 	/**
@@ -294,7 +320,11 @@ abstract class Field
 	 */
 	public function rawValue()
 	{
-		return $this->item[$this->name];
+		if ($this->isStorable()) {
+			return $this->item[$this->name];
+		} else {
+			return $this->value;
+		}
 	}
 
 	/**
@@ -643,17 +673,31 @@ abstract class Field
 		$this->item->error($message, $column);
 	}
 
+	public function renderForAdminView()
+	{
+		return $this->renderForAdmin('view');
+	}
+
+	public function renderForAdminList()
+	{
+		return $this->renderForAdmin('list');
+	}
+
 	/**
 	 * @return mixed
 	 */
-	public function renderForAdminList()
+	public function renderForAdmin($action)
 	{
-		$render = $this->callableParam(['render_in_admin_list', 'render_in_list'], null, [$this], $this->item);
+		$render = $this->callableParam(['render_in_admin_'.$action, 'render_in_'.$action], null, [$this], $this->item);
 		if (is_null($render)) {
-			$render = $this->render();
+			if ($formula = $this->param('formula')) {
+				$render = $this->item->calculateFormula($formula);
+			} else {
+				$render = $this->render();
+			}
 		}
-		if (isset($this->data['link_in_list'])) {
-			$url = $this->callableParam('link_in_list', null, [$this], $this->item);
+		if (isset($this->data['link_in_'.$action])) {
+			$url = $this->callableParam('link_in_'.$action, null, [$this], $this->item);
 			$url = StringTemplate::process($url, function($key) {
 				if ($key == 'id') {
 					return $this->item->getKey();
@@ -663,9 +707,18 @@ abstract class Field
 			$render = empty($render) ? 'empty' : trim($render);
 			$render = "<a href=\"{$url}\">{$render}</a>";
 		}
-		$method = 'adminListValuePreprocess';
+		$method = 'admin'.ucfirst($action).'ValuePreprocess';
 		if (method_exists($this->item, $method)) {
 			return $this->item->$method($render, $this);
+		}
+		if (strpos($render, "\n")>0 && strpos($render, '<')===false) {
+			$out = '';
+			foreach(explode("\n", $render) as $line) {
+				if ($line = trim($line)) {
+					$out .= "\n<p>{$line}</p>";
+				}
+			}
+			return $out;
 		}
 		return $render;
 	}

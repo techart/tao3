@@ -20,7 +20,7 @@ abstract class PageModel extends \TAO\ORM\Model
 
 	/**
 	 * Шаблон урла. Если урл не задан, то при сохранении будет сгенерирован по шаблону.
-	 * Вставки - {date}, {title}
+	 * Вставки - {date}, {title}, {id}
 	 */
 	protected $urlTemplate = false;
 
@@ -95,6 +95,26 @@ abstract class PageModel extends \TAO\ORM\Model
 			$url = str_replace('{date}', $this->dateForUrl(), $url);
 			$url = str_replace('{title}', $this->titleForUrl(), $url);
 			$this->url = $url;
+		}
+	}
+
+	/**
+	 * Генерация урла (дополнительная часть, после сохранения записи)
+	 */
+	protected function generateUrlAfterSave()
+	{
+		if (empty($this->url)) {
+			return;
+		}
+
+		$url = $this->url;
+		if (strpos($url, '{id}') !== false) {
+			$url = str_replace('{id}', $this->id, $url);
+		}
+
+		if ($url != $this->url) {
+			$this->url = $url;
+			$this->save();
 		}
 	}
 

@@ -60,7 +60,7 @@ abstract class User extends AbstractModel implements
 				'group' => 'common',
 			),
 			'email' => array(
-				'type' => 'string(50) index',
+				'type' => 'string(250) index',
 				'label' => 'E-Mail',
 				'in_list' => true,
 				'weight_in_list' => 200,

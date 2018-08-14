@@ -258,6 +258,9 @@ class Multilink extends Field
 			$table = $this->data['table_relations'];
 		} else {
 			$table = $this->item->getTableName() . '_' . $this->relatedModel()->getTableName() . '_relations';
+			if (method_exists($this->item, 'transformRelationTableName')) {
+				$table = $this->item->transformRelationTableName($table);
+			}
 		}
 		if ($db = $this->item->getTableDatabase()) {
 			$table = "{$db}.{$table}";
@@ -421,5 +424,18 @@ class Multilink extends Field
 			}
 		}
 		$this->attach($ids);
+	}
+	
+	public function render($arg1 = false, $arg2 = false)
+	{
+		if ($arg1 || $arg2) {
+			return parent::render($arg1, $arg2);
+		}
+		$out = [];
+		foreach ($this->relatedItems() as $item) {
+			$out[] = $item->title();
+		}
+		sort($out);
+		return implode(', ', $out);
 	}
 }

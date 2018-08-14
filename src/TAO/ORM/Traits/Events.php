@@ -61,6 +61,10 @@ trait Events
 	{
 	}
 
+	protected function generateUrlAfterSave()
+	{
+	}
+
 	/**
 	 *
 	 */
@@ -74,6 +78,7 @@ trait Events
 	 */
 	final public function immutableAfterSave()
 	{
+		$this->generateUrlAfterSave();
 	}
 
 	/**

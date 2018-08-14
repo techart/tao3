@@ -83,9 +83,26 @@ class Image extends Upload
 	
 	public function renderForAdminList()
 	{
-		$render = $this->callableParam(['render_in_admin_list', 'render_in_list'], null, [$this], $this->item);
+		return $this->renderForAdmin('list');
+	}
+	
+	public function renderForAdminView()
+	{
+		return $this->renderForAdmin('view');
+	}
+	
+	public function renderForAdmin($action)
+	{
+		if ($action == 'view') {
+			$pcall = ['render_in_admin_view', 'render_in_admin_list', 'render_in_admin'];
+			$pmods = ['in_admin_view_mods', 'in_admin_list_mods', 'in_admin_mods'];
+		} else {
+			$pcall = ['render_in_admin_list', 'render_in_admin_view', 'render_in_admin'];
+			$pmods = ['in_admin_list_mods', 'in_admin_view_mods', 'in_admin_mods'];
+		}
+		$render = $this->callableParam($pcall, null, [$this], $this->item);
 		if (is_null($render)) {
-			$mods = $this->param(['in_admin_list_mods', 'in_list_mods'], 'fit100x100');
+			$mods = $this->param($pmods, 'fit100x100');
 			$url = $this->url();
 			if ($url) {
 				$murl = $this->url($mods);

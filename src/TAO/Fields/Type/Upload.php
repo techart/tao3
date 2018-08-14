@@ -146,6 +146,7 @@ class Upload extends Field
 		parent::afterItemSave();
 		if ($dest = $this->processAfterSet()) {
 			$this->item->where($this->item->getKeyName(), $this->item->getKey())->update([$this->name => $dest]);
+			$this->item[$this->name] = $dest;
 		}
 	}
 

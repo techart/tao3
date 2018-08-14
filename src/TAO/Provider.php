@@ -2,6 +2,7 @@
 
 namespace TAO;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use TAO\Components\Sitemap\Manager;
@@ -11,6 +12,9 @@ class Provider extends ServiceProvider
 {
 	public function boot()
 	{
+		setlocale(LC_ALL, config('app.php_locale'));
+		Carbon::setLocale(config('app.locale'));
+
 		$this->publishes([
 			__DIR__ . '/../../config/tao.php' => config_path('tao.php'),
 		]);

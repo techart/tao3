@@ -28,19 +28,27 @@ class Utils
 		if ($date === false) {
 			return new \DateTime('now');
 		}
+
 		if (\TAO::regexp('{^\d+$}', trim($date))) {
 			return new \DateTime(date('Y-m-d H:i:s', $date));
 		}
-		if ($m = \TAO::regexp('{^(\d+)\.(\d+)\.(\d+)$}', $date)) {
+		if ($m = \TAO::regexp('{(\d+)\.(\d+)\.(\d+)\s*-\s*(\d+):(\d+):(\d+)}', $date)) {
+			return new \DateTime("{$m[3]}-{$m[2]}-{$m[1]} {$m[4]}:{$m[5]}:{$m[6]}");
+		}
+		if ($m = \TAO::regexp('{(\d+)\.(\d+)\.(\d+)\s*-\s*(\d+):(\d+)}', $date)) {
+			return new \DateTime("{$m[3]}-{$m[2]}-{$m[1]} {$m[4]}:{$m[5]}");
+		}
+		if ($m = \TAO::regexp('{(\d+)\.(\d+)\.(\d+)}', $date)) {
 			return new \DateTime("{$m[3]}-{$m[2]}-{$m[1]}");
 		}
-		if ($m = \TAO::regexp('{^(\d+)\.(\d+)\.(\d+)\s*-\s*(\d+):(\d+)$}', $date)) {
-			return new \DateTime("{$m[3]}-{$m[2]}-{$m[1]} - {$m[4]}:{$m[5]}:0");
+
+		$date = strtotime($date);
+
+		if ($date) {
+			return new \DateTime(date('Y-m-d H:i:s', $date));
 		}
-		if ($m = \TAO::regexp('{^(\d+)\.(\d+)\.(\d+)\s*-\s*(\d+):(\d+):(\d+)$}', $date)) {
-			return new \DateTime("{$m[3]}-{$m[2]}-{$m[1]} - {$m[4]}:{$m[5]}:{$m[5]}");
-		}
-		return new \DateTime($date);
+
+		return new \DateTime('now');
 	}
 
 	public function date($format = false, $date = false)
@@ -56,7 +64,7 @@ class Utils
 	{
 		return Carbon::instance($this->dateTime($date));
 	}
-	
+
 	public function dataEncode($data)
 	{
 		$data = serialize($data);
@@ -67,7 +75,7 @@ class Utils
 		$data = str_replace('/', '(s)', $data);
 		return $data;
 	}
-	
+
 	public function dataDecode($data)
 	{
 		$data = str_replace('(s)', '/', $data);

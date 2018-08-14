@@ -14,7 +14,9 @@
 
 @if ($p1>1)
   @include('pager ~ link', ['number' => 1, 'text' => 1])
- ...
+  @if ($p1>2)
+  ...
+  @endif
 @endif
 
 @for ($i=$p1;$i<=$p2;$i++)

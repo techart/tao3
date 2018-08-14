@@ -462,11 +462,11 @@ class TAO
 		if (is_array($src)) {
 			return $src;
 		}
+		$args = [];
 		if (is_string($src)) {
-			$args = '';
 			if ($m = \TAO::regexp('{^(.+?)/(.+)$}', $src)) {
 				$src = trim($m[1]);
-				$args = trim($m[2]);
+				$args = Collection::parseString(trim($m[2]));
 			}
 			if ($m = \TAO::regexp('{^datatype:(.+)$}', $src)) {
 				$datatypeCode = trim($m[1]);
@@ -475,12 +475,15 @@ class TAO
 					$datatypeCode = trim($m[1]);
 					$method = trim($m[2]);
 				}
-				$callback = "datatype.{$datatypeCode}::{$method}";
-				$src = $args ? [$callback, [Collection::parseString($args)]] : $callback;
+				$src = "datatype.{$datatypeCode}::{$method}";
 			}
 		}
 		if (Type::isCallable($src)) {
-			return Callback::instance($src)->call();
+			$callback = Callback::instance($src);
+			if (!empty($args)) {
+				$callback->args([$args]);
+			}
+			return $callback->call();
 		}
 		return array();
 	}

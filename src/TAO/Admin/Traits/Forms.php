@@ -12,6 +12,43 @@ trait Forms
 	 */
 	protected $editItem;
 
+	protected function templateView()
+	{
+		return 'table.form.view';
+	}
+
+	public function viewAction()
+	{
+		$this->initViews();
+
+		if (is_null($this->id)) {
+			return \TAO::pageNotFound();
+		}
+
+		/** @var Model $item */
+		$item = $this->datatype()->find($this->id);
+		if (!$item || !$item->accessView(\Auth::user())) {
+			return \TAO::pageNotFound();
+		}
+
+		$this->editItem = $item;
+		$fields = $item->adminFormFields();
+		foreach(array_keys($fields) as $name) {
+			$value = trim($item->field($name)->renderForAdminView());
+			if ($value == '') {
+				unset($fields[$name]);
+			}
+		}
+
+		return $this->render($this->templateView(), $this->formViewParams(array(
+			'id' => $this->id,
+			'item' => $item,
+			'title' => $item->title(),
+			'fields' => $fields,
+		)));
+	}
+
+
 	protected function templateEdit()
 	{
 		return 'table.form.edit';

@@ -16,7 +16,7 @@ class Image extends TestCase
 		// With callback
 		$render = 'Admin content';
 		$field = $this->createField([
-			'render_in_list' => function () use ($render) {
+			'render_in_admin_list' => function () use ($render) {
 				return $render;
 			}
 		]);

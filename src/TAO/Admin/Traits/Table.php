@@ -23,6 +23,10 @@ trait Table
 	/**
 	 * @var bool
 	 */
+	protected $canView = false;
+	/**
+	 * @var bool
+	 */
 	protected $canCopy = false;
 
 	protected $canExport = false;
@@ -192,6 +196,11 @@ trait Table
 		$rows = $this->filtered()->get();
 		$fields = $this->csvFields();
 		$csv = '';
+		foreach(array_keys($fields) as $field) {
+			$csv .= empty($csv)? '' : ';';
+			$csv .= $this->datatype()->field($field)->labelInAdminList();
+		}
+		$csv .= "\n";
 		foreach($rows as $row) {
 			$csv .= $this->csvRow($row, $fields);
 		}
@@ -231,6 +240,7 @@ trait Table
 			'can_edit' => $this->canEdit,
 			'can_delete' => $this->canDelete,
 			'can_copy' => $this->canCopy,
+			'can_view' => $this->canView,
 			'add_text' => $this->datatype()->adminAddButtonText(),
 			'filter' => $filter,
 			'with_filter' => !empty($filter),
@@ -240,11 +250,26 @@ trait Table
 			'filter_empty' => empty($this->filter),
 			'additional_actions' => $this->additionalActions(),
 			//'sidebar_visible' => true,
-			'with_row_actions' => ($this->canEdit || $this->canDelete || $this->canCopy),
+			'with_row_actions' => ($this->canEdit || $this->canDelete || $this->canCopy || $this->canView),
 			'pager_callback' => array($this, 'pageUrl'),
 			'page' => $this->page,
-			'user' => Auth::user()
+			'user' => Auth::user(),
+			'order_fields' => $this->orderFields(),
 		]);
+	}
+	
+	protected function orderFields()
+	{
+		$out = [];
+		foreach ($this->datatype()->fieldsObjects() as $name => $field) {
+			if ($order = $field->param('order')) {
+				$out[$name] = $this->actionUrl('list', array(
+					'page' => 1,
+					'order' => $order,
+				));
+			}
+		}
+		return $out;
 	}
 
 	protected function templateTree()
@@ -287,9 +312,10 @@ trait Table
 			'can_edit' => $this->canEdit,
 			'can_delete' => $this->canDelete,
 			'can_copy' => $this->canCopy,
+			'can_view' => $this->canView,
 			'add_text' => $this->datatype()->adminAddButtonText(),
 			'with_filter' => false,
-			'with_row_actions' => ($this->canEdit || $this->canDelete || $this->canCopy),
+			'with_row_actions' => ($this->canEdit || $this->canDelete || $this->canCopy || $this->canView),
 			'user' => Auth::user()
 		]);
 	}
@@ -358,6 +384,9 @@ trait Table
 	protected function prepareRow($row)
 	{
 		$row->prepareForAdminList();
+		if ($row->canViewInAdmin()) {
+			$this->canView = true;
+		}
 		if ($row->accessEdit(\Auth::user())) {
 			$this->canEdit = true;
 		}
@@ -426,8 +455,14 @@ trait Table
 
 	protected function filtered()
 	{
-		$builder = $this->datatype()->ordered();
-		return $this->datatype()->applyFilter($builder, $this->filterValues());
+		if ($this->order) {
+			$builder = $this->datatype()->withOrder($this->order);
+		} else {
+			$builder = $this->datatype()->ordered();
+		}
+		$builder = $this->datatype()->applyFilter($builder, $this->filterValues());
+		$builder = $this->datatype()->adminModifyBuilder($builder);
+		return $builder;
 	}
 
 	protected function countRows()

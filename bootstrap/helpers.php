@@ -1,4 +1,5 @@
 <?php
+
 if (!function_exists('who_calls')) {
 	function who_calls($n = 'all')
 	{
@@ -23,6 +24,7 @@ if (!function_exists('who_calls')) {
 		dump($out);
 	}
 }
+
 if (!function_exists('trait_used')) {
 	/**
 	 * @param object|string $object
@@ -32,5 +34,12 @@ if (!function_exists('trait_used')) {
 	function trait_used($object, $traitName)
 	{
 		return in_array($traitName, class_uses_recursive($object));
+	}
+}
+
+if (!function_exists('dt')) {
+	function dt($code)
+	{
+		return \TAO::datatype($code);
 	}
 }

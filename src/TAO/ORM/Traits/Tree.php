@@ -27,6 +27,7 @@ trait Tree
 				'items' => function () {
 					return $this->buildTreeForParentSelect();
 				},
+				'default' => 0,
 				'label' => 'Родитель',
 				'weight' => 100,
 				'in_list' => false,

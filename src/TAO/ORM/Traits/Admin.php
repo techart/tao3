@@ -62,7 +62,7 @@ trait Admin
 	 * Список вкладок на многовкладочных формах.
 	 * Обычно вкладки формируются на основании метода adminFormGroups, поэтому переопределять этот метод рекомендуется в совсем уж страшных случаях.
 	 *
-	 * @return array|bool
+	 * @return array
 	 */
 	public function adminFormTabs()
 	{
@@ -74,20 +74,22 @@ trait Admin
 					$tabs[$code] = $label;
 				}
 			}
-			return count($tabs) > 0 ? $tabs : false;
+			if (count($tabs) > 0) {
+				return $tabs;
+			};
 		}
-		return false;
+		return [];
 	}
 
 	/**
 	 * Список групп полей для админской формы.
 	 * На основании этого списка формируется список вкладок и блоков внутри вкладок
 	 *
-	 * @return bool
+	 * @return array
 	 */
 	public function adminFormGroups()
 	{
-		return method_exists($this, 'groupsHelper')? $this->groupsHelper() : false;
+		return method_exists($this, 'groupsHelper') ? $this->groupsHelper() : [];
 	}
 
 	/**
@@ -293,7 +295,12 @@ trait Admin
 		}
 		return $filterFields;
 	}
-	
+
+	public function adminModifyBuilder($builder)
+	{
+		return $builder;
+	}
+
 	public function titleForFilter($name, $datatype = false)
 	{
 		if (request()->has('filter')) {
@@ -309,5 +316,10 @@ trait Admin
 				return $value;
 			}
 		}
+	}
+
+	public function canViewInAdmin()
+	{
+		return false;
 	}
 }

@@ -28,7 +28,8 @@
 		'radio' => \TAO\Fields\Type\Radio::class,
 		'multicheckbox' => \TAO\Fields\Type\MultiCheckbox::class,
 		'html' => \TAO\Fields\Type\Html::class,
-		"coordinates" => \TAO\Fields\Type\Coordinates::class,
+		'coordinates' => \TAO\Fields\Type\Coordinates::class,
+		'array' => \TAO\Fields\Type\ArrayField::class,
 	],
 
 	'text' => [
@@ -36,6 +37,7 @@
 			'markdown' => \TAO\Text\Processor\Parser\Markdown::class,
 			'translit' => \TAO\Text\Processor\Translit::class,
 			'translit_for_url' => \TAO\Text\Processor\TranslitForUrl::class,
+			'arrays' => \TAO\Text\Processor\Parser\Arrays::class,
 		]
 	],
 

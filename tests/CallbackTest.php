@@ -64,25 +64,11 @@ class CallbackTest extends TestCase
 		);
 	}
 
-	// Testing arguments
-
-	public function testValidationCallbackWithArguments()
-	{
-		require 'Utils/Callback/function.php';
-
-		$this->assertTrue(Callback::isValidCallback(['callbackTest', [1, 2]]));
-		$this->assertTrue(Callback::isValidCallback([[self::class, 'methodForTesting'], [1]]));
-		$this->assertTrue(Callback::isValidCallback([[$this, 'methodForTesting'], [1, 2, 3]]));
-		$this->assertFalse(Callback::isValidCallback(['nonexistentFunction', [1, 2, 3]]));
-		$this->assertFalse(Callback::isValidCallback([[self::class, 'nonexistentMethod'], [1]]));
-		$this->assertFalse(Callback::isValidCallback([[$this, 'nonexistentMethod'], [1, 2]]));
-	}
-
 	public function testFunctionWithArgsCall()
 	{
 		require 'Utils/Callback/function.php';
 
-		$this->assertEquals(3, Callback::instance(['callbackTestWithArgs', [1, 2]])->call());
+		$this->assertEquals(3, Callback::instance('callbackTestWithArgs', [1, 2])->call());
 		$this->assertEquals(3, Callback::instance('callbackTestWithArgs')->call(1, 2));
 	}
 
@@ -91,7 +77,7 @@ class CallbackTest extends TestCase
 		$args = [1, 3];
 		$this->assertEquals(
 			self::methodForTestArgs($args[0], $args[1]),
-			Callback::instance([[self::class, 'methodForTestArgs'], $args])->call()
+			Callback::instance([self::class, 'methodForTestArgs'], $args)->call()
 		);
 		$this->assertEquals(
 			self::methodForTestArgs($args[0], $args[1]),
@@ -99,7 +85,7 @@ class CallbackTest extends TestCase
 		);
 		$this->assertEquals(
 			self::methodForTestArgs($args[0], $args[1]),
-			Callback::instance([[$this, 'methodForTestArgs'], $args])->call()
+			Callback::instance([$this, 'methodForTestArgs'], $args)->call()
 		);
 		$this->assertEquals(
 			self::methodForTestArgs($args[0], $args[1]),
@@ -120,7 +106,7 @@ class CallbackTest extends TestCase
 
 		$this->assertEquals(
 			\TAO::datatype('callbackTest')->callbackArgumentsTest($arg1, $arg2),
-			Callback::instance(['datatype.callbackTest::callbackArgumentsTest', [$arg1, $arg2]])->call()
+			Callback::instance('datatype.callbackTest::callbackArgumentsTest', [$arg1, $arg2])->call()
 		);
 	}
 
@@ -128,7 +114,6 @@ class CallbackTest extends TestCase
 	{
 		$this->assertFalse(Callback::instance([new SimpleDatatype(), 'unknownMethod'])->isValid());
 	}
-
 
 	// Utility methods
 	public static function methodForTesting()

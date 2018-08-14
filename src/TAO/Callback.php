@@ -2,6 +2,7 @@
 
 namespace TAO;
 use TAO\Exception\InvalidCallbackParams;
+use TAO\Type\Collection;
 
 /**
  * Класс предоставляет функционал использования своего синтаксиса для создания callback. Сейчас, помимо стандартного
@@ -48,9 +49,13 @@ class Callback
 			|| !is_array($this->callback) && is_callable($this->callback);
 	}
 
-	public static function instance($callback)
+	public static function instance($callback, $args = [])
 	{
-		return $callback instanceof Callback ? $callback : new self($callback);
+		$callback = $callback instanceof Callback ? $callback : new self($callback);
+		if (!empty($args)) {
+			$callback->args($args);
+		}
+		return $callback;
 	}
 
 	public function __construct($callback)
@@ -71,7 +76,6 @@ class Callback
 
 	protected function parse($callback)
 	{
-		$callback = $this->extractArguments($callback);
 		if (is_string($callback) && preg_match(static::$regexps['datatype'], $callback, $m)) {
 			$datatype = \TAO::datatype($m[1]);
 			if (!$datatype) {
@@ -84,19 +88,5 @@ class Callback
 			$callbackForMessage = is_string($callback) ? $callback : print_r($callback, true);
 			throw new InvalidCallbackParams("Invalid callback {$callbackForMessage}");
 		}
-	}
-
-	protected function extractArguments($callback)
-	{
-		if ($this->hasArguments($callback)) {
-			$this->args($callback[1]);
-			$callback = $callback[0];
-		}
-		return $callback;
-	}
-
-	protected function hasArguments($callback)
-	{
-		return is_array($callback) && count($callback) == 2 && self::isValidCallback(reset($callback));
 	}
 }

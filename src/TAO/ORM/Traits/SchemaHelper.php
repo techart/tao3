@@ -121,6 +121,11 @@ trait SchemaHelper
 				if (isset($data['td'])) {
 					$fdata['admin_td_attrs'] = $data['td'];
 				}
+				foreach(['formula', 'order'] as $key) {
+					if (isset($data[$key])) {
+						$fdata[$key] = $data[$key];
+					}
+				}
 				foreach(['link_in_list'] as $key) {
 					if (isset($data[$key])) {
 						$fdata[$key] = $data[$key];

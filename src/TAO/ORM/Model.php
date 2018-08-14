@@ -326,7 +326,21 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 		}
 		return $builder;
 	}
-
+	
+	public function withOrder($order)
+	{
+		$method = 'withOrder' . camel_case($order);
+		if (method_exists($this, $method)) {
+			return $this->$method();
+		}
+		$direction = 'asc';
+		if ($m = \TAO::regexp('{^(.+):(asc|desc)$}', $order)) {
+			$order = trim($m[1]);
+			$direction = $m[2];
+		}
+		return $this->orderBy($order, $direction);
+	}
+	
 	/**
 	 * Возвращает билдер (Illuminate\Database\Query\Builder) с отсортированными записями
 	 * По умолчанию - сртировки по id. Если нужна другая сортировка по умолчанию, то переопределите метод.

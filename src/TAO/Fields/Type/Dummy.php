@@ -26,5 +26,6 @@ class Dummy extends Field
 
 	public function rawValue()
 	{
+		return $this->item[$this->name] ?? '';
 	}
 }

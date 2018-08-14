@@ -78,7 +78,7 @@ class Navigation
 	public static function instance($name = 'site')
 	{
 		if (!isset(self::$instances[$name])) {
-			self::$instances[$name] = new self($name);
+			self::$instances[$name] = app(self::class, ['data' => $name]);
 		}
 		return self::$instances[$name];
 	}

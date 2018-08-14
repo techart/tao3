@@ -32,7 +32,7 @@ trait Actions
 	{
 		$this->action = \Request::get('action', 'list');
 		$this->filter = \Request::get('filter', array());
-		$this->order = \Request::get('order', array());
+		$this->order = \Request::get('order', false);
 		$this->page = \Request::get('page', 1);
 		$this->id = \Request::get('id', null);
 		$method = "{$this->action}Action";

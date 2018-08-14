@@ -5,6 +5,7 @@ namespace TaoTests\Fields;
 use TAO\Fields\Field;
 use TaoTests\TestCase;
 use TaoTests\TestFields;
+use TaoTests\Utils\Fields\DatatypeForStorableFields;
 use TaoTests\Utils\SimpleDatatype;
 use TaoTests\Utils\TAO\TaoTestDatatype;
 
@@ -16,7 +17,8 @@ class FieldTest extends TestCase
 	{
 		return [
 			'tao_test' => TaoTestDatatype::class,
-			'simple' => SimpleDatatype::class
+			'simple' => SimpleDatatype::class,
+			'with_storable_fields' => \DatatypeForStorableFields::class
 		];
 	}
 
@@ -165,6 +167,37 @@ class FieldTest extends TestCase
 			'csv_value' => 'return50',
 		], new TaoTestDatatype());
 		$this->assertEquals(50, $field->csvValue());
+	}
+
+	public function testStorableField()
+	{
+		$item = new DatatypeForStorableFields();
+		$fieldName = 'storable';
+
+		$value = 'value';
+		$item->field($fieldName)->set($value);
+		$item->save();
+
+		$this->assertTrue(\Schema::hasColumn('datatype_for_storable_fields', $fieldName));
+
+		$item2 = DatatypeForStorableFields::find($item->getKey());
+		$this->assertEquals($value, $item2->field($fieldName)->value());
+	}
+
+	public function testNonstorableField()
+	{
+		$item = new DatatypeForStorableFields();
+		$fieldName = 'nonstorable';
+
+		$value = 'value';
+		$item->field($fieldName)->set($value);
+		$item->save();
+
+		$this->assertNull($item->$fieldName);
+		$this->assertFalse(\Schema::hasColumn('datatype_for_storable_fields', $fieldName));
+
+		$item2 = DatatypeForStorableFields::find($item->getKey());
+		$this->assertEquals('', $item2->field($fieldName)->value());
 	}
 
 	//Utility methods

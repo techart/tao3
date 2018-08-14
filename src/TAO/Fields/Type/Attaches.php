@@ -408,7 +408,7 @@ class Attaches extends StringField implements \IteratorAggregate
 
 	public function countRenderableEntries()
 	{
-		return count($this->renfderableEntries());
+		return count($this->renderableEntries());
 	}
 
 	/**
@@ -505,5 +505,9 @@ class Attaches extends StringField implements \IteratorAggregate
 			}
 		}
 	}
-
+	
+	public function defaultTemplate()
+	{
+		return 'fields ~ attaches.template';
+	}
 }

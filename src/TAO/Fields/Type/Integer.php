@@ -53,4 +53,9 @@ class Integer extends Field
 	{
 		$this->set(((int)$src));
 	}
+
+	public function set($value)
+	{
+		$this->item[$this->name] = preg_replace('{[^\d]}', '', $value);
+	}
 }
