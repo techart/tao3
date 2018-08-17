@@ -22,7 +22,6 @@ class Html extends Text
 	 * добавление стилей для редактора из указанной точки входа tao-webpack (пар-р tao_webpack_css)
 	 *
 	 * Каждое поле имеет свой конфиг, который можно описать/переопределить в описании поля в пункте editor_config
-	 * в пункте editor_config
 	 *
 	 * @return array
 	 */
@@ -44,7 +43,7 @@ class Html extends Text
 			$user_config['content_css'] = \TAO::frontend()->cssUrl($user_config['tao_webpack_css']);
 		}
 
-		return array_merge_recursive(config('redactor'), $user_config, ['selector' => '#' . $this->editorID()]);
+		return array_merge_recursive(config('html-editor'), $user_config, ['selector' => '#' . $this->editorID()]);
 	}
 
 	/**

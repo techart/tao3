@@ -181,7 +181,7 @@ class Provider extends ServiceProvider
 		$link_name = $scripts_dir . '/tinymce';
 
 		if (is_dir($scripts_dir) && !is_link($link_name)) {
-			symlink(base_path('vendor/tinymce/tinymce'), $link_name);
+			symlink('../../../../tinymce/tinymce', $link_name);
 		}
 	}
 

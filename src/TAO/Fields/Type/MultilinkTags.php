@@ -67,5 +67,10 @@ class MultilinkTags extends Multilink
 		}
 	}
 
+	protected function itemsFromModel()
+	{
+		return $this->relatedModel()->itemsForSelectFlat();
+	}
+
 
 }

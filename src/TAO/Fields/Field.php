@@ -139,7 +139,7 @@ abstract class Field
 		}
 		if ($index) {
 			$type = $index['name'];
-			$name = $index['extra'] ? $index['extra'] : ('idx_' . $this->item->getTable() . '_' . $this->name);
+			$name = $index['extra'] ? $index['extra'] : $this->indexName();
 			$columns = $index['args'] ? $index['args'] : array($this->name);
 
 			/**
@@ -1001,6 +1001,21 @@ abstract class Field
 
 	public function dataImport($src)
 	{
+	}
+
+	protected function indexName($columns = null)
+	{
+		if (is_null($columns)) {
+			$columns = [$this->name];
+		} else if (is_string($columns)) {
+			$columns = [$columns];
+		}
+
+		$name = 'idx_' . $this->item->getTable() . '_' . implode('_', $columns);
+		if (strlen($name) > 64) {
+			$name = substr('idx_' . $this->item->getTable(), 0, 30) . '_' . md5(implode('_', $columns));
+		}
+		return $name;
 	}
 
 	/**

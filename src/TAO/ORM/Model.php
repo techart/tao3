@@ -326,7 +326,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 		}
 		return $builder;
 	}
-	
+
 	public function withOrder($order)
 	{
 		$method = 'withOrder' . camel_case($order);
@@ -340,7 +340,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 		}
 		return $this->orderBy($order, $direction);
 	}
-	
+
 	/**
 	 * Возвращает билдер (Illuminate\Database\Query\Builder) с отсортированными записями
 	 * По умолчанию - сртировки по id. Если нужна другая сортировка по умолчанию, то переопределите метод.
@@ -354,7 +354,8 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 
 	/**
 	 * Формирует на основании списка записей этого типа список, используемый в селектах, радио, мультилинках и пр.
-	 * В качестве аргумента передаются возможные модификаторы
+	 * В качестве аргумента передаются возможные модификаторы. Параметр $flat нужен для того, чтобы получить
+	 * одноуровневый список записей даже если тип данных древовидный.
 	 *
 	 * @param array $args
 	 * @return array
@@ -365,6 +366,11 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 			/** @var Tree $this */
 			return $this->treeForSelect($args);
 		}
+		return $this->itemsForSelectFlat($args);
+	}
+
+	public function itemsForSelectFlat($args = [])
+	{
 		$out = Collection::numericKeysOnly($args);
 		foreach ($this->ordered()->get() as $row) {
 			$out[$row->getKey()] = $row->title();

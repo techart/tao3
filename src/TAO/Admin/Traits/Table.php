@@ -204,7 +204,16 @@ trait Table
 		foreach($rows as $row) {
 			$csv .= $this->csvRow($row, $fields);
 		}
-		return response($csv, 200, ['Content-Type' => 'text/x-csv']);
+		$fileName = $this->csvFileName();
+		return response($csv, 200, [
+			'Content-Type' => 'text/x-csv',
+			'Content-Disposition' => "attachment; filename='$fileName'"
+		]);
+	}
+
+	protected function csvFileName()
+	{
+		return $this->datatypeCode . '.csv';
 	}
 
 	protected function templateTable()
@@ -257,7 +266,7 @@ trait Table
 			'order_fields' => $this->orderFields(),
 		]);
 	}
-	
+
 	protected function orderFields()
 	{
 		$out = [];
@@ -283,7 +292,7 @@ trait Table
 	public function treeAction()
 	{
 		$this->initViews();
-		
+
 		$filter = $this->filter;
 		$filter['max_depth'] = $this->datatype()->adminMaxDepth();
 		$tree = $this->datatype()->buildTree($filter);

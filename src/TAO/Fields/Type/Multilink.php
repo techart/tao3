@@ -207,9 +207,12 @@ class Multilink extends Field
 			$items = \TAO::itemsForSelect($items);
 			return $items;
 		}
-		$model = $this->relatedModel();
-		$items = $model->itemsForSelect([]);
-		return $items;
+		return $this->itemsFromModel();
+	}
+
+	protected function itemsFromModel()
+	{
+		return $this->relatedModel()->itemsForSelect();
 	}
 
 	/**
@@ -224,9 +227,9 @@ class Multilink extends Field
 				$thisKey = $this->thisKey();
 				$relatedKey = $this->relatedKey();
 				$table->integer($thisKey)->unsigned();
-				$table->index($thisKey);
+				$table->index($thisKey, $this->indexName($thisKey));
 				$table->integer($relatedKey)->unsigned();
-				$table->index($relatedKey);
+				$table->index($relatedKey, $this->indexName($relatedKey));
 			});
 		}
 	}
@@ -425,7 +428,7 @@ class Multilink extends Field
 		}
 		$this->attach($ids);
 	}
-	
+
 	public function render($arg1 = false, $arg2 = false)
 	{
 		if ($arg1 || $arg2) {
