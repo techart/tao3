@@ -18,6 +18,7 @@ class Provider extends ServiceProvider
 		$this->publishes([
 			__DIR__ . '/../../config/tao.php' => config_path('tao.php'),
 		]);
+		$this->loadTranslationsFrom(__DIR__ . '/../../resources/lang/', 'techart');
 		$this->loadViewsFrom(__DIR__ . '/../../views', 'tao');
 
 		foreach (array_keys(app()->tao->routers()) as $name) {

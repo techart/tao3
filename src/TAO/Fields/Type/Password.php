@@ -27,7 +27,7 @@ class Password extends StringField
 	public function styleForAdminInput()
 	{
 		$style = parent::styleForAdminInput();
-		return empty($style) ? 'width:80%' : $style;
+		return empty($style) ? 'display:inline-block;width:80%;' : $style;
 	}
 
 	/**

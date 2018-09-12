@@ -1,6 +1,6 @@
 <select
 	name="{{ $field->name }}"
-	class="input select {{ $field->classForInput() }}"
+	class="input select form-control {{ $field->classForInput() }}"
 	style="{!! $field->styleForInput() !!}"
 	value="1"
 	{!! $field->renderAttrs() !!}

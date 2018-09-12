@@ -7,6 +7,7 @@ use TAO\Fields\Field;
 
 class Integer extends Field
 {
+
 	/**
 	 * @param Blueprint $table
 	 * @return mixed
@@ -57,5 +58,10 @@ class Integer extends Field
 	public function set($value)
 	{
 		$this->item[$this->name] = preg_replace('{[^\d]}', '', $value);
+	}
+
+	public function renderWithoutTemplate()
+	{
+		return (string)$this->value();
 	}
 }

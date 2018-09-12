@@ -8,11 +8,9 @@
 Assets::useFile('/tao/scripts/tinymce/tinymce.min.js');
 ?>
 
-<div class="control-group">
-		<textarea name="{{ $field->name }}" id="{{ $field->editorID() }}"
-				  class="input text tinyMCE-container {{ $field->classForInput() }}"
-				  style="{!! $field->styleForInput() !!}" {!! $field->renderAttrs() !!}>{{ $field->value() }}</textarea>
-</div>
+<textarea name="{{ $field->name }}" id="{{ $field->editorID() }}"
+		  class="input text tinyMCE-container form-control {{ $field->classForInput() }}"
+		  style="{!! $field->styleForInput() !!}" {!! $field->renderAttrs() !!}>{{ $field->value() }}</textarea>
 
 <script>
 	document.addEventListener("DOMContentLoaded", function () {

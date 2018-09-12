@@ -75,6 +75,10 @@ class Navigation
 
 	protected static $instances = array();
 
+	/**
+	 * @param string $name
+	 * @return self
+	 */
 	public static function instance($name = 'site')
 	{
 		if (!isset(self::$instances[$name])) {

@@ -1,7 +1,7 @@
 <div class="tao-field-multilink-tags">
   <textarea
 	  name="{{ $field->name }}"
-	  class="input text {{ $field->classForInput() }}"
+	  class="input text form-control {{ $field->classForInput() }}"
 	  style="{!! $field->styleForInput() !!}"
 	  {!! $field->renderAttrs() !!}
 >{{ $field->inputValue() }}</textarea>

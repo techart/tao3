@@ -12,6 +12,12 @@ body {
     }
 }
 
+@font-face {
+  font-family: 'Glyphicons Halflings';
+
+  src: url('bootstrap/core/fonts/glyphicons-halflings-regular.eot');
+  src: url('bootstrap/core/fonts/glyphicons-halflings-regular.eot?#iefix') format('embedded-opentype'), url('bootstrap/core/fonts/glyphicons-halflings-regular.woff2') format('woff2'), url('bootstrap/core/fonts/glyphicons-halflings-regular.woff') format('woff'), url('bootstrap/core/fonts/glyphicons-halflings-regular.ttf') format('truetype'), url('bootstrap/core/fonts/glyphicons-halflings-regular.svg#glyphicons_halflingsregular') format('svg');
+}
 
 /** Login Page **/
 #login {
@@ -105,12 +111,29 @@ body {
 }
 
 .block-header {
-	margin-bottom: 0px;
+	min-height: 40px;
+	padding-right: 20px;
+	padding-left: 20px;
+	background-color: #fafafa;
+	background-image: -moz-linear-gradient(top, #ffffff, #f2f2f2);
+	background-image: -webkit-gradient(linear, 0 0, 0 100%, from(#ffffff), to(#f2f2f2));
+	background-image: -webkit-linear-gradient(top, #ffffff, #f2f2f2);
+	background-image: -o-linear-gradient(top, #ffffff, #f2f2f2);
+	background-image: linear-gradient(to bottom, #ffffff, #f2f2f2);
+	background-repeat: repeat-x;
+	border: 1px solid #d4d4d4;
 	border-right: none;
 	border-left: none;
-	-webkit-border-radius: 0px;
-	-moz-border-radius: 0px;
-	border-radius: 0px;
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
+	filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#ffffffff', endColorstr='#fff2f2f2', GradientType=0);
+	*zoom: 1;
+	-webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+	-moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
+
+	/*margin-bottom: 0px;*/
 }
 .block-header div {
 	padding-top: 10px;
@@ -336,22 +359,25 @@ td.admin-tree-title {}
     }
 
     .controls a.control i {
+      position: relative;
+      top: 1px;
       display: inline-block;
+      font-family: 'Glyphicons Halflings';
+      font-style: normal;
+      font-weight: normal;
+      line-height: 1;
       padding: 0;
-      background-image: url("/tao/images/bootstrap/glyphicons-halflings.png");
-      background-repeat: no-repeat;
-      width: 14px;
-      height: 14px;
       margin-top: 1px;
-      line-height: 14px;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
     }
 
-      .controls a.control i.up {
-        background-position: -289px -96px;
+      .controls a.control i.up:before {
+        content: "\e093";
       }
 
-      .controls a.control i.down {
-        background-position: -312px -96px;
+      .controls a.control i.down:before {
+        content: "\e094";
       }
 
 .tao-fields-upload {
@@ -376,6 +402,15 @@ td.admin-tree-title {}
     color: red;
   }
 
+  .tao-fields-upload > span {
+    display: inline-block;
+    margin-bottom: 5px;
+  }
+
+  .tao-fields-upload > span > span {
+    margin-left: 5px;
+  }
+
   .tao-fields-upload__btn {
     display: inline-block;
     position: relative;
@@ -392,6 +427,10 @@ td.admin-tree-title {}
     }
 
 .tao-fields-attaches {
+}
+
+.tao-fields-attaches .upload-error {
+    color: red;
 }
 
   .tao-fields-attaches-filelist {
@@ -522,11 +561,14 @@ td.admin-tree-title {}
 }
 
 .multilink-item {
-	display: block;
+	display: flex;
+	font-weight: 400;
 }
 
 	.multilink-item-label {
 		vertical-align: middle;
+		margin-left: 5px;
+		line-height: 1.8;
 	}
 
 .unvisible {
@@ -640,4 +682,10 @@ form.tao-filter {
 	border: 1px solid #ccc;
 	border-radius: 5px;
 	padding: 10px;
+}
+
+.nav-tabs > li.active > a,
+.nav-tabs > li.active > a:hover,
+.nav-tabs > li.active > a:focus {
+	background-color: #f5f5f5;
 }

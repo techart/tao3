@@ -17,7 +17,7 @@
 			<input
 					type="text"
 					name="{{ $field->latInputName() }}"
-					class="b-field-coordinates__input-lat input integer {{ $field->classForInput() }}"
+					class="b-field-coordinates__input-lat input integer form-control {{ $field->classForInput() }}"
 					style="{!! $field->styleForInput() !!}"
 					value="{{ $field->lat() }}"
 					{!! $field->renderAttrs() !!}
@@ -31,7 +31,7 @@
 			<input
 					type="text"
 					name="{{ $field->lngInputName() }}"
-					class="b-field-coordinates__input-lng input integer {{ $field->classForInput() }}"
+					class="b-field-coordinates__input-lng input integer form-control {{ $field->classForInput() }}"
 					style="{!! $field->styleForInput() !!}"
 					value="{{ $field->lng() }}"
 					{!! $field->renderAttrs() !!}

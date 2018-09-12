@@ -234,6 +234,12 @@ class Selector
 		}
 		$this->data['count'] = $count;
 		$this->data['numpages'] = $numPages;
+
+		if ((1 > $this->data['page']) ||
+			($this->data['numpages'] < $this->data['page'])) {
+			return response(view('404'), 404);
+		}
+
 		$this->data['rows'] = $rows;
 		$template = isset($this->data['template']) ? $this->data['template'] : $this->defaultTemplate($mode);
 

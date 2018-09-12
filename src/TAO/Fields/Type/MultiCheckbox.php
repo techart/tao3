@@ -19,8 +19,8 @@ use Illuminate\Database\Schema\Blueprint;
  *
  * Class MultiCheckbox
  *
- * @property $attachedKeys \Illuminate\Support\Collection | null
- * @property $relationsIsLoaded bool
+ * @property \Illuminate\Support\Collection | null $attachedKeys
+ * @property bool $relationsIsLoaded
  *
  * @package TAO\Fields\Type
  */
@@ -97,7 +97,7 @@ class MultiCheckbox extends Field
 	 */
 	public function set($values)
 	{
-		$this->attachedKeys = array_wrap($values);
+		$this->attachedKeys = collect(array_wrap($values));
 	}
 
 	/**
@@ -127,7 +127,7 @@ class MultiCheckbox extends Field
 			}
 
 			// Добавим новые
-			$this->table()->insert(array_map([$this, 'mapValueForInsert'], $this->attachedKeys));
+			$this->table()->insert($this->attachedKeys->map([$this, 'mapValueForInsert'])->toArray());
 		});
 	}
 
@@ -232,6 +232,16 @@ class MultiCheckbox extends Field
 		return array_keys(parent::getValueFromRequest($request));
 	}
 
+	public function renderForAdminView()
+	{
+		return $this->render();
+	}
+
+	public function renderWithoutTemplate()
+	{
+		return implode(', ', $this->value());
+	}
+
 	/**
 	 * Подготавливает значение для вставки в таблицу
 	 *
@@ -239,7 +249,7 @@ class MultiCheckbox extends Field
 	 *
 	 * @return array
 	 */
-	private function mapValueForInsert($value)
+	public function mapValueForInsert($value)
 	{
 		return [
 			$this->item->getForeignKey() => $this->item->getKey(),

@@ -4,6 +4,7 @@ namespace TAO\App\Exceptions;
 
 use Exception;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use TAO\ErrorsNotifier;
@@ -20,7 +21,7 @@ class Handler extends ExceptionHandler
 		\Illuminate\Auth\AuthenticationException::class,
 		\Illuminate\Auth\Access\AuthorizationException::class,
 		\Symfony\Component\HttpKernel\Exception\HttpException::class,
-		\Illuminate\Database\Eloquent\ModelNotFoundException::class,
+		ModelNotFoundException::class,
 		\Illuminate\Session\TokenMismatchException::class,
 		\Illuminate\Validation\ValidationException::class,
 	];
@@ -58,6 +59,9 @@ class Handler extends ExceptionHandler
 			if ($factory->exists($view)) {
 				return response(view($view), $status);
 			}
+		}
+		if ($exception instanceof ModelNotFoundException) {
+			abort(404);
 		}
 		return parent::render($request, $exception);
 	}

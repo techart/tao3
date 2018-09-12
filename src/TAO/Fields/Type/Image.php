@@ -26,10 +26,11 @@ class Image extends Upload
 		if (starts_with($path, 'data:')) {
 			$image = \Image::make(base64_decode(preg_replace('{^.+;base64,}', '', $path)));
 		} else {
-			if (empty($path) || !\Storage::exists($path)) {
-				return 'Image not found';
+			if (!$this->exists($path)) {
+				$image = \Image::make('tao/images/fields/image/noimage/100x100.png');
+			} else {
+				$image = \Image::make(\Storage::get($path));
 			}
-			$image = \Image::make(\Storage::get($path));
 		}
 		if ($m = \TAO::regexp('{^image/(gif|png|jpeg)$}', $image->mime)) {
 			$ext = str_replace('jpeg', 'jpg', $m[1]);
@@ -66,7 +67,10 @@ class Image extends Upload
 	{
 		$path = $this->value();
 		if (empty($path) || !$mods) {
-			return parent::url();
+			if (null === ($url = parent::url())) {
+				$url = '/tao/images/fields/image/noimage/100x100.png';
+			}
+			return $url;
 		}
 		$modified = app('tao.images')->modify($path, $mods);
 		if (starts_with($modified, 'data:')) {
@@ -122,6 +126,9 @@ class Image extends Upload
 		if (empty($path)) {
 			return null;
 		}
+		if (!\Storage::exists($path)) {
+			return null;
+		}
 		return app('tao.images')->size($path);
 	}
 
@@ -129,6 +136,9 @@ class Image extends Upload
 	{
 		$path = $this->value();
 		if (empty($path)) {
+			return '';
+		}
+		if (!\Storage::exists($path)) {
 			return '';
 		}
 		return app('tao.images')->show($path, $mods, $tpl);

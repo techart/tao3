@@ -3,6 +3,7 @@
 namespace TAO\Fields\Type;
 
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\File;
 use TAO\Fields\Field;
 use TAO\Fields;
@@ -192,7 +193,7 @@ class Upload extends Field
 	public function size()
 	{
 		$file = $this->value();
-		if (empty($file)) {
+		if (!$this->exists($file)) {
 			return 0;
 		}
 		if (starts_with($file, 'data:')) {
@@ -218,6 +219,24 @@ class Upload extends Field
 		return '{datatype}-{field}-{id}.{ext}';
 	}
 
+	/**
+	 * @return bool
+	 */
+
+	public function exists($file = null)
+	{
+		if (null === $file) {
+			$file = $this->value();
+		}
+		if (empty($file)) {
+			return false;
+		}
+		if ((!starts_with($file, 'data:')) &&
+			(!\Storage::exists($file))) {
+			return false;
+		}
+		return true;
+	}
 
 	/**
 	 * @return bool|string
@@ -230,6 +249,9 @@ class Upload extends Field
 		}
 		if (starts_with($file, 'data:')) {
 			return $file;
+		}
+		if (!\Storage::exists($file)) {
+			return null;
 		}
 		return \Storage::url($file);
 	}
@@ -292,5 +314,32 @@ class Upload extends Field
 				$this->item[$this->name] = $dest;
 			}
 		}
+	}
+
+	/**@see https://laravel.com/api/5.0/Illuminate/Filesystem/FilesystemAdapter.html
+	 * Метод возвращает абсолютный путь до файла на сервере
+	 * Использовать на свой страх и риск, корректно работает только с локальным хранилищем
+	 * @return bool|string
+	 */
+	public function getAbsolutePath ()
+	{
+		$prefixPath = Storage::getDriver()->getAdapter()->getPathPrefix();
+		if( $prefixPath ){
+			return rtrim($prefixPath, '/').'/'.ltrim($this->value(), '/');
+
+		}
+		return false;
+	}
+
+	/** @see https://laravel.com/api/5.6/Illuminate/Http/File.html
+	 * @return Illuminate\Http\File
+	 */
+	public function getFileObject ()
+	{
+		$absolutePath = $this->getAbsolutePath();
+		if( $absolutePath ){
+			return new File( $absolutePath );
+		}
+		return false;
 	}
 }

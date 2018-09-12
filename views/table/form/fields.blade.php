@@ -17,16 +17,16 @@ $group = false;
                 <div class="block-simple form-horizontal">
             @else
                 <div class="block form-horizontal">
-                    <div class="navbar navbar-inner block-header">
-                        <div class="muted pull-left">{{ $group }}</div>
+                    <div class="block-header">
+                        <div class="text-muted pull-left">{{ $group }}</div>
                     </div> 
             @endif
             <fieldset class="admin">
         @endif
     
-        <div class="control-group">
-            <label class="control-label" for="{{ $field->name }}">{!! $field->labelInAdminForm() !!}</label>
-            <div class="controls">
+        <div class="form-group">
+            <label class="col-sm-2 control-label" for="{{ $field->name }}">{!! $field->labelInAdminForm() !!}</label>
+            <div class="col-sm-10">
                 {!! $field->renderInput() !!}
                 @if ($comment = $field->param(['comment_in_admin', 'comment'], false))
                 <p class="comment">{!! $comment !!}</p>

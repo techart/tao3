@@ -1,0 +1,79 @@
+.b-pairs__table {
+	box-shadow: 0 0 0 1px #dbdbdb;
+	margin-bottom: 1em;
+	width: 100%;
+}
+
+.b-pairs .b-pairs__heading,
+.b-pairs .b-pairs__cell {
+	border: 1px solid #f8f8f8;
+}
+
+.b-pairs .b-pairs__heading {
+	padding: 6px;
+	border-bottom: 2px solid #dbdbdb;
+	text-align: left;
+	font-size: 14px;
+	color: #666;
+}
+
+.b-pairs .b-pairs__cell:first-child,
+.b-pairs .b-pairs__heading:first-child {
+	width: 42px;
+	padding: 6px 10px 6px 6px;
+	box-shadow: inset -4px 0 0 #f8f8f8;
+	line-height: 0;
+	text-align: center;
+}
+
+.b-pairs .b-pairs__heading:first-child {
+	padding: 0 7px 0 2px;
+}
+
+.b-pairs .b-pairs__row--error .b-pairs__input {
+	color: indianred;
+}
+
+.b-pairs__row:hover,
+.b-pairs__row--focus-within,
+.b-pairs__row--blank {
+	background-color: #f8f8f8;
+}
+
+.b-pairs .b-pairs__input {
+	padding: 3px;
+	border-radius: 0;
+	width: 100%;
+	border: 1px solid transparent;
+	box-shadow: none;
+	background: transparent;
+	transition: none;
+	outline: 0;
+}
+
+.b-pairs .b-pairs__input:hover {
+	background-color: #fff;
+	border: 1px solid #e6e6e6;
+}
+
+.b-pairs .b-pairs__input:focus {
+	background-color: #fff;
+	border: 1px solid #dbdbdb;
+	box-shadow: none;
+}
+
+.b-pairs__row--blank .b-pairs__input--checkbox {
+	visibility: hidden;
+}
+
+.b-pairs__delete {
+	border: 1px solid transparent;
+	background: none;
+	border-radius: 0;
+	padding: 2px 4px;
+}
+
+.b-pairs__delete:hover,
+.b-pairs__delete:focus {
+	border-color: #dbdbdb;
+}

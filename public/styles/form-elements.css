@@ -295,10 +295,10 @@ input[class*="span"],
 select[class*="span"],
 textarea[class*="span"],
 .uneditable-input[class*="span"],
-.row-fluid input[class*="span"],
-.row-fluid select[class*="span"],
-.row-fluid textarea[class*="span"],
-.row-fluid .uneditable-input[class*="span"] {
+.row input[class*="span"],
+.row select[class*="span"],
+.row textarea[class*="span"],
+.row .uneditable-input[class*="span"] {
     float: none;
     margin-left: 0;
 }
@@ -307,12 +307,12 @@ textarea[class*="span"],
 .input-append .uneditable-input[class*="span"],
 .input-prepend input[class*="span"],
 .input-prepend .uneditable-input[class*="span"],
-.row-fluid input[class*="span"],
-.row-fluid select[class*="span"],
-.row-fluid textarea[class*="span"],
-.row-fluid .uneditable-input[class*="span"],
-.row-fluid .input-prepend [class*="span"],
-.row-fluid .input-append [class*="span"] {
+.row input[class*="span"],
+.row select[class*="span"],
+.row textarea[class*="span"],
+.row .uneditable-input[class*="span"],
+.row .input-prepend [class*="span"],
+.row .input-append [class*="span"] {
     display: inline-block;
 }
 
@@ -414,7 +414,7 @@ textarea.span1,
 }
 
 .controls-row [class*="span"],
-.row-fluid .controls-row [class*="span"] {
+.row .controls-row [class*="span"] {
     float: left;
 }
 
@@ -1018,6 +1018,10 @@ legend + .control-group {
 }
 
 .tao-fields-attaches {
+}
+
+.tao-fields-attaches .upload-error {
+    color: red;
 }
 
 .tao-fields-attaches-filelist {

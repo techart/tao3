@@ -4,6 +4,8 @@ namespace TAO\ORM\Abstracts;
 
 abstract class FormMessageModel extends \TAO\ORM\Model
 {
+	protected $fieldsMode = 'public_form';
+
 	/**
 	 * @return array
 	 */
@@ -51,19 +53,6 @@ abstract class FormMessageModel extends \TAO\ORM\Model
 		return $fields;
 	}
 
-	public function formField($name)
-	{
-		$fields = $this->processedFields();
-		if (!isset($fields[$name])) {
-			throw new \TAO\Fields\Exception\UndefinedField($name, get_class($this));
-		}
-		$data = $fields[$name];
-		if (isset($data['type_in_form'])) {
-			$data['type'] = $data['type_in_form'];
-		}
-		return app('tao.fields')->create($name, $data, $this);
-	}
-
 	/**
 	 * @return array
 	 */
@@ -72,7 +61,7 @@ abstract class FormMessageModel extends \TAO\ORM\Model
 		$fields = [];
 		foreach ($this->processedFields() as $field => $data) {
 			if (!isset($data['protected']) || !$data['protected']) {
-				$fields[$field] = $this->formField($field);
+				$fields[$field] = $this->field($field);
 			}
 		}
 		return $fields;
@@ -332,6 +321,9 @@ abstract class FormMessageModel extends \TAO\ORM\Model
 				foreach ($fields as $field) {
 					$field->setFromRequestAfterSave($request);
 				}
+				if (!is_null($afterInsertResult = $item->afterMessageInsert())) {
+					return $afterInsertResult;
+				}
 				if ($request->ajax()) {
 					return response($item->ajaxOk($context));
 				} else {
@@ -354,5 +346,9 @@ abstract class FormMessageModel extends \TAO\ORM\Model
 				}
 			}
 		}
+	}
+
+	protected function afterMessageInsert()
+	{
 	}
 }

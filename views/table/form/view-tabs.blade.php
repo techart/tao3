@@ -1,7 +1,7 @@
 <div class="navbar form-tabs-navbar">
-    <div class="navbar-inner">
-        <div class="container">
-            <ul class="nav nav-pills">
+    <div class="container-fluid">
+        <div class="row">
+            <ul class="nav nav-tabs">
                 @foreach ($tabs as $code => $label)
                     <li class="{{ $code==$first_tab? 'active' : ''}}"><a href="#tab_{{ $code }}" data-toggle="tab">{{ $label }}</a></li>
                 @endforeach

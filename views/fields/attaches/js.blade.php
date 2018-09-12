@@ -1,19 +1,19 @@
 <script>
-    $(function() {
+    $(function () {
         var files = {!! $field->renderFilelistJSON() !!};
         var $button = $("#tao_attaches_button_{{ $field->name }}");
         var $informer = $("#tao_attaches_informer_{{ $field->name }}");
         var $hidden = $("#tao_attaches_hidden_{{ $field->name }}");
         var $filelist = $("#tao_attaches_filelist_{{ $field->name }}");
-        
+
         @if ($field->isSortable())
             @bottomScript('/tao/scripts/jquery-ui.min.js')
             @style('/tao/styles/jquery-ui.css')
             $filelist.sortable({
-                update: function() {
+                update: function () {
                     var items = $(this).sortable('toArray');
                     var newfiles = {};
-                    $.each(items, function(key, data) {
+                    $.each(items, function (key, data) {
                         var $e = $('#' + data);
                         var key = $e.attr('data-key');
                         newfiles[key] = files[key];
@@ -23,9 +23,9 @@
                 }
             });
         @endif
-        
+
         @include("fields ~ attaches.{$field->templateFilelistJS()}")
-        
+
         function deleteFromFileList(key) {
             delete files[key];
             renderFileList();
@@ -33,7 +33,7 @@
 
         renderFileList();
 
-        $adminForm[0].elements['{{ $field->name }}-files'].onchange = function() {
+        $adminForm[0].elements['{{ $field->name }}-files'].onchange = function () {
             var formData = new FormData();
             var fileList = $adminForm[0].elements['{{ $field->name }}-files'].files;
             for (var i = 0; i < fileList.length; i++) {
@@ -47,9 +47,8 @@
                 contentType: false,
                 processData: false,
                 dataType: 'json'
-
             })
-            .done(function(response) {
+            .done(function (response) {
                 $informer.removeClass('upload-progress').empty();
                 if (response.error) {
                     $informer.addClass('upload-error').html(response.error);
@@ -64,8 +63,57 @@
                     renderFileList();
                 }
             })
-            .fail(function(response) {
-                $informer.addClass('upload-error').html(response.error);
+            .fail(function (response) {
+                var errorMessage;
+                switch (response.status) {
+
+                    case 400:
+                        errorMessage = 'Неправильный запрос на загрузку вложения.';
+                        break;
+
+                    case 401:
+                        errorMessage = 'Адрес загрузки вложения требует авторизации.';
+                        break;
+
+                    case 403:
+                        errorMessage = 'Адрес загрузки вложения закрыт для доступа.';
+                        break;
+
+                    case 404:
+                        errorMessage = 'Не найден адрес загрузки вложения.';
+                        break;
+
+                    case 405:
+                        errorMessage = 'Используемый метод загрузки вложения запрещён.';
+                        break;
+
+                    case 413:
+                        errorMessage = 'Файл вложения слишком большой.';
+                        break;
+
+                    case 500:
+                        errorMessage = 'На сервере произошла ошибка.';
+                        break;
+
+                    case 501:
+                        errorMessage = 'Используется неизвестный серверу метод загрузки вложения.';
+                        break;
+
+                    case 502:
+                        errorMessage = 'Некому принять запрос на загрузку вложения.';
+                        break;
+
+                    case 504:
+                        errorMessage = 'Не смогли дождаться ответа обработчика загрузки вложения.';
+                        break;
+
+                    default:
+                        errorMessage = 'При загрузке вложения произошла ошибка.';
+
+                }
+                if ('' !== errorMessage) {
+                    $informer.addClass('upload-error').html([errorMessage, ' (Статус ', response.status.toString(), ')'].join(''));
+                }
             });
         };
     });

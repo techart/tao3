@@ -68,7 +68,38 @@ class DateInteger extends Field
 	{
 		$context = parent::defaultContext();
 		$context['format'] = $this->generateFormat();
-		$context['with_datepicker'] = $this->param('with_datepicker', true);
+		$context['with_datetimepicker'] = $this->param('with_datepicker', true);
+		$context['datetimepicker_options'] = array(
+			'format' => $this->datetimepickerFormat(),
+			'locale' => 'ru',
+			'tooltips' => array(
+				'today' => 'Сегодня',
+				'clear' => 'Очистить',
+				'close' => 'Закрыть',
+				'selectMonth' => 'Выбрать месяц',
+				'prevMonth' => 'Предыдущий месяц',
+				'nextMonth' => 'Следующий месяц',
+				'selectYear' => 'Выбрать год',
+				'prevYear' => 'Предыдущий год',
+				'nextYear' => 'Следующий год',
+				'selectDecade' => 'Выбрать десятилетие',
+				'prevDecade' => 'Предыдущее десятилетие',
+				'nextDecade' => 'Следующее десятилетие',
+				'prevCentury' => 'Предыдущее столетие',
+				'nextCentury' => 'Следующее столетие',
+				'pickHour' => 'Выбрать часы',
+				'incrementHour' => 'Добавить час',
+				'decrementHour' => 'Отнять час',
+				'pickMinute' => 'Выбрать минуты',
+				'incrementMinute' => 'Добавить минуту',
+				'decrementMinute' => 'Отнять минуту',
+				'pickSecond' => 'Выбрать секунды',
+				'incrementSecond' => 'Добавить секунду',
+				'decrementSecond' => 'Отнять секунду',
+				'togglePeriod' => 'Переключить период',
+				'selectTime' => 'Выбрать время',
+			),
+		);
 		return $context;
 	}
 
@@ -85,13 +116,28 @@ class DateInteger extends Field
 	 */
 	public function generateFormat()
 	{
+		$format = 'd.m.Y';
+		if ($this->withTime()) {
+			$format .= ' - H:i';
+			if ($this->withSeconds()) {
+				$format .= ':s';
+			}
+		}
+		return $format;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function datetimepickerFormat()
+	{
 		if ($this->withTime()) {
 			if ($this->withSeconds()) {
-				return 'd.m.Y - H:i:s';
+				return 'DD.MM.YYYY - HH:mm:ss';
 			}
-			return 'd.m.Y - H:i';
+			return 'DD.MM.YYYY - HH:mm';
 		}
-		return 'd.m.Y';
+		return 'DD.MM.YYYY';
 	}
 
 	/**

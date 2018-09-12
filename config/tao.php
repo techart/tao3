@@ -30,6 +30,8 @@
 		'html' => \TAO\Fields\Type\Html::class,
 		'coordinates' => \TAO\Fields\Type\Coordinates::class,
 		'array' => \TAO\Fields\Type\ArrayField::class,
+		'pairs' => \TAO\Fields\Type\Pairs::class,
+		'float' => \TAO\Fields\Type\FloatField::class,
 	],
 
 	'text' => [

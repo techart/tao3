@@ -6,7 +6,9 @@
 			@if (isset($image))
 				<a class="preview"><img src="{{ $field->adminPreviewUrl() }}"></a>
 			@endif
-			<a href="{!! url($field->url()) !!}">Скачать</a> ({{ $field->humanSize() }})
+			@if ($field->exists())
+				<a href="{!! url($field->url()) !!}">Скачать</a> ({{ $field->humanSize() }})
+			@endif
 			@if ($field->param('can_delete', true))
 				<a href="javascript:void();" id="tao_upload_delete_{{ $field->name }}">Удалить</a>
 			@endif
