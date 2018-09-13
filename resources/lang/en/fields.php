@@ -5,4 +5,7 @@
 	'new_key' => "New key",
 	'new_value' => "New value",
 	'remove_multiple_confirmation' => "Are you certain you want to delete those entries?",
+	'errors' => [
+		'recaptcha' => 'Invalid recaptcha'
+	]
 ];

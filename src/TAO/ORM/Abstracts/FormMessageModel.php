@@ -268,7 +268,7 @@ abstract class FormMessageModel extends \TAO\ORM\Model
 	{
 		list($template, $context) = $this->validateArgs($arg1, $arg2);
 		$info = [$arg1, $arg2];
-		$key = 'tao_form_' . $this->getDatatype() . '_' . md5(serialize($info));
+		$key = uniqid('tao_form_');
 		\Session::put($key, $info);
 		$context['session_key'] = $key;
 		$context['ajax_options'] = json_encode($this->ajaxOptions($context));

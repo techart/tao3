@@ -32,6 +32,7 @@
 		'array' => \TAO\Fields\Type\ArrayField::class,
 		'pairs' => \TAO\Fields\Type\Pairs::class,
 		'float' => \TAO\Fields\Type\FloatField::class,
+		'recaptcha' => \TAO\Fields\Type\Recaptcha::class,
 	],
 
 	'text' => [
