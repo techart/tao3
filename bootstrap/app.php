@@ -10,6 +10,7 @@ if (empty($vendorPath)) {
 require $vendorPath . '/autoload.php';
 require 'helpers.php';
 require 'cfg.php';
+require 'lang.php';
 
 $app = new \TAO\Application($appPath);
 

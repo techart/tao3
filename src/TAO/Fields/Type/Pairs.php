@@ -114,12 +114,12 @@ class Pairs extends Field
 
 	public function keyCaption()
 	{
-		return $this->param('key_caption', __('techart::fields.key'));
+		return $this->param('key_caption', __('fields.key'));
 	}
 
 	public function valueCaption()
 	{
-		return $this->param('value_caption', __('techart::fields.value'));
+		return $this->param('value_caption', __('fields.value'));
 	}
 
 	/**

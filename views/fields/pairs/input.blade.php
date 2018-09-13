@@ -6,7 +6,8 @@ Assets::useScript('/tao/scripts/fields/pairs.js');
 ?>
 
 
-<div class="b-pairs" data-remove-confirm="@lang('techart::fields.remove_multiple_confirmation')" style="{!! $field->styleForAdminInput() !!}">
+<div class="b-pairs" data-remove-confirm="@lang('fields.remove_multiple_confirmation')"
+     style="{!! $field->styleForAdminInput() !!}">
 	<table class="b-pairs__table">
 		<thead>
 			<tr>
@@ -44,17 +45,17 @@ Assets::useScript('/tao/scripts/fields/pairs.js');
 				</td>
 				<td class="b-pairs__cell" style="{!! $field->styleForCol('key') !!}">
 					<input class="b-pairs__input b-pairs__input--text b-pairs__input--key"
-						   name="{{ $field->nameForKey("blank") }}" type="text"
-						   placeholder="@lang("techart::fields.new_key")">
+					       name="{{ $field->nameForKey("blank") }}" type="text"
+					       placeholder="@lang("fields.new_key")">
 				</td>
 				<td class="b-pairs__cell" style="{!! $field->styleForCol('value') !!}">
 					<input class="b-pairs__input b-pairs__input--text b-pairs__input--value"
-						   name="{{ $field->nameForValue("blank") }}" type="text"
-						   placeholder="@lang("techart::fields.new_value")">
+					       name="{{ $field->nameForValue("blank") }}" type="text"
+					       placeholder="@lang("fields.new_value")">
 				</td>
 			</tr>
 		</tbody>
 	</table>
-
-	<button class="b-pairs__add-button btn btn-info" type="button">@lang('techart::fields.add')</button>
+	
+	<button class="b-pairs__add-button btn btn-info" type="button">@lang('fields.add')</button>
 </div>
