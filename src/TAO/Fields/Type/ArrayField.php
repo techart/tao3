@@ -71,6 +71,11 @@ class ArrayField extends StringField
 			$this->item[$this->name] = serialize($this->item[$this->name]);
 		}
 	}
+	
+	public function renderWithoutTemplate()
+	{
+		return 'array('.count($this->value()).')';
+	}
 
 	public function value($name = false, $default = null)
 	{
