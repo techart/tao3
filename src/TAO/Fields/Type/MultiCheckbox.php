@@ -80,11 +80,11 @@ class MultiCheckbox extends Field
 	/**
 	 * Узнать, сохранено ли значение для $id
 	 *
-	 * @param $id string
+	 * @param $id
 	 *
 	 * @return bool
 	 */
-	public function isAttached(string $id)
+	public function isAttached($id)
 	{
 		return $this->attachedKeys()->containsStrict($id);
 	}
