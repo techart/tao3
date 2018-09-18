@@ -14,14 +14,18 @@ class Variable implements \ArrayAccess
 	protected $description;
 	protected $values = [];
 	protected $adminRender;
+	protected $adminMaxLength = false;
+	protected $adminStripTags = false;
 
 	public function __construct($scope, $name, $data)
 	{
 		$this->scope = $scope;
 		$this->name = $name;
 		$this->fields = $data['fields'];
-		$this->description = isset($data['description']) ? $data['description'] : $name;
-		$this->adminRender = isset($data['admin_render']) ? $data['admin_render'] : false;
+		$this->description = $data['description'] ?? $name;
+		$this->adminRender = $data['admin_render'] ?? false;
+		$this->adminStripTags = $data['admin_strip_tags'] ?? true;
+		$this->adminMaxLength = $data['admin_max_length'] ?? false;
 		$this->setup();
 	}
 
@@ -94,7 +98,15 @@ class Variable implements \ArrayAccess
 		}
 		$fields = array_keys($this->values);
 		$field = array_shift($fields);
-		return $this->field($field)->renderForAdminList();
+		$value = trim($this->field($field)->renderForAdminList());
+		if ($this->adminStripTags) {
+			$value = str_replace('>', '> ', $value);
+			$value = trim(strip_tags($value));
+		}
+		if ($this->adminMaxLength && strlen($value) > $this->adminMaxLength) {
+			$value = trim(substr($value, 0, $this->adminMaxLength)) . '...';
+		}
+		return $value;
 	}
 
 	public function getHomeSubDir()

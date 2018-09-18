@@ -15,7 +15,9 @@ class Controller extends \TAO\Controller
 
 	public function generate()
 	{
-		$this->sitemapManager->registerDefaultSources();
-		return $this->sitemapManager->render((int)config('sitemap.cache.lifetime'));
+		return $this->sitemapManager->generateDynamically(
+			(int)config('sitemap.cache.lifetime'),
+			config('app.url')
+		);
 	}
 }

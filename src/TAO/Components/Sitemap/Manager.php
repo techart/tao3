@@ -1,8 +1,9 @@
 <?php
 namespace TAO\Components\Sitemap;
 
-use Roumen\Sitemap\Sitemap;
-use TAO\Urls;
+use Illuminate\Http\Response;
+use Laravelium\Sitemap\Sitemap;
+
 
 /**
  * Class Sitemap
@@ -14,8 +15,28 @@ class Manager
 	 * @var string|SitemapSource[]
 	 */
 	protected $sources = [];
+	/**
+	 * @var array
+	 */
+	protected $extraLinks = [];
 
 	protected $cacheName = 'laravel.sitemap';
+
+	/**
+	 * Динамически генерирует контент sitemap.xml
+	 *
+	 * @param int $cacheLifeTime
+	 * @param string $rootUrl
+	 * @return Response
+	 */
+	public function generateDynamically($cacheLifeTime = 0, $rootUrl = '')
+	{
+		if ($rootUrl != '') {
+			\URL::forceRootUrl($rootUrl);
+		}
+		$this->registerDefaultSources();
+		return $this->render($cacheLifeTime);
+	}
 
 	/**
 	 * Регистрирует поставщика ссылок для sitemap. Должен реализовывать интерфейс SitemapSource.
@@ -79,7 +100,7 @@ class Manager
 	 */
 	protected function collectLinks()
 	{
-		$links = [];
+		$links = $this->extraLinks;
 		foreach ($this->sources as $source) {
 			$links = array_merge($links, $this->makeSource($source)->sitemapLinks());
 		}
@@ -90,7 +111,7 @@ class Manager
 	 * Генерирует контент файла sitemap.
 	 *
 	 * @param int $cacheLifetime
-	 * @return \Illuminate\Support\Facades\View
+	 * @return Response
 	 */
 	public function render($cacheLifetime = 0)
 	{
@@ -148,6 +169,11 @@ class Manager
 			$link['freq'] = $link['changefreq'];
 		}
 		return $link;
+	}
+
+	public function addLinks($links)
+	{
+		$this->extraLinks = array_replace_recursive($this->extraLinks, $links);
 	}
 
 	/**
