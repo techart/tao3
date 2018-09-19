@@ -48,7 +48,9 @@ class PublicUpload extends Upload
 			$fileName = $this->destinationFilename($info);
 			\Storage::deleteDirectory($path);
 			$file->storeAs($path, $fileName);
-			$this->item->where($this->item->getKeyName(), $this->item->getKey())->update([$this->name => $path . '/' . $fileName]);
+			$fullPath = $path . '/' . $fileName;
+			$this->item[$this->name] = $fullPath;
+			$this->item->where($this->item->getKeyName(), $this->item->getKey())->update([$this->name => $fullPath]);
 			return $info;
 		}
 	}
