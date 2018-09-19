@@ -62,7 +62,7 @@ class Provider extends ServiceProvider
 		});
 
 		Blade::directive('endTextProcess', function ($args) {
-			return "<?php \$textProcess = ob_get_clean(); print \TAO\Text::process(\$textProcess, $args) ?>";
+			return "<?php \$textProcess = ob_get_clean(); print \TAO\Text::process(\$textProcess, [$args]) ?>";
 		});
 
 		if ($this->app->runningInConsole()) {
