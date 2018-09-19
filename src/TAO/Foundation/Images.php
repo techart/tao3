@@ -20,6 +20,13 @@ class Images
 		$this->extraMods[$name] = $callback;
 	}
 
+	public function localizePath($path)
+	{
+		$path = str_replace(trim(config('app.url'),'/'), '', $path);
+		$path = preg_replace('{^/storage/}', 'public/', $path);
+		return $path;
+	}
+
 	protected function initMods()
 	{
 		if (is_null($this->userMods)) {
@@ -37,6 +44,8 @@ class Images
 
 	public function modify($path, $mods)
 	{
+		$originalPath = $path;
+		$path = $this->localizePath($path);
 		if (\Storage::exists($path)) {
 			$mods = $this->parseMods($mods);
 			if (empty($mods)) {
@@ -54,11 +63,12 @@ class Images
 		if (starts_with($path, 'data:')) {
 			return $this->modifyImage($path, false, $mods);
 		}
-		return $path;
+		return $originalPath;
 	}
 
 	public function make($path)
 	{
+		$path = $this->localizePath($path);
 		if ($m = \TAO::regexp('{^data:.+;base64,(.+)$}', $path)) {
 			$content = base64_decode($m[1]);
 		} else {
@@ -75,6 +85,15 @@ class Images
 		}
 	}
 
+	public function url($path)
+	{
+		$path = $this->localizePath($path);
+		if (starts_with($path, 'data:')) {
+			return $path;
+		}
+		return \Storage::url($path);
+	}
+
 	public function show($path, $mods = false, $tpl = '<img src="{url}" width="{width}" height="{height}">')
 	{
 		if ($mods) {
@@ -82,7 +101,7 @@ class Images
 		}
 		$width = 0;
 		$height = 0;
-		$url = \Storage::url($path);
+		$url = $this->url($path);
 		if (strpos($tpl, '{width}') || strpos($tpl, '{height}')) {
 			$size = $this->size($path);
 			$width = $size->width;

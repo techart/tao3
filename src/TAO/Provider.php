@@ -57,6 +57,14 @@ class Provider extends ServiceProvider
 			return "<?php print TAO::frontend()->render({$args}); ?>";
 		});
 
+		Blade::directive('textProcess', function ($args) {
+			return "<?php ob_start(); ?>";
+		});
+
+		Blade::directive('endTextProcess', function ($args) {
+			return "<?php \$textProcess = ob_get_clean(); print \TAO\Text::process(\$textProcess, $args) ?>";
+		});
+
 		if ($this->app->runningInConsole()) {
 			$commands = [];
 			$paths = \TAO::merge([

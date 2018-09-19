@@ -39,6 +39,7 @@
 		'processors' => [
 			'markdown' => \TAO\Text\Processor\Parser\Markdown::class,
 			'translit' => \TAO\Text\Processor\Translit::class,
+			'insertions' => \TAO\Text\Processor\Insertions::class,
 			'translit_for_url' => \TAO\Text\Processor\TranslitForUrl::class,
 			'arrays' => \TAO\Text\Processor\Parser\Arrays::class,
 		]
@@ -48,5 +49,15 @@
 		'users' => \TAO\ORM\Model\User::class,
 		'roles' => \TAO\ORM\Model\Role::class,
 	],
-
+	
+	'insertions' => [
+		'img' => [
+			'action' => \TAO\Insertions\Img::class,
+			'params' => [
+				'preview_mods' => 'fit200x200',
+				'full_mods' => 'fit800x800',
+				'block' => 'b-public-image',
+			],
+		],
+	],
 ];

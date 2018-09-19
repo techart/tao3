@@ -43,3 +43,11 @@ if (!function_exists('dt')) {
 		return \TAO::datatype($code);
 	}
 }
+
+
+if (!function_exists('insertions')) {
+	function insertions($src)
+	{
+		return \TAO\Text::process($src, 'insertions');
+	}
+}
