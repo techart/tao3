@@ -84,6 +84,12 @@ class TAO
 		return response(view('404'), 404);
 	}
 
+	public function version()
+	{
+		$data = json_decode(file_get_contents('../vendor/techart/tao3/composer.json'));
+		return $data->version;
+	}
+
 	/**
 	 *
 	 */

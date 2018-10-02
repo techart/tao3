@@ -1,7 +1,7 @@
 {
 	"name": "techart/tao3",
 	"description": "Techart extensions for Laravel",
-	"version": "3.6.2",
+	"version": "3.7.1",
 	"license": "Apache-2.0",
 	"authors": [
 		{
@@ -16,11 +16,11 @@
 		}
 	},
 	"require": {
-		"PHP": ">=7.0",
+		"PHP": ">=7.1",
 		"ramsey/uuid": "^3.6",
 		"curl/curl": "~1.7",
 		"doctrine/dbal": "^2.5",
-		"laravel/framework": "5.5.*",
+		"laravel/framework": "5.7.*",
 		"laravel/tinker": "~1.0",
 		"rcrowe/twigbridge": "^0.9.4",
 		"intervention/image": "^2.3",
@@ -29,7 +29,7 @@
 		"guzzlehttp/guzzle": "^6.3",
 		"laracasts/utilities": "^3.0",
 		"techart/frontend-api": "^2.0",
-		"laravelium/sitemap": "2.7.*"
+		"laravelium/sitemap": "^3.0"
 	},
 	"extra": {
 		"laravel": {
@@ -39,7 +39,7 @@
 		}
 	},
 	"require-dev": {
-		"phpunit/phpunit": "~6.0",
+		"phpunit/phpunit": "~7.0",
 		"orchestra/testbench": "~3.5"
 	}
 }
