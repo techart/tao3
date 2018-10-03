@@ -24,4 +24,4 @@
     
 @endphp
 
-<a class="btn {{ implode(' ', $classes) }}" href="{!! $href !!}">{{ $text }}</a>
+<a class="btn {{ implode(' ', $classes) }}" href="{!! $href !!}">{!! $text !!}</a>

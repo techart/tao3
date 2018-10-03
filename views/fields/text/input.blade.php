@@ -5,5 +5,5 @@
 		class="input text form-control input-{{ $field->name }}-variant input-{{ $field->name }}-variant-{{ $code }}{{ $field->tabKeyClass() }} {{ $field->classForInput() }}"
 		style="{!! trim($field->styleForInput(), ';') !!}{!! ($code=='default'? '' : ';display:none;') !!}"
 		{!! $field->renderAttrs() !!}
-	>{{ htmlspecialchars($field->variantValue($code)) }}</textarea>
+	>{!! htmlspecialchars($field->variantValue($code)) !!}</textarea>
 @endforeach
