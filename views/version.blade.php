@@ -11,6 +11,6 @@
 		</style>
 	</head>
 	<body>
-		Techart.TAO.CMS {{ \TAO::version() }} / Laravel {{ \Illuminate\Foundation\Application::VERSION }}
+		Techart.TAO.CMS {{ \TAO::version() }} / Laravel {{ \Illuminate\Foundation\Application::VERSION }} / PHP {{ phpversion() }}
 	</body>
 </html>
