@@ -315,7 +315,7 @@ class Attaches extends StringField implements \IteratorAggregate
 		if ($body) {
 			\Storage::put("{$dir}/{$fileName}", $body);
 		} elseif (\TAO::regexp('{^https?://}', $path)) {
-			app('tao.http')->saveFile($fileName, $dir);
+			app('tao.http')->saveFile($path, $dir);
 		} elseif (is_file($path)) {
 			\Storage::putFileAs($dir, new File($path), $fileName);
 		} else {

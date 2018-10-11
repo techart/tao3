@@ -18,7 +18,7 @@ class Pairs extends Field
 	 */
 	public function createField(Blueprint $table)
 	{
-		return $table->json($this->name);
+		return $table->json($this->name)->nullable();
 	}
 
 	/**
@@ -35,7 +35,7 @@ class Pairs extends Field
 	 */
 	protected function prepareValue($value)
 	{
-		if (!$value) {
+		if (!is_null($value)) {
 			return $this->defaultValue();
 		}
 		return parent::prepareValue(json_decode($value, true));

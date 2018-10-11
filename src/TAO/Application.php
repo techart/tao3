@@ -57,7 +57,7 @@ class Application extends \Illuminate\Foundation\Application
 
 	public function modifyRequest()
 	{
-		if (\TAO::isDatatypeExists('urlrewriter')) {
+		if (!\TAO::isCLI() && \TAO::isDatatypeExists('urlrewriter')) {
 			$urls = \TAO::datatype('urlrewriter');
 			$this->taoRequest = $urls->modifyRequest($this->request());
 		}

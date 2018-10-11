@@ -86,6 +86,9 @@ trait Addressable
 	 */
 	public function routePageByUrl($data = [])
 	{
+		if (\TAO::isCLI()) {
+			return $this;
+		}
 		/**
 		 * @var Request $request
 		 */

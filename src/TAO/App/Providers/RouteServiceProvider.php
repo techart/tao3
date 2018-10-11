@@ -49,6 +49,9 @@ class RouteServiceProvider extends ServiceProvider
 	 */
 	protected function mapWebRoutes()
 	{
+		if (empty(env('APP_KEY'))) {
+			return $this;
+		}
 		Route::middleware('web')
 			->namespace($this->namespace)
 			->group($this->webRoutesPath());
