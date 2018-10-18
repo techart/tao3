@@ -159,6 +159,10 @@ class Provider extends ServiceProvider
 			return app()->make(\TAO\Foundation\Utils::class);
 		});
 
+		$this->app->singleton('unisender', function () {
+			return \TAO\Components\Unisender\API::makeInstance();
+		});
+
 		foreach (array_keys(app()->tao->routers()) as $name) {
 			$router = app()->tao->router($name);
 			if (method_exists($router, 'register')) {

@@ -45,7 +45,7 @@ class HTTP
 		$this->options[$name] = $value;
 	}
 
-	public function get($url)
+	protected function prepare($url)
 	{
 		$this->url = $url;
 		$this->curl = new \Curl\Curl();
@@ -64,23 +64,39 @@ class HTTP
 			$this->curl->setHeader($name, $value);
 		}
 
-		$this->curl->get($url);
-
 		return $this;
 	}
 
-	public function getBody($url)
+	public function get($url)
 	{
-		$this->get($url);
+		$this->prepare($url);
+		$this->curl->get($url);
+		return $this;
+	}
+
+	public function post($url, $data = [])
+	{
+		$this->prepare($url);
+		$this->curl->post($url, $data);
+		return $this;
+	}
+
+	public function getBody($url, $post = false, $data = [])
+	{
+		if ($post) {
+			$this->post($url, $data);
+		} else {
+			$this->get($url);
+		}
 		if ($this->curl->http_status_code != 200) {
 			throw new \TAO\Exception\HTTP($this->curl);
 		}
 		return $this->curl->response;
 	}
 
-	public function getJSON($url)
+	public function getJSON($url, $post = false, $data = [])
 	{
-		return json_decode($this->getBody($url));
+		return json_decode($this->getBody($url, $post, $data));
 	}
 
 	public function getResponseFilename()
