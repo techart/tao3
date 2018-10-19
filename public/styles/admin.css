@@ -312,6 +312,11 @@ td.admin-tree-title {}
   td.admin-tree-title .bullet-level-0 { padding-left: 0px;}
   td.admin-tree-title .bullet-level-1 { padding-left: 50px;}
   td.admin-tree-title .bullet-level-2 { padding-left: 100px;}
+  td.admin-tree-title .bullet-level-3 { padding-left: 150px;}
+  td.admin-tree-title .bullet-level-4 { padding-left: 200px;}
+  td.admin-tree-title .bullet-level-5 { padding-left: 250px;}
+  td.admin-tree-title .bullet-level-6 { padding-left: 300px;}
+  td.admin-tree-title .bullet-level-7 { padding-left: 350px;}
 
   tr:hover td.admin-tree-title .controls { visibility: visible;}
   tr:hover td.admin-tree-title1 { border-left-color: #888;;}
