@@ -14,6 +14,7 @@ class Variable implements \ArrayAccess
 	protected $description;
 	protected $values = [];
 	protected $render;
+	protected $access;
 	protected $adminRender;
 	protected $adminMaxLength = false;
 	protected $adminStripTags = false;
@@ -25,6 +26,7 @@ class Variable implements \ArrayAccess
 		$this->fields = $data['fields'];
 		$this->description = $data['description'] ?? $name;
 		$this->render = $data['render'] ?? false;
+		$this->access = $data['access'] ?? false;
 		$this->adminRender = $data['admin_render'] ?? false;
 		$this->adminStripTags = $data['admin_strip_tags'] ?? true;
 		$this->adminMaxLength = $data['admin_max_length'] ?? false;
@@ -48,7 +50,13 @@ class Variable implements \ArrayAccess
 
 	public function accessEdit($user)
 	{
-		return $user['is_admin'];
+		if (is_string($this->access)) {
+			return $user->checkAccess($this->access);
+		}
+		if (Type::isCallable($this->access)) {
+			return Callback::instance($this->access)->args([$this])->call();
+		}
+		return $user->checkAccess('root');
 	}
 
 	public function fields()
