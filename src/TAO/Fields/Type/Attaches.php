@@ -56,11 +56,17 @@ class Attaches extends StringField implements \IteratorAggregate
 	public function value($raw = false)
 	{
 		$defs = $this->defaultInfo();
-		$value = unserialize(parent::value());
+		$value = parent::value();
+		if (starts_with($value, '{')) {
+			$value = (array)json_decode($value);
+		} else {
+			$value = (array)unserialize($value);
+		}
 		$out = [];
 		if (is_array($value)) {
 			foreach ($value as $key => $data) {
-				$path = $data['path'];
+				$data = (array)$data;
+				$path = $data['path'] ?? false;
 				if (\Storage::exists($path)) {
 					$data['key'] = $key;
 					$data['new'] = false;

@@ -247,7 +247,7 @@ abstract class Field
 			$value = $this->defaultValue();
 			if (isset($this->data['default'])) {
 				$def = $this->data['default'];
-				if ($m = \TAO::regexp('{^filter\[([a-z0-9_]+)\]$}', $def)) {
+				if (is_string($this->data['default']) && $m = \TAO::regexp('{^filter\[([a-z0-9_]+)\]$}', $def)) {
 					$key = trim($m[1]);
 					if (request()->has('filter')) {
 						$filter = request()->get('filter');

@@ -60,10 +60,12 @@ class Sitemap extends TestCase
 		$link2 = '/test2/';
 
 		$page1 = new Datatype();
+		$page1->isactive = 1;
 		$page1->url = $link1;
 		$page1->save();
 
 		$page2 = new Datatype();
+		$page2->isactive = 1;
 		$page2->url = $link2;
 		$page2->save();
 
