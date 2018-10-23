@@ -13,6 +13,7 @@ class Variable implements \ArrayAccess
 	protected $fields = [];
 	protected $description;
 	protected $values = [];
+	protected $render;
 	protected $adminRender;
 	protected $adminMaxLength = false;
 	protected $adminStripTags = false;
@@ -23,6 +24,7 @@ class Variable implements \ArrayAccess
 		$this->name = $name;
 		$this->fields = $data['fields'];
 		$this->description = $data['description'] ?? $name;
+		$this->render = $data['render'] ?? false;
 		$this->adminRender = $data['admin_render'] ?? false;
 		$this->adminStripTags = $data['admin_strip_tags'] ?? true;
 		$this->adminMaxLength = $data['admin_max_length'] ?? false;
@@ -84,7 +86,7 @@ class Variable implements \ArrayAccess
 	public function render()
 	{
 		if (Type::isCallable($this->render)) {
-			return Callback::instance($this->render)->call();
+			return Callback::instance($this->render)->args([$this])->call();
 		}
 		$fields = array_keys($this->values);
 		$field = array_shift($fields);
