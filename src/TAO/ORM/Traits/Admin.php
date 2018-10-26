@@ -108,6 +108,7 @@ trait Admin
 				$fields[$name] = $field;
 			}
 		}
+		$this->setupFields();
 		uasort($fields, function ($f1, $f2) {
 			$w1 = $f1->weightInAdminForm();
 			$w2 = $f2->weightInAdminForm();

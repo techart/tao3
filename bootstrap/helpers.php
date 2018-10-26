@@ -5,7 +5,7 @@ if (!function_exists('who_calls')) {
 	{
 		$out = [];
 		$data = debug_backtrace();
-		foreach($data as $item) {
+		foreach ($data as $item) {
 			$m = '';
 			if (isset($item['line'])) {
 				$m .= "({$item['line']}) ";
@@ -41,6 +41,13 @@ if (!function_exists('dt')) {
 	function dt($code)
 	{
 		return \TAO::datatype($code);
+	}
+}
+
+if (!function_exists('protect_field')) {
+	function protect_field($time = 5)
+	{
+		return app(\TAO\Components\Protect\Utils::class)->timeField($time);
 	}
 }
 

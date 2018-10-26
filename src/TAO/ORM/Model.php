@@ -87,11 +87,18 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 			$this->incrementing = true;
 		}
 		$this->updateSchemaIfNecessary();
-		$this->setupFields();
 		if (!$this->typeTitle) {
 			$this->typeTitle = get_class($this);
 		}
 	}
+
+	public function newInstance($attributes = [], $exists = false)
+	{
+		$instance = parent::newInstance($attributes, $exists);
+		$instance->setupFields();
+		return $instance;
+	}
+
 
 	/**
 	 * Возвращает мнемокод дататайпа для этой модели

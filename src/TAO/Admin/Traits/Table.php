@@ -416,6 +416,7 @@ trait Table
 		$fields = array();
 		foreach ($this->datatype()->setFieldsMode($mode)->fieldsObjects() as $name => $field) {
 			if ($field->$validationMethod()) {
+				$field->setupDefault();
 				$fields[$name] = $field;
 			}
 		}

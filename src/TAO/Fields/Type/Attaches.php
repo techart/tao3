@@ -308,12 +308,6 @@ class Attaches extends StringField implements \IteratorAggregate
 		$dir = "{$dir}/{$this->name}";
 		$dest = "{$dir}/{$fileName}";
 
-		$data = array(
-			'path' => $dest,
-			'name' => $fileName,
-			'info' => \TAO::merge($this->defaultInfo(), $info),
-		);
-
 		if (\Storage::exists($dest)) {
 			\Storage::delete($dest);
 		}
@@ -321,12 +315,19 @@ class Attaches extends StringField implements \IteratorAggregate
 		if ($body) {
 			\Storage::put("{$dir}/{$fileName}", $body);
 		} elseif (\TAO::regexp('{^https?://}', $path)) {
-			app('tao.http')->saveFile($path, $dir);
+			$dest = app('tao.http')->saveFile($path, $dir);
 		} elseif (is_file($path)) {
 			\Storage::putFileAs($dir, new File($path), $fileName);
 		} else {
 			\Storage::copy($path, "{$dir}/{$fileName}");
 		}
+
+		$data = array(
+			'path' => $dest,
+			'name' => $fileName,
+			'info' => \TAO::merge($this->defaultInfo(), $info),
+		);
+
 		$files[$key] = $data;
 		$this->item[$this->name] = serialize($files);
 		$this->item->where($this->item->getKeyName(), $this->item->getKey())->update([$this->name => serialize($files)]);

@@ -34,6 +34,7 @@ class Multilink extends Field
 	 */
 	public function add($ids)
 	{
+		$this->loadRelationsIfRequired();
 		$this->addToAttachedIds($ids);
 	}
 
@@ -117,13 +118,7 @@ class Multilink extends Field
 	 */
 	public function attachedIds()
 	{
-		if (!$this->relationsIsLoaded) {
-			if ($this->item->getKey()) {
-				$ids = $this->belongsToMany()->allRelatedIds();
-				$this->set(is_array($ids)? $ids : $ids->toArray());
-			}
-			$this->relationsIsLoaded = true;
-		}
+		$this->loadRelationsIfRequired();
 		return $this->attachedIds;
 	}
 
@@ -440,5 +435,31 @@ class Multilink extends Field
 		}
 		sort($out);
 		return implode(', ', $out);
+	}
+
+	/**
+	 * Метод загружает привязки из БД
+	 *
+	 * @throws UnknownDatatype
+	 */
+	protected function loadRelations()
+	{
+		if ($this->item->getKey()) {
+			$ids = $this->belongsToMany()->allRelatedIds();
+			$this->set(is_array($ids) ? $ids : $ids->toArray());
+		}
+		$this->relationsIsLoaded = true;
+	}
+
+	/**
+	 * Метод вызывает загрузку привязок из БД если они еще не были загружены
+	 *
+	 * @throws UnknownDatatype
+	 */
+	protected function loadRelationsIfRequired()
+	{
+		if (!$this->relationsIsLoaded) {
+			$this->loadRelations();
+		}
 	}
 }

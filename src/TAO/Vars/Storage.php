@@ -3,6 +3,8 @@
 namespace TAO\Vars;
 
 use Illuminate\Support\Facades\Storage as AppStorage;
+use TAO\Callback;
+use TAO\Type;
 
 class Storage
 {
@@ -83,5 +85,17 @@ class Storage
 			return "vars/{$name}";
 		}
 		return "vars/{$scope}/{$name}";
+	}
+
+	public function accessToScope($scope = false)
+	{
+		$data = $scope? config("vars.{$scope}", []) : config('vars');
+		if ($access = $data['access'] ?? false) {
+			if (Type::isCallable($access)) {
+				return Callback::instance($access)->call();
+			}
+			return auth()->user()->checkAccess($access);
+		}
+		return true;
 	}
 }

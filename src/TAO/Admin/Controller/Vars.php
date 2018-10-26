@@ -16,16 +16,28 @@ class Vars extends Base
 
 	protected function listAction()
 	{
+		if (!$this->accessToScope()) {
+			return \TAO::pageNotFound();
+		}
 		return $this->render('vars ~ index');
+	}
+
+	protected function accessToScope()
+	{
+		return \TAO::vars()->accessToScope(app()->tao->router('admin')->varsScope);
 	}
 
 	protected function editAction()
 	{
-		if (is_null($this->id)) {
+		if (is_null($this->id) || !$this->accessToScope()) {
 			return \TAO::pageNotFound();
 		}
 
-		$item = \TAO::vars($this->id);
+		if ($scope = app()->tao->router('admin')->varsScope) {
+			$item = \TAO::vars("{$scope}::{$this->id}");
+		} else {
+			$item = \TAO::vars($this->id);
+		}
 		if (!$item || !$item->accessEdit(\Auth::user())) {
 			return \TAO::pageNotFound();
 		}
@@ -74,6 +86,11 @@ class Vars extends Base
 		$context['varGroups'] = $this->groups;
 		if (!isset($context['title'])) {
 			$context['title'] = $this->title;
+		}
+		$context['scopePrefix'] = '';
+		if (!isset($context['scope']) && ($scope = app()->tao->router('admin')->varsScope)) {
+			$context['scope'] = $scope;
+			$context['scopePrefix'] = "{$scope}::";
 		}
 		$context['controller'] = $this;
 		return $context;

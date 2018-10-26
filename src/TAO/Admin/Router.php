@@ -8,6 +8,7 @@ class Router extends \TAO\Router
 	public $datatype;
 	public $datatypeCode;
 	public $vars;
+	public $varsScope;
 
 	public function route($request)
 	{
@@ -36,6 +37,7 @@ class Router extends \TAO\Router
 			} elseif ($m = app()->tao->regexp('{^vars/([^/]+)$}', $path)) {
 				$group = $m[1];
 				$this->vars = config("vars.{$group}", false);
+				$this->varsScope = $group;
 				if (is_array($this->vars)) {
 					app()->router->any("/admin/vars/{$group}", '\\TAO\\Admin\\Controller\\Vars@entryPointAction');
 				}

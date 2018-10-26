@@ -108,7 +108,7 @@ class HTTP
 		}
 		$url = preg_replace('{^https?://}', '', $this->url);
 		$url = preg_replace('{^[^/]+}', '', $url);
-		if ($m = \TAO::regexp('{/([^/]+)\.([a-z0-9]{1,4})$}', $url)) {
+		if ($m = \TAO::regexp('{/([^/]+)\.([a-z0-9]+)$}i', $url)) {
 			return $m[1] . '.' . $m[2];
 		}
 		$mime = 'application/octet-stream';
@@ -127,7 +127,7 @@ class HTTP
 		}
 		$name = $this->getResponseFilename();
 		$ext = 'bin';
-		if ($m = \TAO::regexp('{(.+)\.([a-z0-9]+)}', $name)) {
+		if ($m = \TAO::regexp('{(.+)\.([a-z0-9]+)$}i', $name)) {
 			$name = strtolower(trim($m[1]));
 			$ext = strtolower(trim($m[2]));
 		}
