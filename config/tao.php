@@ -1,5 +1,7 @@
 <?php return [
 
+	'frontend_env' => env('FRONTEND_ENV', false),
+	
 	'routers' => [
 		'fspages' => \TAO\FSPages\Router::class,
 		'admin' => \TAO\Admin\Router::class,

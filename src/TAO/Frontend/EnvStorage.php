@@ -8,7 +8,7 @@ class EnvStorage implements EnvironmentStorageInterface
 {
 	public function getFromConfig($name)
 	{
-		$env = env('FRONTEND_ENV', false);
+		$env = config('tao.frontend_env', false);
 		if ($env) {
 			return $env;
 		}
