@@ -49,7 +49,7 @@ class RouteServiceProvider extends ServiceProvider
 	 */
 	protected function mapWebRoutes()
 	{
-		if (empty(env('APP_KEY'))) {
+		if (empty(config('app.key'))) {
 			return $this;
 		}
 		Route::middleware('web')

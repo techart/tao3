@@ -42,6 +42,7 @@
 			'insertions' => \TAO\Text\Processor\Insertions::class,
 			'translit_for_url' => \TAO\Text\Processor\TranslitForUrl::class,
 			'arrays' => \TAO\Text\Processor\Parser\Arrays::class,
+			'typographer' => \TAO\Text\Processor\Typographer::class,
 		]
 	],
 
@@ -49,7 +50,7 @@
 		'users' => \TAO\ORM\Model\User::class,
 		'roles' => \TAO\ORM\Model\Role::class,
 	],
-	
+
 	'insertions' => [
 		'img' => [
 			'action' => \TAO\Insertions\Img::class,
