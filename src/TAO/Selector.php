@@ -234,14 +234,27 @@ class Selector
 		}
 		$this->data['count'] = $count;
 		$this->data['numpages'] = $numPages;
+		$this->data['rows'] = $rows;
 
-		if ((1 > $this->data['page']) ||
-			($this->data['numpages'] < $this->data['page'])) {
+		if ((0 < $this->data['count']) &&
+			((1 > $this->data['page']) ||
+			($this->data['numpages'] < $this->data['page']))) {
 			return response(view('404'), 404);
 		}
 
-		$this->data['rows'] = $rows;
+		if (isset($this->data['empty_block'])) {
+			if (!view()->exists($this->data['empty_block'])) {
+				unset($this->data['empty_block']);
+			}
+		}
+
 		$template = isset($this->data['template']) ? $this->data['template'] : $this->defaultTemplate($mode);
+
+		if ((0 === $this->data['count']) && isset($this->data['empty_template'])) {
+			if (view()->exists($this->data['empty_template'])) {
+				$template = $this->data['empty_template'];
+			}
+		}
 
 		$this->beforeRender();
 

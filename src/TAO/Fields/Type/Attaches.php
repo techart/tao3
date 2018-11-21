@@ -278,6 +278,7 @@ class Attaches extends StringField implements \IteratorAggregate
 		}
 
 		$this->item->where($this->item->getKeyName(), $this->item->getKey())->update([$this->name => serialize($out)]);
+		$this->item[$this->name] = serialize($out);
 	}
 
 	/**

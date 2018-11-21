@@ -4,6 +4,7 @@ namespace TAO\App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use TAO\Callback;
 
 class Kernel extends ConsoleKernel
 {
@@ -24,8 +25,18 @@ class Kernel extends ConsoleKernel
 	 */
 	protected function schedule(Schedule $schedule)
 	{
-		// $schedule->command('inspire')
-		//          ->hourly();
+		if (Callback::isValidCallback(config('app.schedules'))) {
+			Callback::instance(config('app.schedules'))->call($schedule);
+			return;
+		}
+
+		if (\TAO::isIterable(config('app.schedules'))) {
+			foreach (config('app.schedules') as $scheduleConfig) {
+				if (Callback::isValidCallback($scheduleConfig)) {
+					Callback::instance($scheduleConfig)->call($schedule);
+				}
+			}
+		}
 	}
 
 	/**

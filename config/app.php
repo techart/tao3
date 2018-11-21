@@ -6,8 +6,8 @@ return [
 	'debug' => env('APP_DEBUG', false),
 	'url' => env('APP_URL', 'http://localhost'),
 	'timezone' => env('APP_TIMEZONE', 'Europe/Moscow'),
-	'locale' => env('APP_LOCALE','ru'),
-	'php_locale' => env('APP_PHP_LOCALE','ru_RU.UTF-8'),
+	'locale' => env('APP_LOCALE', 'ru'),
+	'php_locale' => env('APP_PHP_LOCALE', 'ru_RU.UTF-8'),
 	'fallback_locale' => 'en',
 	'key' => env('APP_KEY'),
 	'cipher' => 'AES-256-CBC',
@@ -91,9 +91,11 @@ return [
 		'TAO' => TAO\Facades\TAO::class,
 		'Twig' => TwigBridge\Facade\Twig::class,
 	],
+
 	'errors' => [
 		'notification' => [
 			'subject' => '{name}: Ошибка на странице {fullUrl}',
-		]
-	]
+		],
+	],
+
 ];
