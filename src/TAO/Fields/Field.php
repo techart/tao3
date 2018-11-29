@@ -704,7 +704,7 @@ abstract class Field
 				}
 				return (string)$this->item->field($key)->value();
 			});
-			$render = empty($render) ? 'empty' : trim($render);
+			$render = trim($render);
 			$render = "<a href=\"{$url}\">{$render}</a>";
 		}
 		$method = 'admin'.ucfirst($action).'ValuePreprocess';

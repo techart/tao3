@@ -12,7 +12,7 @@
                 {!! $field->renderAttrs() !!}
             >
             <span class="multilink-item-custom-checkbox"></span>
-            <span class="multilink-item-label">{{ $title }}</span>
+            <span class="multilink-item-label">{!! $title !!}</span>
         </label>
     @endforeach
 </div>

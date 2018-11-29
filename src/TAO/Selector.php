@@ -194,7 +194,13 @@ class Selector
 
 	public function beforeRender()
 	{
-		\Assets::setMeta('title', $this->data['title']);
+		\Assets::setMeta('title', $this->data['meta_title'] ?? $this->data['title']);
+		if (isset($this->data['meta_description'])) {
+			\Assets::setMeta('description', $this->data['meta_description']);
+		}
+		if (isset($this->data['meta_keywords'])) {
+			\Assets::setMeta('keywords', $this->data['meta_keywords'] ?? null);
+		}
 	}
 
 	/**
@@ -256,8 +262,6 @@ class Selector
 			}
 		}
 
-		$this->beforeRender();
-
 		if (isset($this->data['before_render'])) {
 			$beforeRender = $this->data['before_render'];
 			if ($this->datatype && is_string($beforeRender) && preg_match('{^[a-z][a-z0-9_]*$}i', $beforeRender)) {
@@ -265,6 +269,8 @@ class Selector
 			}
 			Callback::instance($beforeRender)->call($this);
 		}
+
+		$this->beforeRender();
 
 		return view($template, $this->data);
 	}
