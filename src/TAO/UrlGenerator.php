@@ -16,18 +16,18 @@ class UrlGenerator extends \Illuminate\Routing\UrlGenerator
 		}
 
 		$url = parent::to($path, $extra, $secure);
-		if ($this->hasTrailingSlash($path) && !$this->hasTrailingSlash($url)) {
-			$url = $this->addTrailingSlash($url);
+		if (\URL::hasTrailingSlash($path) && !\URL::hasTrailingSlash($url)) {
+			$url = \URL::addTrailingSlash($url);
 		}
 		return $url;
 	}
 
-	protected function hasTrailingSlash($url)
+	public function hasTrailingSlash($url)
 	{
 		return ends_with(parse_url($url, PHP_URL_PATH), '/');
 	}
 
-	protected function addTrailingSlash($url)
+	public function addTrailingSlash($url)
 	{
 		if ($url == '/') {
 			return $url;
@@ -51,13 +51,13 @@ class UrlGenerator extends \Illuminate\Routing\UrlGenerator
 
 		$url = $urlParts['scheme'] . '://';
 
-		if(isset($urlParts['user']) && isset($urlParts['pass'])) {
+		if (isset($urlParts['user']) && isset($urlParts['pass'])) {
 			$url .= $urlParts['user'] . ':' . $urlParts['pass'] . '@';
 		}
 
 		$url .= $urlParts['host'];
 
-		if(isset($urlParts['port'])) {
+		if (isset($urlParts['port'])) {
 			$url .= ':' . $urlParts['port'];
 		}
 

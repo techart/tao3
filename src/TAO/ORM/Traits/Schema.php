@@ -3,6 +3,7 @@
 namespace TAO\ORM\Traits;
 
 use Illuminate\Database\Schema\Blueprint;
+use TAO\Fields\Field;
 
 /**
  * Class Schema
@@ -150,7 +151,10 @@ trait Schema
 			if ($this->timestamps && !$this->hasColumns(['created_at', 'updated_at'])) {
 				$table->timestamps();
 			}
-			$this->checkFieldsSchema($table);
+			$this->checkFieldsColumns($table);
+		});
+		$this->tableSchema(function (Blueprint $table) {
+			$this->checkFieldsIndexes($table);
 		});
 	}
 
@@ -158,13 +162,26 @@ trait Schema
 	 * @param Blueprint $table
 	 * @return $this
 	 */
-	protected function checkFieldsSchema(Blueprint $table)
+	protected function checkFieldsColumns(Blueprint $table)
 	{
-		foreach ($this->calculatedFields() as $name => $data) {
-			$field = $this->field($name);
+		$fields = $this->fieldsObjects();
+		array_walk($fields, function ($field) use ($table) {
+			/** @var Field $field */
 			$field->checkSchema($table);
+		});
+	}
+
+	/**
+	 * @param Blueprint $table
+	 * @return $this
+	 */
+	protected function checkFieldsIndexes(Blueprint $table)
+	{
+		$fields = $this->fieldsObjects();
+		array_walk($fields, function ($field) use ($table) {
+			/** @var Field $field */
 			$field->checkIndexes($table);
-		}
+		});
 		return $this;
 	}
 

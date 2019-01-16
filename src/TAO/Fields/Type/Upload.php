@@ -270,6 +270,14 @@ class Upload extends Field
 		return $render;
 	}
 
+	public function renderWithoutTemplate()
+	{
+		$url = $this->url();
+		$value = $this->value();
+		$render = "<a href='{$url}'>{$value}</a>";
+		return $render;
+	}
+
 	public function dataExportValue()
 	{
 		$value = $this->value();

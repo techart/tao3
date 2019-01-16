@@ -271,6 +271,8 @@ trait SchemaHelper
 				$style .= "width: {$value};";
 			} elseif ($m = \TAO::regexp('{^(\d+)h$}', $value)) {
 				$style .= "height: {$m[1]}px;";
+			} elseif ($m = \TAO::regexp('{^([a-z_][a-z0-9_-]+)$}i', $value)) {
+				$data[$value] = true;
 			}
 		}
 		if ($style) {

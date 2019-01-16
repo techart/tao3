@@ -30,7 +30,7 @@ abstract class ComponentServiceProvider extends ServiceProvider
 
 	public function commandsPath()
 	{
-		return $this->packageDir() . '/src/Commands';
+		return $this->packageDir() . '/src/Console/Commands';
 	}
 
 	public function translationsPath()
@@ -104,12 +104,10 @@ abstract class ComponentServiceProvider extends ServiceProvider
 	{
 		$commands = [];
 		$path = $this->commandsPath();
-		if ($path && file_exists($path)) {
-			if (is_dir($path)) {
-				foreach (\File::allFiles($path) as $file) {
-					$commandClassName = $file->getBasename('.' . $file->getExtension());
-					$commands[] = $this->namespace() . '\\Commands\\' . $commandClassName;
-				}
+		if ($path && is_dir($path)) {
+			foreach (\File::allFiles($path) as $file) {
+				$commandClassName = $file->getBasename('.' . $file->getExtension());
+				$commands[] = $this->namespace() . '\\Console\\Commands\\' . $commandClassName;
 			}
 		}
 		if ($commands) {
