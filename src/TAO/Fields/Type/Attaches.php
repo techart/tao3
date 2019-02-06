@@ -465,6 +465,20 @@ class Attaches extends StringField implements \IteratorAggregate
 		$context['container_class'] = $this->containerClass();
 		return $context;
 	}
+	
+	public function jsonValue()
+	{
+		$out = [];
+		foreach($this->value() as $key => $entry) {
+			$out[$key] = [
+				'url' => (request()->isSecure()? 'https://' : 'http://') . $_SERVER['REQUEST_URI'] . $entry->url(),
+				'name' => $entry->name(),
+				'ext' => $entry->ext(),
+				'info' => $entry->info(),
+			];
+		}
+		return $out;
+	}
 
 	public function dataExportValue()
 	{

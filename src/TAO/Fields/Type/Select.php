@@ -32,6 +32,11 @@ class Select extends Field
 		}
 		return $table->integer($this->name, false, false)->default(0);
 	}
+	
+	public function defaultValue()
+	{
+		return 0;
+	}
 
 	/**
 	 * @return mixed

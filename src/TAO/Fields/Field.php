@@ -680,7 +680,28 @@ abstract class Field
 
 	public function renderForAdminList()
 	{
-		return $this->renderForAdmin('list');
+		$value = $this->renderForAdmin('list');
+		$handlers = $this->param('list_value_handlers', false);
+		if (is_array($handlers)) {
+			$value = $this->applyHandlers($value, $handlers);
+		}
+		return $value;
+	}
+	
+	public function applyHandlers($value, $handlers = [])
+	{
+		foreach($handlers as $handler) {
+			if ($handler = trim($handler)) {
+				if ($m = \TAO::regexp('{^(.+)\.([^.]+)$}', $handler)) {
+					$dt = dt($m[1]);
+					$method = $m[2];
+					$value = $dt->$method($value, $this->item);
+				} else {
+					$value = $handler($value, $this->item);
+				}
+			}
+		}
+		return $value;
 	}
 
 	/**
@@ -982,6 +1003,12 @@ abstract class Field
 		}
 		return true;
 	}
+	
+	public function jsonValue()
+	{
+		return $this->value();
+	}
+	
 	protected function dataExportValue()
 	{
 		return '';

@@ -2,6 +2,6 @@
 @script('/tao/scripts/form.js')
 <script>
   $(function() {
-    taoAjaxForm('{{ $form->htmlId($__data) }}', {!! $ajax_options !!});
+    new taoAjaxForm('{{ $form->htmlId($__data) }}', {!! $ajax_options !!});
   });
 </script>

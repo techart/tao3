@@ -94,6 +94,10 @@ class Provider extends ServiceProvider
 			return app()->make(HTTP::class);
 		});
 
+		$this->app->bind('tao.mail.transport', function ($app) {
+			return app()->make(\TAO\Mail\PHPTransport::class);
+		});
+
 		$this->app->singleton('url', function ($app) {
 			$routes = $app['router']->getRoutes();
 			$app->instance('routes', $routes);

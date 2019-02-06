@@ -42,6 +42,7 @@ class TAO
 	protected $viewsPaths = [];
 	protected $viewsPrefixes = [];
 	protected $variant = false;
+	protected $itemsForSelectCache = [];
 
 	public function useLayout($name)
 	{
@@ -468,8 +469,14 @@ class TAO
 		if (is_array($src)) {
 			return $src;
 		}
+		$out = [];
 		$args = [];
+		$cacheKey = false;
 		if (is_string($src)) {
+			$cacheKey = 'itemsForSelect-'.md5($src);
+			if (isset($this->itemsForSelectCache[$cacheKey])) {
+				return $this->itemsForSelectCache[$cacheKey];
+			}
 			if ($m = \TAO::regexp('{^(.+?)/(.+)$}', $src)) {
 				$src = trim($m[1]);
 				$args = Collection::parseString(trim($m[2]));
@@ -489,9 +496,12 @@ class TAO
 			if (!empty($args)) {
 				$callback->args([$args]);
 			}
-			return $callback->call();
+			$out = $callback->call();
 		}
-		return array();
+		if ($cacheKey) {
+			$this->itemsForSelectCache[$cacheKey] = $out;
+		}
+		return $out;
 	}
 
 	public function merge($a, $b)

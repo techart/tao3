@@ -255,6 +255,15 @@ class Upload extends Field
 		}
 		return \Storage::url($file);
 	}
+	
+	public function jsonValue()
+	{
+		$url = $this->url();
+		if (starts_with($url, '/')) {
+			$url = (request()->isSecure()? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $url;
+		}
+		return $url;
+	}
 
 	/**
 	 * @return string

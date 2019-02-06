@@ -4,10 +4,11 @@ namespace TAO\ORM\Traits;
 
 trait SchemaHelper
 {
-	private $generatedSchemaData = false;
 	private $weightInCSV = 0;
 	private $weightInForm = 0;
 	private $weightInList = 0;
+	
+	protected static $parsedData = [];
 
 	public function fields()
 	{
@@ -28,24 +29,16 @@ trait SchemaHelper
 
 	protected function generateSchemaData()
 	{
-		if ($this->generatedSchemaData) {
-			return $this->generatedSchemaData();
-		}
 		$ref = new \ReflectionClass($this);
 		$path = $ref->getFileName();
-		$cache = 'schema-helper'.md5($path);
-		$time = filemtime($path);
-
-		$data = \Cache::get($cache, 0);
-		//if (is_array($data) && $data[''])
-
-		//\Cache::put($key, $time, 500000);
-		$data = $this->parseSource($path);
-		return $data;
+		return $this->parseSource($path);
 	}
 
-	protected function parseSource($path)
+	public function parseSource($path)
 	{
+		if (isset(self::$parsedData[$path])) {
+			return self::$parsedData[$path];
+		}
 		$src = file_get_contents($path);
 		if ($m = \TAO::regexp('{/\*schema(.+)schema\*/}ism', $src)) {
 			$list = [];
@@ -121,7 +114,7 @@ trait SchemaHelper
 				if (isset($data['td'])) {
 					$fdata['admin_td_attrs'] = $data['td'];
 				}
-				foreach(['formula', 'order'] as $key) {
+				foreach(['formula', 'order', 'list_value_handlers'] as $key) {
 					if (isset($data[$key])) {
 						$fdata[$key] = $data[$key];
 					}
@@ -133,11 +126,14 @@ trait SchemaHelper
 				}
 				$form[$field] = $fdata;
 			}
-			return [
+			$out = [
 				'time' => time(),
 				'groups' => $groups,
 				'fields' => $form,
 			];
+			self::$parsedData[$path] = $out;
+			return $out;
+			
 		} else {
 			throw new \TAO\ORM\Exception\SchemaHelper("Schema block not found in {$path}");
 		}
@@ -209,6 +205,7 @@ trait SchemaHelper
 		$line = trim($m[2]);
 		$td = '';
 		$th = '';
+		$handlers = [];
 		foreach($this->parseString($line) as $key => $value) {
 			if (!is_numeric($key)) {
 				if ($key == 'link') {
@@ -225,6 +222,8 @@ trait SchemaHelper
 				$td .= "text-align: {$value};";
 			} elseif ($value == 'bold') {
 				$td .= "font-weight: {$value};";
+			} elseif ($m = \TAO::regexp('{^/:(.+)$}', $value)) {
+				$handlers[] = trim($m[1]);
 			}
 		}
 		if ($th) {
@@ -234,6 +233,7 @@ trait SchemaHelper
 			$data['td'] = "style=\"{$td}\"";
 		}
 		$data['weight'] = (++$this->weightInList)*1000;
+		$data['list_value_handlers'] = $handlers;
 		return $data;
 	}
 	

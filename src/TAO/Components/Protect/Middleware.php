@@ -11,7 +11,7 @@ class Middleware
 				$info = \Crypt::decrypt($request->get('_tao_form_info'));
 				if (isset($info['min_time'])) {
 					if (time() < (int)$info['min_time']) {
-						$this->invalid();
+						return $this->invalid();
 					}
 				}
 			} else {
@@ -22,7 +22,7 @@ class Middleware
 					} else {
 						if (ends_with($url, '*')) {
 							if (starts_with($thisUrl, substr($url, 0, strlen($url) - 1))) {
-								$this->invalid();
+								return $this->invalid();
 							}
 						}
 					}
@@ -34,6 +34,15 @@ class Middleware
 
 	protected function invalid()
 	{
+		if (request()->ajax()) {
+			return response([
+				'result' => 'protect_error',
+				'errors' => [
+					'_protect' => config('tao.robots_protection_message', 'Robot detected!'),
+				],
+				'redirect' => false,
+			]);
+		}
 		throw new Exception('Protection error');
 	}
 }
