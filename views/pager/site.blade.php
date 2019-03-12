@@ -8,7 +8,7 @@
 
 
 @if ($page>1)
-  {{ Assets::setMeta('rel_canonical', call_user_func($pager_callback, 1)) }}
+  {{ Assets::setMeta('rel_canonical', url(call_user_func($pager_callback, 1))) }}
   @include('pager ~ link', ['number' => $page-1, 'text' => '&lt;', 'link_rel' => 'prev'])
 @endif
 

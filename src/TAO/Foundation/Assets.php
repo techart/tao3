@@ -37,9 +37,9 @@ class Assets
 		$this->vars[$name] = $value;
 	}
 
-	public function getVar($name)
+	public function getVar($name, $default = null)
 	{
-		return $this->vars[$name] ?? null;
+		return $this->vars[$name] ?? $default;
 	}
 
 

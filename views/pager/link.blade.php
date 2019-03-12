@@ -19,7 +19,7 @@
     $href = call_user_func($pager_callback, $number);
     
     if (isset($link_rel)) {
-        Assets::setMeta("rel_{$link_rel}", $href);
+        Assets::setMeta("rel_{$link_rel}", url($href));
     } 
     
 @endphp
