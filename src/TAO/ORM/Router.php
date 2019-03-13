@@ -10,6 +10,9 @@ class Router extends \TAO\Router
 
 	public function routes()
 	{
+		if (\TAO::isCLI()) {
+			return;
+		}
 		foreach (\TAO::datatypeCodes() as $code) {
 			$datatype = \TAO::datatype($code);
 			$datatype->automaticRoutes();

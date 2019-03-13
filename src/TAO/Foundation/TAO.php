@@ -148,7 +148,7 @@ class TAO
 
 	public function routes()
 	{
-		if (config('auth.public.login', false)) {
+		if (!\TAO::isCLI() && config('auth.public.login', false)) {
 			/**
 			 * @var User $datatype
 			 */
@@ -162,7 +162,7 @@ class TAO
 			\Route::get('/login/social/{driver}/callback/', "{$controller}@handleProviderCallback");
 		}
 
-		if (config('auth.public.register', false)) {
+		if (!\TAO::isCLI() && config('auth.public.register', false)) {
 			/**
 			 * @var User $datatype
 			 */
