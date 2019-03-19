@@ -27,6 +27,8 @@ class Selector
 	public $args = [];
 	public $data = [];
 
+	public static $routedSelectors = [];
+
 
 	public function setMnemocode($code)
 	{
@@ -160,7 +162,26 @@ class Selector
 				return $this->render($data);
 			});
 		}
+		$routeName = $this->data['name'] ?? $this->mnemocode;
+		$routed = clone $this;
+		$routed->mnemocode = $routeName;
+		self::$routedSelectors[$routeName] = $routed;
 		return $this;
+	}
+	
+	public function url($page = 1)
+	{
+		$selector = self::$routedSelectors[$this->mnemocode] ?? $this;
+		$pager = $selector->data['pager_callback'] ?? false;
+		if ($pager) {
+			return call_user_func($pager, $page);
+		}
+		$url = $selector->data['base'] ?? '/';
+		if ($page > 1) {
+			$var = $selector->data['pager_var'] ?? 'page';
+			$url .= "{$var}-{$page}/";
+		}
+		return $url;
 	}
 
 	/**

@@ -27,6 +27,7 @@
 		'documents' => \TAO\Fields\Type\Documents::class,
 		'gallery' => \TAO\Fields\Type\Gallery::class,
 		'public_upload' => \TAO\Fields\Type\PublicUpload::class,
+		'public_image' => \TAO\Fields\Type\PublicImage::class,
 		'radio' => \TAO\Fields\Type\Radio::class,
 		'multicheckbox' => \TAO\Fields\Type\MultiCheckbox::class,
 		'html' => \TAO\Fields\Type\Html::class,

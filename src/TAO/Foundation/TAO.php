@@ -263,11 +263,16 @@ class TAO
 		if (!is_null($datatype)) {
 			return $this->datatypes[$name] = $datatype;
 		}
+		
 		if (!is_null($default) && $default) {
 			if (is_string($default)) {
 				$default = app($default);
 			}
 			$default->initDatatype();
+			return $default;
+		}
+		
+		if (!is_null($default)) {
 			return $default;
 		}
 
@@ -346,6 +351,7 @@ class TAO
 
 	public function selector($code, $default = null)
 	{
+
 		if (isset($this->selectors[$code])) {
 			$class = $this->selectors[$code];
 			if (is_object($class)) {
@@ -362,6 +368,10 @@ class TAO
 		$datatype = static::datatype($code, false);
 		if ($datatype) {
 			return $datatype->selector();
+		}
+		
+		if ($selector = \TAO\Selector::$routedSelectors[$code] ?? false) {
+			return $selector;
 		}
 
 		if (!is_null($default)) {
