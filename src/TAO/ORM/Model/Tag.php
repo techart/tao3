@@ -42,6 +42,11 @@ abstract class Tag extends AbstractModel
 		}
 	}
 
+	public function initTagByValue($value)
+	{
+		$this->setTitle($value);
+	}
+
 	/**
 	 * @return Builder
 	 */

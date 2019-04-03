@@ -207,7 +207,7 @@ trait Table
 		$fileName = $this->csvFileName();
 		return response($csv, 200, [
 			'Content-Type' => 'text/x-csv',
-			'Content-Disposition' => "attachment; filename='$fileName'"
+			'Content-Disposition' => "attachment; filename={$fileName}"
 		]);
 	}
 

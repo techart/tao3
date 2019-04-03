@@ -51,19 +51,34 @@ class MultilinkTags extends Multilink
 					$tags[$tag] = $tag;
 				}
 			}
-			$this->belongsToMany()->detach();
-			foreach ($tags as $tag) {
-				/** @var Tag $tagModel */
-				$tagModel = $this->relatedModel();
-				$tagItem = $tagModel->findTag($tag);
-				if (!$tagItem) {
-					/** @var Tag $tagItem */
-					$tagItem = $this->relatedModel()->newInstance();
+
+			$this->setTags($tags);
+		}
+	}
+
+	/**
+	 * @param array $tags
+	 * @throws \TAO\Exception\UnknownDatatype
+	 * @throws \TAO\ORM\Exception\NonStrorableObjectSaving
+	 */
+	public function setTags($tags)
+	{
+		$this->belongsToMany()->detach();
+		foreach ($tags as $tag) {
+			/** @var Tag $tagModel */
+			$tagModel = $this->relatedModel();
+			$tagItem = $tagModel->findTag($tag);
+			if (!$tagItem) {
+				/** @var Tag $tagItem */
+				$tagItem = $this->relatedModel()->newInstance();
+				if (method_exists($tagItem, 'initTagByValue')) {
+					$tagItem->initTagByValue($tag);
+				} else {
 					$tagItem->setTitle($tag);
-					$tagItem->save();
 				}
-				$this->belongsToMany()->attach($tagItem);
+				$tagItem->save();
 			}
+			$this->belongsToMany()->attach($tagItem);
 		}
 	}
 
