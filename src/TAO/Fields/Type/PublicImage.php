@@ -52,4 +52,9 @@ class PublicImage extends Image
 			return $info;
 		}
 	}
+
+	public function isMultipartEnctypeRequired()
+	{
+		return true;
+	}
 }

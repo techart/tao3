@@ -36,4 +36,21 @@ class Text extends StringField
 	{
 		return $this->param('tab_key', false)? ' use-tab-key' : '';
 	}
+	
+	public function apiActionSave()
+	{
+		if (!$this->item->getKey()) {
+			return [
+				'result' => 'error',
+				'error' => 'Item not found',
+			];
+		}
+		$field = request()->get('field');
+		$value = request()->get('textarea');
+		$this->item[$field] = $value;
+		$this->item->save();
+		return [
+			'result' => 'ok',
+		];
+	}
 }

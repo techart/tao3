@@ -63,6 +63,28 @@ class ErrorsNotifier
 	 */
 	protected function hasRecipients()
 	{
-		return !is_null($this->recipientEmails()) || !is_null($this->slackWebhookUrl());
+		return $this->isEmailEnabled() || $this->isSlackEnabled();
+	}
+
+	protected function isEmailEnabled()
+	{
+		return !is_null($this->recipientEmails());
+	}
+
+	protected function isSlackEnabled()
+	{
+		return !is_null($this->slackWebhookUrl());
+	}
+
+	public function enabledChannels()
+	{
+		$channels = [];
+		if ($this->isSlackEnabled()) {
+			$channels[] = 'slack';
+		}
+		if ($this->isEmailEnabled()) {
+			$channels[] = 'mail';
+		}
+		return $channels;
 	}
 }

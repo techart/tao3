@@ -32,4 +32,8 @@ class Renderer extends \Techart\Frontend\Templates\Renderer
 		$this->globals[$name] = $value;
 	}
 
+	public function url($file)
+	{
+		return Manager::instanse()->url($file);
+	}
 }

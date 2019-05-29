@@ -1,12 +1,6 @@
 <?php
-
-Route::get('/', function () {
-	return view('main');
-});
-
-Route::get('/taoversion', function () {
-	return view('version');
-});
+Route::get('/', '\\TAO\\Controller\\MainPage@index');
+Route::get('/taoversion', '\\TAO\\Controller\\Utils@taoversion');
 
 if (config('sitemap.dynamic')) {
 	Route::get(config('sitemap.url'), '\\TAO\\Components\\Sitemap\\Controller@generate');

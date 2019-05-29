@@ -93,6 +93,11 @@ class HTTP
 		}
 		return $this->curl->response;
 	}
+	
+	public function getStatusCode()
+	{
+		return $this->curl->http_status_code;
+	}
 
 	public function getJSON($url, $post = false, $data = [])
 	{

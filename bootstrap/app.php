@@ -12,7 +12,8 @@ require 'helpers.php';
 require 'cfg.php';
 require 'lang.php';
 
-$app = new \TAO\Application($appPath);
+$appClass = $appClass ?? \TAO\Application::class;
+$app = new $appClass($appPath);
 
 $app->singleton(
     Illuminate\Contracts\Http\Kernel::class,

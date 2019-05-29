@@ -54,4 +54,9 @@ class PublicUpload extends Upload
 			return $info;
 		}
 	}
+
+	public function isMultipartEnctypeRequired()
+	{
+		return true;
+	}
 }

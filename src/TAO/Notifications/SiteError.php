@@ -8,6 +8,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Symfony\Component\Debug\ExceptionHandler;
+use TAO\ErrorsNotifier;
 use TAO\Text\StringTemplate;
 
 class SiteError extends Notification
@@ -26,9 +27,14 @@ class SiteError extends Notification
 		$this->exception = $exception;
 	}
 
+	/**
+	 * @param ErrorsNotifier $notifiable
+	 *
+	 * @return array
+	 */
 	public function via($notifiable)
 	{
-		return ['mail', 'slack'];
+		return $notifiable->enabledChannels();
 	}
 
 	/**

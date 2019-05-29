@@ -1101,4 +1101,11 @@ abstract class Field
 	{
 		return $this->render();
 	}
+
+	/**
+	 * @return bool
+	 */
+	public function isMultipartEnctypeRequired() {
+		return false;
+	}
 }

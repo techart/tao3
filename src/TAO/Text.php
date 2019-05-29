@@ -3,6 +3,7 @@
 namespace TAO;
 
 use TAO\Text\ConfigurableProcessorInterface;
+use TAO\Text\Exception\UndefinedProcessor;
 use TAO\Text\ProcessorFactory;
 use TAO\Text\ProcessorInterface;
 
@@ -31,7 +32,11 @@ class Text
 				$processorOptions = [];
 			}
 			if (!($processor instanceof ProcessorInterface) && !($processor instanceof ConfigurableProcessorInterface)) {
-				$processor = ProcessorFactory::processor($processor);
+				try {
+					$processor = ProcessorFactory::processor($processor);
+				} catch (UndefinedProcessor $exception) {
+					continue;
+				}
 			}
 			if ($processor instanceof ConfigurableProcessorInterface) {
 				$text = $processor->process($text, $processorOptions);

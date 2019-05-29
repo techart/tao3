@@ -26,7 +26,7 @@ class ProcessorFactory
 		if (isset($processors[$processor_code])) {
 			$processor = app()->make($processors[$processor_code]);
 		}
-		if (!$processor) {
+		if (empty($processor)) {
 			throw new UndefinedProcessor($processor_code);
 		}
 		return $processor;

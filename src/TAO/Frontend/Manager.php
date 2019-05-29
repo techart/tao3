@@ -41,6 +41,15 @@ class Manager extends \Techart\Frontend\Frontend
 		return new Repository($factory);
 	}
 
+	/**
+	 * @param $name
+	 * @return \Techart\Frontend\Templates\Bem\Block
+	 */
+	public function block($name)
+	{
+		return new \Techart\Frontend\Templates\Bem\Block($name);
+	}
+
 	public function __call($name, $arguments)
 	{
 		switch ($name) {

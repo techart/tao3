@@ -119,7 +119,24 @@ abstract class FormMessageModel extends \TAO\ORM\Model
 	 * @return string
 	 */
 	public function formEnctype() {
+		if ($this->isMultipartEnctypeRequired()) {
+			return 'multipart/form-data';
+		}
+
 		return 'application/x-www-form-urlencoded';
+	}
+
+	public function isMultipartEnctypeRequired() {
+		$isMultipartEnctypeRequired = false;
+
+		foreach ($this->fieldsObjects() as $field) {
+			if ($field->isMultipartEnctypeRequired()) {
+				$isMultipartEnctypeRequired = true;
+				break;
+			}
+		}
+
+		return $isMultipartEnctypeRequired;
 	}
 
 	/**
@@ -170,9 +187,13 @@ abstract class FormMessageModel extends \TAO\ORM\Model
 		return $this->findView('fields', 'forms ~ fields');
 	}
 
-	public function templateField($field, $context = [])
+	public function templateField($fieldName, $context = [])
 	{
-		return $this->findView("field-{$field}", 'forms ~ field');
+		$field = $this->fieldsObjects()[$fieldName];
+		if ($field->param('type_in_form') === 'hidden') {
+			return $this->findView("field-{$fieldName}", 'forms ~ hidden');
+		}
+		return $this->findView("field-{$fieldName}", 'forms ~ field');
 	}
 
 	public function renderInput($field, $forceType = false)
@@ -249,15 +270,14 @@ abstract class FormMessageModel extends \TAO\ORM\Model
 
 	public function validateArgs($arg1 = false, $arg2 = false)
 	{
-		$template = $this->findView('form', 'forms ~ form');
+		$template = '';
+		$context = [];
 		if (is_string($arg1)) {
 			$template = $arg1;
-		}
-		$context = $this->defaultFormContext();
-		if (is_array($arg1)) {
-			$context = array_merge($context, $arg1);
-		} elseif (is_array($arg2)) {
-			$context = array_merge($context, $arg2);
+		} else if (is_array($arg1)) {
+			$context = $arg1;
+		} else if (is_array($arg2)) {
+			$context = $arg2;
 		}
 		return [$template, $context];
 	}
@@ -283,13 +303,43 @@ abstract class FormMessageModel extends \TAO\ORM\Model
 
 	public function renderForm($arg1 = false, $arg2 = false)
 	{
+		if ($this->isDatatype()) {
+			return $this->newInstance()->renderForm($arg1, $arg2);
+		}
+
 		list($template, $context) = $this->validateArgs($arg1, $arg2);
+
+		if (empty($template)) {
+			$template = $this->findView('form', 'forms ~ form');
+		}
+		$context = \TAO::merge($this->defaultFormContext(), $context);
+
 		$info = [$arg1, $arg2];
 		$key = uniqid('tao_form_');
 		\Session::put($key, $info);
 		$context['session_key'] = $key;
 		$context['ajax_options'] = json_encode($this->ajaxOptions($context));
+		$beforeRenderResult = $this->beforeRenderForm($context, $template);
+		if (is_array($beforeRenderResult)) {
+			$context = \TAO::merge($context, $beforeRenderResult);
+		} elseif (is_string($beforeRenderResult)) {
+			return $beforeRenderResult;
+		}
 		return view($template, $context);
+	}
+
+	/**
+	 * Хук перед рендером формы. Можно модифицировать данные, передаваемые в шаблон или отрендерить форму
+	 *
+	 * Если возвращает массив, то он мержится с данными, передаваемыми в шаблон
+	 *
+	 * @param $context - данные, передаваемые в шаблон
+	 * @param $template - имя шаблона
+	 *
+	 * @return string|array|void
+	 */
+	protected function beforeRenderForm($context, $template)
+	{
 	}
 
 	public function validateForPublic()
