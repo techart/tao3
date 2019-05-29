@@ -112,6 +112,15 @@ class Application extends \Illuminate\Foundation\Application
 	}
 
 	/**
+	 * @return string
+	 */
+	public function getCachedRoutesPath()
+	{
+		return base_path('bootstrap/cache/routes.php');
+	}
+
+
+	/**
 	 *
 	 */
 	public function run()
