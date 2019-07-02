@@ -130,7 +130,7 @@ abstract class ComponentServiceProvider extends ServiceProvider
 
 	protected function setPublished()
 	{
-		return \Cache::set($this->cachePublishedKey(), 1);
+		return \Cache::set($this->cachePublishedKey(), 60);
 	}
 
 	protected function cachePublishedKey()

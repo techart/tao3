@@ -94,6 +94,10 @@ class Provider extends ServiceProvider
 			return app()->make(HTTP::class);
 		});
 
+		$this->app->bind('pdf', function ($app) {
+			return app()->make(\TAO\Foundation\Pdf::class);
+		});
+
 		$this->app->bind('tao.mail.transport', function ($app) {
 			return app()->make(\TAO\Mail\PHPTransport::class);
 		});

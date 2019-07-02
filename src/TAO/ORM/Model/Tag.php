@@ -5,7 +5,7 @@ namespace TAO\ORM\Model;
 use Illuminate\Database\Eloquent\Builder;
 use TAO\ORM\Model as AbstractModel;
 
-abstract class Tag extends AbstractModel
+class Tag extends AbstractModel
 {
 	public $adminMenuSection = 'Словари';
 

@@ -6,7 +6,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
 	protected $appConfig;
 
-	protected function setUp()
+	protected function setUp(): void
 	{
 		parent::setUp();
 
