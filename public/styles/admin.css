@@ -694,3 +694,7 @@ form.tao-filter {
 .nav-tabs > li.active > a:focus {
 	background-color: #f5f5f5;
 }
+
+.label {
+	color: inherit;
+}

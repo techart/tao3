@@ -177,12 +177,32 @@ trait Table
 		}
 		return $actions;
 	}
-
+	
+	public function csvLabel($field, $param)
+	{
+		if (is_string($param)) {
+			return $param;
+		}
+		if (ends_with($field, '()')) {
+			return $field;
+		}
+		return $this->datatype()->field($field)->labelInAdminList();
+	}
+	
+	public function csvValue($row, $field, $param)
+	{
+		if (ends_with($field, '()')) {
+			$method = trim(substr($field, 0, strlen($field)-2));
+			return $row->$method();
+		}
+		return $row->field($field)->csvValue();
+	}
+	
 	public function csvRow($row, $fields)
 	{
 		$values = [];
-		foreach(array_keys($fields) as $field) {
-			$values[] = $row->field($field)->csvValue();
+		foreach($fields as $field => $param) {
+			$values[] = $this->csvValue($row, $field, $param);
 		}
 		ob_start();
 		$df = fopen("php://output", 'w');
@@ -196,9 +216,9 @@ trait Table
 		$rows = $this->filtered()->get();
 		$fields = $this->csvFields();
 		$csv = '';
-		foreach(array_keys($fields) as $field) {
+		foreach($fields as $field => $param) {
 			$csv .= empty($csv)? '' : ';';
-			$csv .= $this->datatype()->field($field)->labelInAdminList();
+			$csv .= $this->csvLabel($field, $param);
 		}
 		$csv .= "\n";
 		foreach($rows as $row) {

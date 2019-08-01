@@ -2,26 +2,15 @@
 
 namespace TAO\ORM\Abstracts;
 
+use TAO\Mail\Traits\FormMessageNotification;
+
 abstract class FormMessageModel extends \TAO\ORM\Model
 {
+	use FormMessageNotification;
+
 	protected $fieldsMode = 'public_form';
 
 	protected $formTitle = '';
-
-	protected $sendNotify = true;
-	protected $notifyEmail = false;
-	protected $notifySubject = 'Заполнена форма';
-	protected $notifyMailable = \TAO\Mail\FormMessageNotifyMail::class;
-	protected $notifyHtmlTemplate = 'email.form.html.notify';
-	protected $notifyTextTemplate = 'email.form.plain.notify';
-
-	protected $sendReply = true;
-	protected $replyEmail = false;
-	protected $replySubject = 'Вы заполнили форму';
-	protected $replyMailable = \TAO\Mail\FormMessageReplyMail::class;
-	protected $replyHtmlTemplate = 'email.form.html.reply';
-	protected $replyTextTemplate = 'email.form.plain.reply';
-
 
 	/**
 	 * @return array
@@ -111,14 +100,16 @@ abstract class FormMessageModel extends \TAO\ORM\Model
 	/**
 	 * @return string
 	 */
-	public function formMethod() {
+	public function formMethod()
+	{
 		return 'post';
 	}
 
 	/**
 	 * @return string
 	 */
-	public function formEnctype() {
+	public function formEnctype()
+	{
 		if ($this->isMultipartEnctypeRequired()) {
 			return 'multipart/form-data';
 		}
@@ -126,7 +117,8 @@ abstract class FormMessageModel extends \TAO\ORM\Model
 		return 'application/x-www-form-urlencoded';
 	}
 
-	public function isMultipartEnctypeRequired() {
+	public function isMultipartEnctypeRequired()
+	{
 		$isMultipartEnctypeRequired = false;
 
 		foreach ($this->fieldsObjects() as $field) {
@@ -423,48 +415,8 @@ abstract class FormMessageModel extends \TAO\ORM\Model
 		return $this->getDatatype();
 	}
 
-	protected function getNotifyList()
-	{
-		if (!$this->notifyEmail) {
-			return false;
-		}
-		return array_wrap($this->notifyEmail);
-	}
-
-	protected function getNotifySubject()
-	{
-		return $this->notifySubject;
-	}
-
-	protected function getReplyList()
-	{
-		if (!$this->replyEmail) {
-			return false;
-		}
-		return array_wrap($this->replyEmail);
-	}
-
-	protected function getReplySubject()
-	{
-		return $this->replySubject;
-	}
-
 	protected function afterMessageInsert()
 	{
-		if ($this->sendNotify && $this->notifyMailable &&
-			($notifyList = $this->getNotifyList()) &&
-			($message = new $this->notifyMailable($this, $this->getNotifySubject(), $this->notifyHtmlTemplate, $this->notifyTextTemplate))) {
-			foreach ($notifyList as $contact) {
-				\Mail::to($contact)->send($message);
-			}
-		}
-
-		if ($this->sendReply && $this->replyMailable &&
-			($replyList = $this->getReplyList()) &&
-			($message = new $this->replyMailable($this, $this->getReplySubject(), $this->replyHtmlTemplate, $this->replyTextTemplate))) {
-			foreach ($replyList as $contact) {
-				\Mail::to($contact)->send($message);
-			}
-		}
+		$this->sendNotificationsAndReplies();
 	}
 }

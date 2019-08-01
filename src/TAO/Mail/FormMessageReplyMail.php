@@ -2,15 +2,22 @@
 
 namespace TAO\Mail;
 
+use TAO\Fields\Field;
 use TAO\Mail\Abstracts\FormMessageMail;
+use TAO\ORM\Abstracts\FormMessageModel;
 
 class FormMessageReplyMail extends FormMessageMail
 {
+	/**
+	 * @param FormMessageModel $form
+	 * @return Field[]
+	 * @throws \TAO\Fields\Exception\UndefinedField
+	 */
 	protected function getFields($form)
 	{
-		return array_where($form->fieldsObjects(), function ($field, $key) {
-			return isset($field->data['in_reply']) && $field->data['in_reply'];
+		return array_where($form->fieldsObjects(), function ($field) {
+			/** @var Field $field */
+			return $field->param('in_reply', false);
 		});
 	}
-
 }

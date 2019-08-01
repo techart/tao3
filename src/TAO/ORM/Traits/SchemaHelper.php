@@ -84,8 +84,15 @@ trait SchemaHelper
 							$items[$key] = $value;
 							$form[$prevField]['items'] = $items;
 						}
-					} elseif ($m = \TAO::regexp('{^\*([0-9a-z_]+)(.*)$}i', $line)) {
-						$list[$m[1]] = $this->parseListField($m);
+					} elseif ($m = \TAO::regexp('{^\*([0-9a-z_()]+)(.*)$}i', $line)) {
+						$listKey = $m[1];
+						$listData = $this->parseListField($m);
+						if (ends_with($listKey, '()')) {
+							$method = substr($listKey, 0, strlen($listKey)-2);
+							$listKey = "_handler_{$method}";
+							$listData['render_in_admin_list'] = $method;
+						}//dump($listKey, $listData);
+						$list[$listKey] = $listData;
 					} elseif ($m = \TAO::regexp('{^([^\s]+)(.*)$}i', $line)) {
 						list($field, $data) = $this->parseFormField($m, $tabgroup);
 						if (\TAO::regexp('{^[a-z0-9_]+$}i', $field)) {
@@ -114,7 +121,7 @@ trait SchemaHelper
 				if (isset($data['td'])) {
 					$fdata['admin_td_attrs'] = $data['td'];
 				}
-				foreach(['formula', 'order', 'list_value_handlers'] as $key) {
+				foreach(['formula', 'order', 'list_value_handlers', 'getter', 'render_in_admin_list'] as $key) {
 					if (isset($data[$key])) {
 						$fdata[$key] = $data[$key];
 					}

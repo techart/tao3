@@ -71,6 +71,7 @@ class Kernel extends HttpKernel
 		}
 		foreach(config('tao.route_middleware', []) as $name => $m) {
 			$this->routeMiddleware[$name] = $m;
+			$this->router->aliasMiddleware($name, $m);
 		}
 		return $rc;
 	}

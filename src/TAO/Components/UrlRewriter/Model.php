@@ -191,4 +191,40 @@ class Model extends \TAO\ORM\Model
 		}
 		return isset(static::$replaces[$url]) ? static::$replaces[$url] : $url;
 	}
+
+	public function filter()
+	{
+		return array_merge_recursive((parent::filter() ?: []), [
+			'search' => [
+				'type' => 'string(250)',
+				'label' => '',
+			],
+
+			'type' => [
+				'type' => 'select',
+				'label' => 'Действие',
+				'items' => [
+					'none' => 'Не учитывать',
+					'params' => 'Только параметры',
+					'redirect' => 'Только редиректы',
+				],
+			]
+
+		]);
+	}
+
+	public function applyFilterSearch($builder, $value)
+	{
+		return $builder->where('url', 'like', "%{$value}%")->orWhere('url2', 'like', "%{$value}%");
+	}
+
+	public function applyFilterType($builder, $value)
+	{
+		if($value == 'redirect') {
+			return $builder->whereIn('action', [301, 302]);
+		} elseif ($value == 'params') {
+			return $builder->where('action', 0);
+		}
+
+	}
 }
