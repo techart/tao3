@@ -28,7 +28,7 @@ class Variable implements \ArrayAccess
 		$this->render = $data['render'] ?? false;
 		$this->access = $data['access'] ?? false;
 		$this->adminRender = $data['admin_render'] ?? false;
-		$this->adminStripTags = $data['admin_strip_tags'] ?? true;
+		$this->adminStripTags = $data['admin_strip_tags'] ?? false;
 		$this->adminMaxLength = $data['admin_max_length'] ?? false;
 		$this->setup();
 	}

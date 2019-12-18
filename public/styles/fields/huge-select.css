@@ -1,0 +1,47 @@
+.tao-field-huge-select {
+}
+
+.tao-field-huge-select__visible-value {
+	display: inline-block;
+	min-width: 200px;
+	min-height: 34px;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	padding: 6px 40px 6px 10px;
+	cursor: pointer;
+	background-image: url("/tao/images/ui/bullet_arrow_down.png");
+	background-repeat: no-repeat;
+	background-position: right 1px;
+}
+
+.tao-field-huge-select__search {
+	display: none;
+}
+
+.tao-field-huge-select__search-input {
+	display:block;
+	width: 100%;
+	background-color: #fff;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	padding: 6px 10px;
+}
+
+.tao-field-huge-select__search-select {
+	margin: 5px 0;
+	border: 1px solid #ccc;
+	border-radius: 4px;
+	padding: 6px 10px;
+	font-size: 14px;
+	color: #555;
+}
+
+.tao-field-huge-select__search-select div {
+	padding: 5px 10px;
+	cursor: pointer;
+}
+
+.tao-field-huge-select__search-select div.selected {
+	background-color: #007dbc;
+	color: #fff;
+}

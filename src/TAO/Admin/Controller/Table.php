@@ -34,6 +34,14 @@ class Table extends Base
 		return $acc;
 	}
 
+	public function layout()
+	{
+		if (request()->get('is_embedded', false)) {
+			return app('tao.admin')->embeddedLayout();
+		}
+		return parent::layout();
+	}
+
 	protected function initViews()
 	{
 		$code = $this->datatype()->getDatatype();

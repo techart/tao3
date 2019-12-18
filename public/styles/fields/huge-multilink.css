@@ -1,0 +1,66 @@
+.tao-field-huge-multilink__items {
+
+}
+
+.tao-field-huge-multilink__item {
+    display: inline-block;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    margin: 0 5px 5px 0;
+    padding: 5px 5px 5px 10px;
+}
+
+.tao-field-huge-multilink__item p {
+    display: inline-block;
+    vertical-align: text-top;
+    margin: 0;
+    padding: 0;
+}
+
+.tao-field-huge-multilink__item em {
+    vertical-align: text-top;
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin: 2px 0 0 5px;
+    background-image: url("/tao/images/del16x16.png");
+    cursor: pointer;
+}
+
+.tao-field-huge-multilink__add {
+    padding-bottom: 5px;
+}
+
+.tao-field-huge-multilink__search {
+    margin: 5px 0 0 0;
+    display: none;
+}
+
+.tao-field-huge-multilink__search-input {
+    display:block;
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 6px 10px;
+}
+
+.tao-field-huge-multilink__search-select {
+    display: none;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 6px 10px;
+    font-size: 14px;
+    color: #555;
+}
+
+.tao-field-huge-multilink__search-select div {
+    padding: 5px 10px;
+    cursor: pointer;
+}
+
+.tao-field-huge-multilink__search-select div.selected {
+    background-color: #007dbc;
+    color: #fff;
+}

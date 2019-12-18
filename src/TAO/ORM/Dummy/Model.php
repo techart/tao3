@@ -21,6 +21,11 @@ class Model implements \ArrayAccess
 		return $this->getTable();
 	}
 
+	public function getConnectionName()
+	{
+		return 'mysql';
+	}
+
 	public function getTableDatabase()
 	{
 		return false;

@@ -1,10 +1,10 @@
 <?php
 
 if (!function_exists('who_calls')) {
-	function who_calls($n = 'all')
+	function who_calls($limit = 0)
 	{
 		$out = [];
-		$data = debug_backtrace();
+		$data = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, $limit);
 		foreach ($data as $item) {
 			$m = '';
 			if (isset($item['line'])) {

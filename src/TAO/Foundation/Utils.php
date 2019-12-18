@@ -2,6 +2,7 @@
 
 namespace TAO\Foundation;
 
+use TAO\Exception\InvalidDatetimeFormat;
 use Carbon\Carbon;
 
 class Utils
@@ -23,29 +24,48 @@ class Utils
 		return $size . 'B';
 	}
 
-	public function dateTime($date = false)
+	public function dateTime($date = false, $throwException = false)
 	{
 		if ($date === false) {
 			return new \DateTime('now');
 		}
 
+		$dateTimeString = '';
+
 		if (\TAO::regexp('{^\d+$}', trim($date))) {
-			return new \DateTime(date('Y-m-d H:i:s', $date));
+			$dateTimeString = date('Y-m-d H:i:s', $date);
 		}
 		if ($m = \TAO::regexp('{(\d+)\.(\d+)\.(\d+)\s*-\s*(\d+):(\d+):(\d+)}', $date)) {
-			return new \DateTime("{$m[3]}-{$m[2]}-{$m[1]} {$m[4]}:{$m[5]}:{$m[6]}");
+			$dateTimeString = "{$m[3]}-{$m[2]}-{$m[1]} {$m[4]}:{$m[5]}:{$m[6]}";
 		}
 		if ($m = \TAO::regexp('{(\d+)\.(\d+)\.(\d+)\s*-\s*(\d+):(\d+)}', $date)) {
-			return new \DateTime("{$m[3]}-{$m[2]}-{$m[1]} {$m[4]}:{$m[5]}");
+			$dateTimeString = "{$m[3]}-{$m[2]}-{$m[1]} {$m[4]}:{$m[5]}";
 		}
 		if ($m = \TAO::regexp('{(\d+)\.(\d+)\.(\d+)}', $date)) {
-			return new \DateTime("{$m[3]}-{$m[2]}-{$m[1]}");
+			$dateTimeString = "{$m[3]}-{$m[2]}-{$m[1]}";
+		}
+
+		if ($dateTimeString != '') {
+			try {
+				$dateTimeObject = new \DateTime($dateTimeString);
+				if ($dateTimeObject !== false) {
+					return $dateTimeObject;
+				}
+			} catch (\Exception $e) {
+				if ($throwException) {
+					throw new InvalidDatetimeFormat($date);
+				}
+			}
 		}
 
 		$date = strtotime($date);
 
 		if ($date) {
 			return new \DateTime(date('Y-m-d H:i:s', $date));
+		} else {
+			if ($throwException) {
+				throw new InvalidDatetimeFormat($date);
+			}
 		}
 
 		return new \DateTime('now');

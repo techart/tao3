@@ -687,7 +687,7 @@ abstract class Field
 		}
 		return $value;
 	}
-	
+
 	public function applyHandlers($value, $handlers = [])
 	{
 		foreach($handlers as $handler) {
@@ -1003,12 +1003,12 @@ abstract class Field
 		}
 		return true;
 	}
-	
+
 	public function jsonValue()
 	{
 		return $this->value();
 	}
-	
+
 	protected function dataExportValue()
 	{
 		return '';
@@ -1099,7 +1099,7 @@ abstract class Field
 	 */
 	public function __toString()
 	{
-		return $this->render();
+		return (string)$this->render();
 	}
 
 	/**

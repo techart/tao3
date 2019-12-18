@@ -167,7 +167,9 @@ trait Schema
 		$fields = $this->fieldsObjects();
 		array_walk($fields, function ($field) use ($table) {
 			/** @var Field $field */
-			$field->checkSchema($table);
+			if ($field->name !== $this->primaryKey) {
+				$field->checkSchema($table);
+			}
 		});
 	}
 

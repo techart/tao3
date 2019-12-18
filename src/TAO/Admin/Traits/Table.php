@@ -475,6 +475,9 @@ trait Table
 
 	protected function perPage()
 	{
+		if ($perPage = \request()->get('per_page', false)) {
+			return $perPage;
+		}
 		return $this->datatype()->adminPerPage();
 	}
 

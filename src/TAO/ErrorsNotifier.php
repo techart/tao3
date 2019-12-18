@@ -34,7 +34,7 @@ class ErrorsNotifier
 	 */
 	protected function isEnabled()
 	{
-		return $this->hasRecipients() && \App::environment('prod');
+		return $this->hasRecipients() && app()->environment('prod');
 	}
 
 	protected function config($name, $default = null)

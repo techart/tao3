@@ -50,7 +50,7 @@ class Assets
 				$this->setMeta($name, $value);
 			}
 		}
-		return view('tao::meta', array('meta' => $this->meta));
+		return view('meta', array('meta' => $this->meta));
 	}
 
 	public function getParam($name, $default = null)

@@ -11,6 +11,11 @@ class Admin
 		return 'admin.layout';
 	}
 
+	public function embeddedLayout()
+	{
+		return 'admin.layout-embedded';
+	}
+
 	public function menu()
 	{
 		$menu = array();

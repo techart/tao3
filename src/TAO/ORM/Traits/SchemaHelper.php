@@ -91,7 +91,7 @@ trait SchemaHelper
 							$method = substr($listKey, 0, strlen($listKey)-2);
 							$listKey = "_handler_{$method}";
 							$listData['render_in_admin_list'] = $method;
-						}//dump($listKey, $listData);
+						}
 						$list[$listKey] = $listData;
 					} elseif ($m = \TAO::regexp('{^([^\s]+)(.*)$}i', $line)) {
 						list($field, $data) = $this->parseFormField($m, $tabgroup);

@@ -8,7 +8,7 @@ class Html extends Text
 {
 	/**
 	 * @param Blueprint $table
-	 * @param bool $column
+	 * @param bool      $column
 	 * @return \Illuminate\Support\Fluent|mixed
 	 */
 	public function createField(Blueprint $table, $column = false)
@@ -43,7 +43,7 @@ class Html extends Text
 			$user_config['content_css'] = \TAO::frontend()->cssUrl($user_config['tao_webpack_css']);
 		}
 
-		return array_merge_recursive(config('html-editor'), $user_config, ['selector' => '#' . $this->editorID()]);
+		return array_replace_recursive(config('html-editor'), $user_config, ['selector' => '#' . $this->editorID()]);
 	}
 
 	/**

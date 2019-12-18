@@ -20,7 +20,10 @@
 		'password' => \TAO\Fields\Type\Password::class,
 		'multilink' => \TAO\Fields\Type\Multilink::class,
 		'multilink_tags' => \TAO\Fields\Type\MultilinkTags::class,
+		'multilink_ids' => \TAO\Fields\Type\MultilinkIds::class,
+		'huge_multilink' => \TAO\Fields\Type\HugeMultilink::class,
 		'select' => \TAO\Fields\Type\Select::class,
+		'huge_select' => \TAO\Fields\Type\HugeSelect::class,
 		'upload' => \TAO\Fields\Type\Upload::class,
 		'image' => \TAO\Fields\Type\Image::class,
 		'attaches' => \TAO\Fields\Type\Attaches::class,
@@ -36,6 +39,7 @@
 		'pairs' => \TAO\Fields\Type\Pairs::class,
 		'float' => \TAO\Fields\Type\FloatField::class,
 		'recaptcha' => \TAO\Fields\Type\Recaptcha::class,
+		'iframe' => \TAO\Fields\Type\IFrame::class,
 	],
 
 	'text' => [

@@ -57,7 +57,13 @@ class DateSQL extends DateInteger
 		if (trim($value) == '') {
 			$value = $this->nullValue();
 		} elseif (is_string($value)) {
-			$value = app('tao.utils')->dateTime($value)->format('Y-m-d H:i:s');
+			try {
+				$dateTimeTimestamp = app('tao.utils')->dateTime($value, true)->format('Y-m-d H:i:s');
+			} catch (\Exception $e) {
+				$this->data['fieldError'] = $e->getMessage();
+				$dateTimeTimestamp = $value;
+			}
+			$value = $dateTimeTimestamp;
 		}
 		$this->item[$this->name] = $value;
 	}

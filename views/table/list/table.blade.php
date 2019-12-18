@@ -7,8 +7,8 @@
 @section('content')
     @include('table ~ list.navigator-top')
 
-    <div class="block-simple">
-        <div class="block-content">
+    <div class="block-table">
+        <div class="block-table-content">
             @if ($count == 0)
                 @include('table ~ list.empty')
             @else

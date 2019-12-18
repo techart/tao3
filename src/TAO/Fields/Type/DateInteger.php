@@ -156,7 +156,13 @@ class DateInteger extends Field
 		if (trim($value) == '') {
 			$value = 0;
 		} elseif (is_string($value)) {
-			$value = app('tao.utils')->dateTime($value)->getTimestamp();
+			try {
+				$dateTimeTimestamp = app('tao.utils')->dateTime($value, true)->getTimestamp();
+			} catch (\Exception $e) {
+				$this->data['fieldError'] = $e->getMessage();
+				$dateTimeTimestamp = $value;
+			}
+			$value = $dateTimeTimestamp;
 		}
 		$this->item[$this->name] = $value;
 	}

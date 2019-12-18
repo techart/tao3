@@ -6,9 +6,14 @@ body {
 }
 
 
+
 @media (min-width: 979px){
     body {
             padding-top: 60px;
+    }
+    body.embedded {
+            padding-top: 0;
+            background-color: #fff;
     }
 }
 
@@ -293,9 +298,11 @@ fieldset.admin {
   float: left;
   font-size: 12px;
   color: #888;
+  padding-left: 0;
 }
 
 .navigator-bottom {
+  margin: 0;
 }
 
   .additional_actions {
@@ -697,4 +704,55 @@ form.tao-filter {
 
 .label {
 	color: inherit;
+}
+
+.button-in-embedded {
+	display: inline-block;
+	border: 1px solid #ccc;
+	border-radius: 10px;
+	padding: 5px 20px;
+	color: #555;
+	font-size: 16px;
+}
+
+.button-in-embedded:hover {
+	text-decoration: none;
+	color: #555;
+}
+
+.block-table {
+	background-color: #fff;
+	border: 1px solid #ccc;
+}
+
+.block-table-content {
+	margin: 15px;
+}
+
+body.embedded .block-table-content {
+	margin: 0;
+	border: 0;
+}
+
+body.embedded .block-table {
+	padding:0;
+	border: 0;
+}
+
+.table-navigator-top {
+	margin: 20px 0;
+}
+
+body.embedded .table-navigator-top {
+	margin: 0 0 20px 0;
+}
+
+.page-navigator-top {
+	padding-right: 0;
+}
+
+.page-navigator-bottom {
+	margin-top: 10px;
+	margin-right: 0;
+	padding-right: 0;
 }

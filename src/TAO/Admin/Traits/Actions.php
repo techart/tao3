@@ -49,9 +49,19 @@ trait Actions
 	{
 		$uri = \Request::getPathInfo();
 		$data = array(
-			'order' => $this->order,
 			'filter' => $this->filter,
 		);
+
+		if ($this->order) {
+			$data['order'] = $this->order;
+		}
+
+		foreach(['is_embedded', 'per_page'] as $param) {
+			if ($value = request()->get($param)) {
+				$data[$param] = $value;
+			}
+		}
+
 		if ($action != 'list') {
 			$data['action'] = $action;
 			if ($this->id >= 1 || (is_string($this->id) && $this->id != '')) {
@@ -70,7 +80,7 @@ trait Actions
 			unset($params['__no_page']);
 		}
 		$data = array_merge($data, $params);
-		if (count($data) > 1) {
+		if (count($data) > 0) {
 			$q = trim(http_build_query($data));
 			if ($q != '') {
 				$uri .= '?' . $q;

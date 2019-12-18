@@ -1,3 +1,6 @@
+@if (request()->get('is_embedded'))
+	<a href="{!! url($list_url) !!}" class="button-in-embedded button-in-embedded-list">{{ $item->adminReturnToListText() }}</a>
+@endif
 <form id="admin-form" action="" method="post" enctype="multipart/form-data">
 	{{ csrf_field() }}
 	    

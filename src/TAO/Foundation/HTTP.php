@@ -94,6 +94,11 @@ class HTTP
 		return $this->curl->response;
 	}
 	
+	public function getResponse()
+	{
+		return $this->curl->response;
+	}
+	
 	public function getStatusCode()
 	{
 		return $this->curl->http_status_code;
