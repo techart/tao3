@@ -16,7 +16,8 @@ abstract class PageModel extends \TAO\ORM\Model
 		\TAO\ORM\Traits\Addressable,
 		\TAO\ORM\Traits\Title,
 		\TAO\ORM\Traits\Metas,
-		\TAO\ORM\Traits\Sitemap;
+		\TAO\ORM\Traits\Sitemap,
+		\TAO\ORM\Traits\CheckUniqueUrl;
 
 	/**
 	 * Шаблон урла. Если урл не задан, то при сохранении будет сгенерирован по шаблону.
@@ -117,5 +118,15 @@ abstract class PageModel extends \TAO\ORM\Model
 			$this->save();
 		}
 	}
+
+    /**
+     * @return bool
+     *
+     * Проверка урла на уникальность
+     *
+     */
+	public function validateFieldUrl() {
+		return method_exists($this, 'checkUniqueUrl') ? $this->checkUniqueUrl() : true;
+    }
 
 }

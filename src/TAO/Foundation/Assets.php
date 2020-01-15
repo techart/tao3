@@ -134,6 +134,13 @@ class Assets
 		]);
 	}
 
+	public function useScss($files, $name = false)
+	{
+		if ($url = app('scss')->make($files, $name)) {
+			$this->useStyle($url);
+		}
+	}
+
 	public function renderFile($file)
 	{
 		if (!isset($file['path'])) {

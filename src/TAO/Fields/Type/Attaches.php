@@ -471,7 +471,7 @@ class Attaches extends StringField implements \IteratorAggregate
 		$out = [];
 		foreach($this->value() as $key => $entry) {
 			$out[$key] = [
-				'url' => (request()->isSecure()? 'https://' : 'http://') . $_SERVER['REQUEST_URI'] . $entry->url(),
+				'url' => (request()->isSecure()? 'https://' : 'http://') . $_SERVER['HTTP_HOST'] . $entry->url(),
 				'name' => $entry->name(),
 				'ext' => $entry->ext(),
 				'info' => $entry->info(),

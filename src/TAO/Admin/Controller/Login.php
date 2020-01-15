@@ -18,7 +18,7 @@ class Login extends \TAO\Controller
 	 */
 	public function showLoginForm()
 	{
-		return $this->render('tao::admin.login');
+		return $this->render('admin.login');
 	}
 
 	/**

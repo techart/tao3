@@ -25,6 +25,15 @@ class Upload extends Field
 	public function createField(Blueprint $table)
 	{
 		if ($this->isBase64()) {
+			if ($args = $this->typeParamsArgs()) {
+				foreach ($args as $arg) {
+					if ($arg == 'longtext') {
+						return $table->longText($this->name);
+					} elseif ($arg == 'mediumtext') {
+						return $table->mediumText($this->name);
+					}
+				}
+			}
 			return $table->text($this->name);
 		}
 		return $table->string($this->name, 250)->default('');
@@ -255,7 +264,7 @@ class Upload extends Field
 		}
 		return \Storage::url($file);
 	}
-	
+
 	public function jsonValue()
 	{
 		$url = $this->url();

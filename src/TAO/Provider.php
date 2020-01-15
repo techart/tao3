@@ -10,24 +10,58 @@ use TAO\Foundation\HTTP;
 
 class Provider extends ServiceProvider
 {
+	public function register()
+	{
+		$this->bindServices();
+		$this->registerRouters();
+	}
+
 	public function boot()
 	{
 		setlocale(LC_ALL, config('app.php_locale'));
 		Carbon::setLocale(config('app.locale'));
-
-		$this->publishes([
-			__DIR__ . '/../../config/tao.php' => config_path('tao.php'),
-		]);
+		$this->publishes([__DIR__ . '/../../config/tao.php' => config_path('tao.php')]);
 		$this->loadTranslationsFrom(__DIR__ . '/../../resources/lang/', 'techart');
-		$this->loadViewsFrom(__DIR__ . '/../../views', 'tao');
 
+		$this->checkEnviroment();
+		$this->bootRouters();
+		$this->setupBlade();
+		$this->setupConsoleCommands();
+	}
+
+	protected function setupConsoleCommands()
+	{
+		if ($this->app->runningInConsole()) {
+			$commands = [];
+			$paths = \TAO::merge([
+				'\TAO' => __DIR__ . '/Console/Commands',
+				'\App' => app_path('Console/Commands'),
+			], config('app.artisan.paths', []));
+			foreach ($paths as $namespace => $path) {
+				if (is_dir($path)) {
+					foreach (\File::allFiles($path) as $commandFile) {
+						$commandClassName = str_replace('.' . $commandFile->getExtension(), '', $commandFile->getFilename());
+						$commands[] = $namespace . '\\Console\\Commands\\' . $commandClassName;
+					}
+				}
+			}
+			$commands = \TAO::merge($commands, config('app.artisan.commands', []));
+			$this->commands($commands);
+		}
+	}
+
+	protected function bootRouters()
+	{
 		foreach (array_keys(app()->tao->routers()) as $name) {
 			$router = app()->tao->router($name);
 			if (method_exists($router, 'boot')) {
 				$router->boot();
 			}
 		}
+	}
 
+	protected function setupBlade()
+	{
 		Blade::directive('layout', function () {
 			$layout = app()->tao->layout;
 			return $layout;
@@ -64,30 +98,25 @@ class Provider extends ServiceProvider
 		Blade::directive('endTextProcess', function ($args) {
 			return "<?php \$textProcess = ob_get_clean(); print \TAO\Text::process(\$textProcess, [$args]) ?>";
 		});
+	}
 
-		if ($this->app->runningInConsole()) {
-			$commands = [];
-			$paths = \TAO::merge([
-				'\TAO' => __DIR__ . '/Console/Commands',
-				'\App' => app_path('Console/Commands'),
-			], config('app.artisan.paths', []));
-			foreach ($paths as $namespace => $path) {
-				if (is_dir($path)) {
-					foreach (\File::allFiles($path) as $commandFile) {
-						$commandClassName = str_replace('.' . $commandFile->getExtension(), '', $commandFile->getFilename());
-						$commands[] = $namespace . '\\Console\\Commands\\' . $commandClassName;
-					}
-				}
+	protected function checkEnviroment()
+	{
+		$www = \TAO::publicPath();
+		if (!\App::environment('testing')) {
+			$link = "{$www}/storage";
+			if (!is_link($link)) {
+				symlink(storage_path('app/public'), $link);
 			}
-			$commands = \TAO::merge($commands, config('app.artisan.commands', []));
-			$this->commands($commands);
+			$this->linkTinymce();
 		}
 	}
 
-	public function register()
+	protected function bindServices()
 	{
-		$this->app->bind('view.finder', function ($app) {
-			return new \TAO\View\Finder($app['files'], $app['config']['view.paths']);
+		$this->app->singleton('view.finder', function ($app) {
+			$finder = new \TAO\View\Finder($app['files'], []);
+			return $finder;
 		});
 
 		$this->app->bind('tao.http', function ($app) {
@@ -96,6 +125,10 @@ class Provider extends ServiceProvider
 
 		$this->app->bind('pdf', function ($app) {
 			return app()->make(\TAO\Foundation\Pdf::class);
+		});
+
+		$this->app->bind('scss', function ($app) {
+			return app()->make(\TAO\Foundation\Scss::class);
 		});
 
 		$this->app->bind('tao.mail.transport', function ($app) {
@@ -170,33 +203,22 @@ class Provider extends ServiceProvider
 		$this->app->singleton('unisender', function () {
 			return \TAO\Components\Unisender\API::makeInstance();
 		});
+	}
 
+	protected function registerRouters()
+	{
 		foreach (array_keys(app()->tao->routers()) as $name) {
 			$router = app()->tao->router($name);
 			if (method_exists($router, 'register')) {
 				$router->register();
 			}
 		}
-		if (!\App::environment('testing')) {
-			$www = \TAO::publicPath();
-			$link = "{$www}/tao";
-			if (!is_link($link)) {
-				$assets = str_replace('/src/TAO', '', __DIR__) . '/public';
-				symlink($assets, $link);
-			}
-			$link = "{$www}/storage";
-			if (!is_link($link)) {
-				symlink(storage_path('app/public'), $link);
-			}
-		}
-
-		$this->link_tinymce();
 	}
 
 	/**
 	 * Создание симлинка на tinyMCE
 	 */
-	protected function link_tinymce()
+	protected function linkTinymce()
 	{
 		$scripts_dir = \TAO::publicPath() . '/tao/scripts';
 		$link_name = $scripts_dir . '/tinymce';
@@ -205,6 +227,4 @@ class Provider extends ServiceProvider
 			symlink('../../../../tinymce/tinymce', $link_name);
 		}
 	}
-
-
 }

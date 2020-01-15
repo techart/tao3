@@ -39,8 +39,6 @@ return [
 		Illuminate\Validation\ValidationServiceProvider::class,
 		Illuminate\View\ViewServiceProvider::class,
 
-		TwigBridge\ServiceProvider::class,
-
 		Laravel\Tinker\TinkerServiceProvider::class,
 		Intervention\Image\ImageServiceProvider::class,
 

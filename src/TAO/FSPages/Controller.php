@@ -17,7 +17,7 @@ class Controller extends \TAO\Controller
 	public function file()
 	{
 		$path = app()->tao->router->path;
-		$view = 'tao::fspages.index';
+		$view = 'fspages.index';
 		ob_start();
 		$result = include($path);
 		$content = ob_get_clean();

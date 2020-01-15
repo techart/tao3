@@ -528,6 +528,10 @@ abstract class Field
 			} elseif (is_array($arg2)) {
 				$context = array_merge($context, $arg2);
 			}
+			if ($templateExtra = $context['template_extra'] ?? false) {
+				$templates = [$template . $templateExtra, $template];
+				return view()->first($templates, $context);
+			}
 			return view($template, $context);
 		} else {
 			return 'No input template for field ' . get_class($this);

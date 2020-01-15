@@ -57,6 +57,8 @@
 		'users' => \TAO\ORM\Model\User::class,
 		'roles' => \TAO\ORM\Model\Role::class,
 	],
+	
+	'resources_paths' => [],
 
 	'insertions' => [
 		'img' => [

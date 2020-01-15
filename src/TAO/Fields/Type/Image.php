@@ -126,7 +126,7 @@ class Image extends Upload
 		if (empty($path)) {
 			return null;
 		}
-		if (!\Storage::exists($path)) {
+		if (!$this->isBase64() && !\Storage::exists($path)) {
 			return null;
 		}
 		return app('tao.images')->size($path);
@@ -138,7 +138,7 @@ class Image extends Upload
 		if (empty($path)) {
 			return '';
 		}
-		if (!\Storage::exists($path)) {
+		if (!$this->isBase64() && !\Storage::exists($path)) {
 			return '';
 		}
 		return app('tao.images')->show($path, $mods, $tpl);
