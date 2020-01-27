@@ -109,6 +109,12 @@ class Provider extends ServiceProvider
 				symlink(storage_path('app/public'), $link);
 			}
 			$this->linkTinymce();
+			if (is_null(config('logging'))) {
+				$path = base_path('config/logging.php');
+				if (!is_file($path)) {
+					file_put_contents($path, '<?php return tao_cfg(\'logging\');');
+				}
+			}
 		}
 	}
 
