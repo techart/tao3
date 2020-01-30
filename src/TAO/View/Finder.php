@@ -36,16 +36,16 @@ class Finder extends FileViewFinder
 
 		$name = preg_replace('{\s*~\s*}', '.', $name);
 
-		if ($path = $this->exists($name)) {
-			return $path;
-		}
-
 		foreach (\TAO::getViewsPrefixes() as $prefix) {
 			if ($path = $this->exists("{$prefix}{$name}")) {
 				return $path;
 			}
 		}
 
+		if ($path = $this->exists($name)) {
+			return $path;
+		}
+		
 		if (is_string($name) && strpos($name, '#') !== false) {
 			$path = str_replace('#', '/', $name);
 			foreach (['phtml', 'blade.php', 'twig', 'html.twig'] as $ext) {

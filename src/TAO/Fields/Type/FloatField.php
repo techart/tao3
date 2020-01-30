@@ -7,6 +7,8 @@ use TAO\Fields\Field;
 
 class FloatField extends Field
 {
+	const DEFAULT_TOTAL_DIGITS = 15;
+	const DEFAULT_DECIMAL_DIGITS = 3;
 
 	/**
 	 * @param Blueprint $table
@@ -15,36 +17,44 @@ class FloatField extends Field
 	public function createField(Blueprint $table)
 	{
 		list($digs, $prec) = $this->lengths();
-		return $table->float($this->name, $digs, $prec)->default(0);
+		return $table->float($this->name, $digs, $prec)->default($this->defaultValue());
 	}
 	
 	protected function lengths()
 	{
-		$digs = 15;
-		$prec = 3;
+		$digs = self::DEFAULT_TOTAL_DIGITS;
+		$prec = self::DEFAULT_DECIMAL_DIGITS;
 		$args = $this->typeParamsArgs();
 		if (is_array($args) && !empty($args)) {
-			if (count($args) == 1) {
-				$prec = $args[0];
+			$intArgs = $this->getFirstIntArgs($args);
+			if (count($intArgs) == 1) {
+				$prec = $intArgs[0];
 			} else {
-				$digs = $args[0];
-				$prec = $args[1];
+				$digs = $intArgs[0];
+				$prec = $intArgs[1];
 			}
 		}
 		return [$digs, $prec];
 	}
 
-	/**
-	 * @return int
-	 */
+	protected function getFirstIntArgs($args) {
+		$intArgs = [];
+		foreach ($args as $arg) {
+			if (preg_match('{^\d+$}', $arg)) {
+				$intArgs[] = (int)$arg;
+			} else {
+				break;
+			}
+		}
+
+		return $intArgs;
+	}
+
 	public function defaultValue()
 	{
 		return 0;
 	}
 
-	/**
-	 * @return int
-	 */
 	public function nullValue()
 	{
 		return 0;
@@ -66,13 +76,17 @@ class FloatField extends Field
 
 	public function dataImport($src)
 	{
-		$this->set(((int)$src));
+		$this->set($src);
 	}
 
 	public function set($value)
 	{
-		$value = str_replace(',', '.', $value);
-		$this->item[$this->name] = preg_replace('{[^\d\.]}', '', $value);
+		$newValue = preg_replace('{[^\d\.]}', '', $value);
+		if ($value[0] === '-') {
+			$newValue = '-' . $newValue;
+		}
+
+		parent::set($newValue);
 	}
 
 	public function renderWithoutTemplate()

@@ -40,6 +40,7 @@
 		'float' => \TAO\Fields\Type\FloatField::class,
 		'recaptcha' => \TAO\Fields\Type\Recaptcha::class,
 		'iframe' => \TAO\Fields\Type\IFrame::class,
+		'decimal' => \TAO\Fields\Type\Decimal::class,
 	],
 
 	'text' => [

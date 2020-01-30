@@ -1,7 +1,7 @@
 <?php
 
 namespace TAO\Foundation;
-use Leafo\ScssPhp\Compiler;
+use ScssPhp\ScssPhp\Compiler;
 
 class Scss
 {

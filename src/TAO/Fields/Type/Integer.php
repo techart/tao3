@@ -17,7 +17,7 @@ class Integer extends Field
 		$size = $this->typeParamsEnumArg(array('tiny', 'small', 'medium', 'big'));
 		$unsigned = (bool)$this->typeParamsEnumArg(array('unsigned'));
 		$method = $size ? "{$size}Integer" : 'integer';
-		return $table->$method($this->name, false, $unsigned)->default(0);
+		return $table->$method($this->name, false, $unsigned)->default($this->defaultValue());
 	}
 
 	/**
@@ -57,7 +57,15 @@ class Integer extends Field
 
 	public function set($value)
 	{
-		$this->item[$this->name] = preg_replace('{[^\d]}', '', $value);
+		$newValue = preg_replace('{[^\d]}', '', $value);
+
+		$unsigned = (bool)$this->typeParamsEnumArg(array('unsigned'));
+		if (!$unsigned) {
+			if ($value[0] === '-') {
+				$newValue = '-' . $newValue;
+			}
+		}
+		parent::set($newValue);
 	}
 
 	public function renderWithoutTemplate()
