@@ -46,7 +46,6 @@ class PublicImage extends Image
 			}
 			$path = $this->param('private', false) ? $this->item->getPrivateHomeDir() : $this->item->getHomeDir();
 			$fileName = $this->destinationFilename($info);
-			\Storage::deleteDirectory($path);
 			$file->storeAs($path, $fileName);
 			$this->item->where($this->item->getKeyName(), $this->item->getKey())->update([$this->name => $path . '/' . $fileName]);
 			return $info;

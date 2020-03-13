@@ -170,7 +170,7 @@ trait Table
 		if ($this->canCsv && $this->csvFields() && $this->countRows()>0) {
 			$actions['csv'] = [
 				'button' => 'btn btn-info',
-				'icon' => 'icon-share icon-white',
+				'icon' => 'icon-share icon-white fa fa-share',
 				'title' => 'Экспорт в CSV',
 				'url' => $this->actionUrl('csv'),
 			];

@@ -104,20 +104,24 @@ class Image extends Upload
 			$pcall = ['render_in_admin_list', 'render_in_admin_view', 'render_in_admin'];
 			$pmods = ['in_admin_list_mods', 'in_admin_view_mods', 'in_admin_mods'];
 		}
-		$render = $this->callableParam($pcall, null, [$this], $this->item);
-		if (is_null($render)) {
-			$mods = $this->param($pmods, 'fit100x100');
-			$url = $this->url();
-			if ($url) {
-				$murl = $this->url($mods);
-				$value = "<img src='{$murl}'>";
-				$render = "<a href='{$url}'>{$value}</a>";
+		try {
+			$render = $this->callableParam($pcall, null, [$this], $this->item);
+			if (is_null($render)) {
+				$mods = $this->param($pmods, 'fit100x100');
+				$url = $this->url();
+				if ($url) {
+					$murl = $this->url($mods);
+					$value = "<img src='{$murl}'>";
+					$render = "<a href='{$url}'>{$value}</a>";
+				}
 			}
+			if (is_null($render)) {
+				$render = '';
+			}
+			return $render;
+		} catch (\Throwable $e) {
+			return $e->getMessage();
 		}
-		if (is_null($render)) {
-			$render = '';
-		}
-		return $render;
 	}
 
 	public function imageSize()

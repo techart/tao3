@@ -3,6 +3,7 @@
 namespace TAO\View;
 
 use Illuminate\View\FileViewFinder;
+use Illuminate\Support\Str;
 
 class Finder extends FileViewFinder
 {
@@ -144,14 +145,17 @@ class Finder extends FileViewFinder
 		$this->locationsProcessed = true;
 	}
 
-	protected function buildResourcesPathsSource()
+	protected function convertResourcesPathsSource($src)
 	{
-		$src = config('tao.resources_paths', []);
-		if (is_string($src)) {
-			$src = [$src];
-		}
-		$paths = ['resources'];
-		foreach ($src as $path) {
+		$paths = [];
+		foreach ($src as $path => $expression) {
+			if (is_int($path)) {
+				$path = $expression;
+			} else {
+				if (!$this->checkExpression($expression)) {
+					continue;
+				}
+			}
 			if (\TAO\Callback::isValidCallback($path)) {
 				$addPaths = \TAO\Callback::instance($path)->call();
 				if (is_string($addPaths)) {
@@ -165,8 +169,57 @@ class Finder extends FileViewFinder
 				}
 			}
 		}
+		return $paths;
+	}
+
+	protected function buildResourcesPathsSource()
+	{
+		$paths = [];
+		
+		$src = config('tao.prepend_resources_paths', []);
+		if (is_string($src)) {
+			$src = [$src];
+		}
+		
+		if (count($src) > 0) {
+			$paths = array_merge($paths, $this->convertResourcesPathsSource($src));
+		}
+		
+		$paths[] = 'resources';
+		
+		$src = config('tao.append_resources_paths', []);
+		if (is_string($src)) {
+			$src = [$src];
+		}
+		
+		if (count($src) > 0) {
+			$paths = array_merge($paths, $this->convertResourcesPathsSource($src));
+		}
+		
 		$paths[] = 'tao::vendor/techart/tao3/resources';
 		return $paths;
+	}
+
+	protected function checkExpression($expression)
+	{
+		if ($expression === true) {
+			return true;
+		}
+		if (is_string($expression)) {
+			$uri = request()->getRequestUri();
+			if ($expression == 'admin') {
+				if ($uri == '/admin' || Str::startsWith($uri, '/admin/')) {
+					return true;
+				}
+			}
+			if (Str::startsWith($expression, '{')) {
+				return \TAO::regexp($expression, $uri);
+			}
+		}
+		if (\TAO\Callback::isValidCallback($expression)) {
+			return \TAO\Callback::instance($expression)->call();
+		}
+		return false;
 	}
 
 	protected function checkSymlinks()

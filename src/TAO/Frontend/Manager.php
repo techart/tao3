@@ -11,7 +11,7 @@ class Manager extends \Techart\Frontend\Frontend
 	public static function instanse($path = false, $options = [])
 	{
 		if (!is_string($path) || empty($path)) {
-			$path = 'frontend';
+			$path = config('tao.frontend_path', 'frontend');
 		}
 		if ($path[0] != '/' && $path[0] != '.') {
 			$path = base_path($path);

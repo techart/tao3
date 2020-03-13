@@ -3,6 +3,7 @@
 	'frontend_env' => env('FRONTEND_ENV', false),
 	
 	'routers' => [
+		'users' => \TAO\Users\Router::class,
 		'fspages' => \TAO\FSPages\Router::class,
 		'admin' => \TAO\Admin\Router::class,
 		'models' => \TAO\ORM\Router::class,

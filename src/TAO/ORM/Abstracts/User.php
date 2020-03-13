@@ -2,6 +2,7 @@
 
 namespace TAO\ORM\Abstracts;
 
+use Illuminate\Auth\Notifications\ResetPassword as ResetPasswordNotification;
 use TAO\ORM\Model as AbstractModel;
 
 use Illuminate\Auth\Authenticatable;
@@ -224,5 +225,10 @@ abstract class User extends AbstractModel implements
 	public function adminAddButtonText()
 	{
 		return 'Создать';
+	}
+
+	public function sendPasswordResetNotification($token)
+	{
+		$this->notify(new \TAO\Notifications\ResetPassword($token));
 	}
 }

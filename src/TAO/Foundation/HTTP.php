@@ -38,11 +38,13 @@ class HTTP
 	public function setHeader($name, $value)
 	{
 		$this->headers[$name] = $value;
+		return $this;
 	}
 
 	public function setOption($name, $value)
 	{
 		$this->options[$name] = $value;
+		return $this;
 	}
 
 	protected function prepare($url)

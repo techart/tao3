@@ -29,7 +29,7 @@ class Text extends StringField
 		if (!$style) {
 			$style = 'width:90%;height:300px;';
 		}
-		return $style;
+		return $this->validateStyle($style);
 	}
 	
 	public function tabKeyClass()

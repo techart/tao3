@@ -24,10 +24,12 @@ class RegisterController extends \TAO\Controller
 
 	protected function validator(array $data)
 	{
+		$min = config('auth.min_password_length', 8);
+
 		return Validator::make($data, [
 			'name' => 'required|max:255',
 			'email' => 'required|email|max:255|unique:users',
-			'password' => 'required|min:6|confirmed',
+			'password' => "required|min:{$min}|confirmed",
 		]);
 	}
 

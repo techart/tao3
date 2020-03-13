@@ -7,7 +7,7 @@ if (config('sitemap.dynamic')) {
 }
 
 if (!\App::environment('testing')) {
-	include base_path('routes/web.php');
+	include config('app.web_routes', base_path('routes/web.php'));
 }
 
 TAO::routes();

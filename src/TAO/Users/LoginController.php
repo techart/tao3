@@ -17,7 +17,7 @@ class LoginController extends \TAO\Controller
 
 	protected function redirectTo()
 	{
-		return '/users/home/';
+		return config('auth.redirect_after_login', '/users/home/');
 	}
 
 	public function showLoginForm()

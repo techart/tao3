@@ -2,6 +2,8 @@
 
 $dt = app('tao.admin')->menu();
 
+
+
 $site = isset($dt['*site'])? $dt['*site'] : [];
 $site = isset($site['sub'])? $site['sub'] : [];
 unset($dt['*site']);
@@ -10,6 +12,7 @@ $defaultSite =  array(
     array(
         'url' => '/admin/vars/',
         'title' => 'Настройки',
+        'icon' => 'cog',
     ),
 );
 
@@ -17,10 +20,13 @@ $users =  array(
     array(
         'url' => '/admin/datatype/users/',
         'title' => 'Пользователи',
+        'icon' => 'users',
+        'labels' => dt('users')->count(),
         'divider' => true,
     ),
     array(
         'url' => '/admin/datatype/roles/',
+        'icon' => 'tasks',
         'title' => 'Роли',
     ),
 );

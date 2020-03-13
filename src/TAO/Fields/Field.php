@@ -538,6 +538,17 @@ abstract class Field
 		}
 	}
 
+	public function renderInputInAdminForm($context = [])
+	{
+		$context['field'] = $this;
+		$template = 'table.form.field';
+		$templateCustom = "fields.{$this->inputTemplateFrom()}.admin";
+		if (view()->exists($templateCustom)) {
+			$template = $templateCustom;
+		}
+		return view($template, $context);
+	}
+
 	/**
 	 * Рендер инпута для публичной формы если для этого типа поля есть отдельный шаблон
 	 *
@@ -709,6 +720,9 @@ abstract class Field
 	}
 
 	/**
+	 *
+	 * Отрисовка заничения в админке
+	 *
 	 * @return mixed
 	 */
 	public function renderForAdmin($action)
@@ -782,7 +796,7 @@ abstract class Field
 	 */
 	public function styleForAdminInput()
 	{
-		return $this->param(['admin_form_style', 'form_style', 'style'], '');
+		return $this->validateStyle($this->param(['admin_form_style', 'form_style', 'style'], ''));
 	}
 
 	/**
@@ -1111,5 +1125,26 @@ abstract class Field
 	 */
 	public function isMultipartEnctypeRequired() {
 		return false;
+	}
+
+	public function validateStyle($src)
+	{
+		$disallow = \Assets::getVar('disallow_input_styles', []);
+		$out = '';
+		if (is_string($src)) {
+			$src = explode(';', $src);
+		}
+		foreach ($src as $item) {
+			if ($item = trim($item)) {
+				if ($m = \TAO::regexp('{^([a-z0-9_-]+):(.+)$}i', $item)) {
+					$name = trim($m[1]);
+					$value = trim($m[2]);
+					if (!in_array($name, $disallow)) {
+						$out .= "{$name}:{$value};";
+					}
+				}
+			}
+		}
+		return $out;
 	}
 }

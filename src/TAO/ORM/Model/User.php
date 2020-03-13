@@ -41,6 +41,16 @@ class User extends AbstractUser
 	{
 		return \TAO\Users\RegisterController::class;
 	}
+
+	public function resetController()
+	{
+		return \TAO\Users\ResetController::class;
+	}
+
+	public function sendResetEmailsController()
+	{
+		return \TAO\Users\SendResetEmailsController::class;
+	}
 }
 
 

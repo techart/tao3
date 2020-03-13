@@ -28,6 +28,8 @@ class Navigation
 	 */
 	public $data = array();
 
+	public $initialStruct = [];
+
 	/**
 	 * @var Navigation[]
 	 */
@@ -79,10 +81,11 @@ class Navigation
 	 * @param string $name
 	 * @return self
 	 */
-	public static function instance($name = 'site')
+	public static function instance($data = 'site')
 	{
+		$name = is_string($data) ? $data : serialize($data);
 		if (!isset(self::$instances[$name])) {
-			self::$instances[$name] = app(self::class, ['data' => $name]);
+			self::$instances[$name] = app(self::class, ['data' => $data]);
 		}
 		return self::$instances[$name];
 	}
@@ -102,7 +105,7 @@ class Navigation
 			return;
 		}
 
-		if (!$data) {
+		if ($data === false) {
 			$data = 'navigation';
 		}
 
@@ -258,6 +261,15 @@ class Navigation
 		return isset($this->flags[$flag]) && $this->flags[$flag];
 	}
 
+	public function exists($name)
+	{
+		$path = "../navigation/{$name}.php";
+		if (!is_file($path)) {
+			$path = \TAO::path("navigation/{$name}.php");
+		}
+		return is_file($path);
+	}
+
 	/**
 	 *
 	 */
@@ -267,10 +279,10 @@ class Navigation
 		if (!is_file($path)) {
 			$path = \TAO::path("navigation/{$name}.php");
 		}
-		$struct = include($path);
+		$this->initialStruct = include($path);
 		$this->sub = new \ArrayObject();
-		if (\TAO::isIterable($struct)) {
-			$this->addArray($struct);
+		if (\TAO::isIterable($this->initialStruct)) {
+			$this->addArray($this->initialStruct);
 		}
 	}
 

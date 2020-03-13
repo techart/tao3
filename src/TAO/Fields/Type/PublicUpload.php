@@ -46,7 +46,6 @@ class PublicUpload extends Upload
 			}
 			$path = $this->param('private', false) ? $this->item->getPrivateHomeDir() : $this->item->getHomeDir();
 			$fileName = $this->destinationFilename($info);
-			\Storage::deleteDirectory($path);
 			$file->storeAs($path, $fileName);
 			$fullPath = $path . '/' . $fileName;
 			$this->item[$this->name] = $fullPath;
