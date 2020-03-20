@@ -15,7 +15,7 @@ class Router extends \TAO\Router
 			"{$path}/index.php",
 			"{$path}.php",
 		];
-
+		
 		if ($finded = $path = app('view.finder')->findInResources($paths)) {
 			$this->path = $finded;
 			return array(
@@ -23,7 +23,16 @@ class Router extends \TAO\Router
 				'action' => 'file',
 			);
 		}
-
+		
+		$template = 'pages.' . str_replace('/', '.', trim($request->path(), '/'));
+		if (view()->exists($template)) {
+			$this->path = $template;
+			return array(
+				'controller' => Controller::class,
+				'action' => 'template',
+			);
+		}
+		
 		return false;
 	}
 }

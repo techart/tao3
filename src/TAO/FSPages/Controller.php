@@ -26,4 +26,9 @@ class Controller extends \TAO\Controller
 		}
 		return $this->render($view, array('content' => $content));
 	}
+	
+	public function template()
+	{
+		return $this->render(app()->tao->router->path);
+	}
 }
