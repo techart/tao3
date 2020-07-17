@@ -43,6 +43,12 @@ class Middleware
 				'redirect' => false,
 			]);
 		}
+		if ($url = config('tao.robots_protection_redirect')) {
+			return redirect($url);
+		}
+		if ($tpl = config('tao.robots_protection_template')) {
+			return response(view($tpl));
+		}
 		throw new Exception('Protection error');
 	}
 }

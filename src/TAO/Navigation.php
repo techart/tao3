@@ -76,6 +76,8 @@ class Navigation
 	protected $isRoute = false;
 
 	protected static $instances = array();
+	
+	protected static $extraPaths = [];
 
 	/**
 	 * @param string $name
@@ -165,6 +167,11 @@ class Navigation
 		//print 'Invalid navigation node<hr>';
 		//var_dump($data);
 		//die();
+	}
+	
+	public static function addExtraPath($path)
+	{
+		self::$extraPaths[] = $path;
 	}
 
 	/**
@@ -260,13 +267,31 @@ class Navigation
 		}
 		return isset($this->flags[$flag]) && $this->flags[$flag];
 	}
-
-	public function exists($name)
+	
+	public function navigationSourcePath($name)
 	{
-		$path = "../navigation/{$name}.php";
+		$path = false;
+		
+		if (!empty(self::$extraPaths)) {
+			for($i = count(self::$extraPaths) - 1; $i >= 0; $i--) {
+				$path = self::$extraPaths[$i] . '/' . $name . '.php';
+				if (is_file($path)) {
+					break;
+				}
+			}
+		}
+		$path = $path ?: base_path("navigation/{$name}.php");
+		
 		if (!is_file($path)) {
 			$path = \TAO::path("navigation/{$name}.php");
 		}
+		
+		return $path;
+	}
+
+	public function exists($name)
+	{
+		$path = $this->navigationSourcePath($name);
 		return is_file($path);
 	}
 
@@ -275,10 +300,7 @@ class Navigation
 	 */
 	protected function initRoot($name = 'site')
 	{
-		$path = "../navigation/{$name}.php";
-		if (!is_file($path)) {
-			$path = \TAO::path("navigation/{$name}.php");
-		}
+		$path = $this->navigationSourcePath($name);
 		$this->initialStruct = include($path);
 		$this->sub = new \ArrayObject();
 		if (\TAO::isIterable($this->initialStruct)) {

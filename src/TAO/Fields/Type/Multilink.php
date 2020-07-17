@@ -434,7 +434,7 @@ class Multilink extends Field
 			$out[] = $item->title();
 		}
 		sort($out);
-		return implode(', ', $out);
+		return implode($this->param('render_delimiter', ', '), $out);
 	}
 
 	/**
