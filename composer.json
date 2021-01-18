@@ -1,7 +1,7 @@
 {
 	"name": "techart/tao3",
 	"description": "Techart extensions for Laravel",
-	"version": "6.1.0",
+	"version": "6.1.1",
 	"license": "Apache-2.0",
 	"authors": [
 		{
@@ -16,7 +16,7 @@
 		}
 	},
 	"require": {
-		"PHP": ">=7.1",
+		"PHP": "~7.3",
 		"laravel/framework": "^8.0",
 		"laravel/tinker": "^2.0",
 		"laravel/helpers": "~1.1",
