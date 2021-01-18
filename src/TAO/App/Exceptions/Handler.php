@@ -35,7 +35,7 @@ class Handler extends ExceptionHandler
 	 * @return mixed
 	 * @throws Exception
 	 */
-	public function report(Exception $exception)
+	public function report(\Throwable $exception)
 	{
 		if ($this->shouldReport($exception)) {
 			$this->notify($exception);
@@ -50,7 +50,7 @@ class Handler extends ExceptionHandler
 	 * @param  \Exception $exception
 	 * @return \Illuminate\Http\Response
 	 */
-	public function render($request, \Exception $exception)
+	public function render($request, \Throwable $exception)
 	{
 		if ($this->isHttpException($exception)) {
 			$status = $exception->getStatusCode();

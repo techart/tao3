@@ -226,11 +226,12 @@ class Provider extends ServiceProvider
 	 */
 	protected function linkTinymce()
 	{
-		$scripts_dir = \TAO::publicPath() . '/tao/scripts';
-		$link_name = $scripts_dir . '/tinymce';
+		$scriptsDir = \TAO::publicPath() . '/tao/scripts';
+		$link = $scriptsDir . '/tinymce';
+		$linkTo = base_path("vendor/tinymce/tinymce");
 
-		if (is_dir($scripts_dir) && !is_link($link_name)) {
-			symlink('../../../../tinymce/tinymce', $link_name);
+		if (is_dir($scriptsDir) && !is_link($link)) {
+			symlink($linkTo, $link);
 		}
 	}
 }

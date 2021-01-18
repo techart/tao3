@@ -6,10 +6,10 @@ class Manager extends \Illuminate\Session\SessionManager
 {
 	protected function buildSession($handler)
 	{
-		if ($this->app['config']['session.encrypt']) {
+		if (config('session.encrypt')) {
 			return $this->buildEncryptedSession($handler);
 		} else {
-			return new Store($this->app['config']['session.cookie'], $handler);
+			return new Store(config('session.cookie'), $handler);
 		}
 	}
 }

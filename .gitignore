@@ -1,3 +1,1 @@
-composer.lock
-vendor
-public/scripts/tinymce
+resources/public/scripts/tinymce
