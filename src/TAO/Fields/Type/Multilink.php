@@ -216,7 +216,7 @@ class Multilink extends Field
 	 */
 	public function checkSchema(Blueprint $table)
 	{
-		$relTable = $this->tableRelations();
+		$relTable = preg_replace('{^[a-z0-9_]+\.}i', '', $this->tableRelations());
 		if (!$this->item->dbSchema()->hasTable($relTable)) {
 			$this->item->dbSchema()->create($relTable, function (Blueprint $table) {
 				$thisKey = $this->thisKey();
@@ -261,7 +261,9 @@ class Multilink extends Field
 			}
 		}
 		if ($db = $this->item->getTableDatabase()) {
-			$table = "{$db}.{$table}";
+			if (strpos($table, '.') === false) {
+				$table = "{$db}.{$table}";
+			}
 		}
 		return $table;
 	}
