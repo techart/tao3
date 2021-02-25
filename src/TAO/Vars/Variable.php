@@ -149,7 +149,11 @@ class Variable implements \ArrayAccess
 
 	public function getKey()
 	{
-		return $this->name;
+		$key = $this->name;
+		if ($this->scope ?? false) {
+			$key = "{$this->scope}::{$key}";
+		}
+		return $key;
 	}
 
 	public function getKeyName()
