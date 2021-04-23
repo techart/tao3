@@ -1,3 +1,7 @@
+## 6.2.0
+
+- Параметр delimiter в поле MultilinkTags (@podolsky)
+
 ## 6.1.3
 
 ### Исправлено

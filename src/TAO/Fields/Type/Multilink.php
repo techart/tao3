@@ -95,6 +95,15 @@ class Multilink extends Field
 		if (is_null($value)) {
 			$value = [];
 		}
+		if (is_string($value)) {
+			$values = [];
+			foreach(preg_split("{[^\d]+}", $value) as $n) {
+				if ($n = (int)$n) {
+					$values[$n] = $n;
+				}
+			}
+			return array_keys($values);
+		}
 		if (is_array($value) && !\TAO\Type\Collection::isIndexed($value)) {
 			$value = array_keys($value);
 		}

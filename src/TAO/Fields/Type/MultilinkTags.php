@@ -4,6 +4,15 @@ namespace TAO\Fields\Type;
 
 use TAO\ORM\Model\Tag;
 
+/**
+ * Class MultilinkTags
+ * @package TAO\Fields\Type
+ *
+ * Tag model must implement methods
+ * @uses \TAO\ORM\Model\Tag::findTag()
+ * @uses \TAO\ORM\Model\Tag::initTagByValue()
+ * @uses \TAO\ORM\Model\Tag::setTitle()
+ */
 class MultilinkTags extends Multilink
 {
 	public function styleForAdminInput()
@@ -27,7 +36,8 @@ class MultilinkTags extends Multilink
 			$tags[$tag] = $tag;
 		}
 		sort($tags);
-		return implode(', ', $tags);
+		$delimiter = (string)$this->param('delimiter') ?: ', ';
+		return implode($delimiter, $tags);
 	}
 
 	protected function getValueFromRequest($request)
@@ -45,7 +55,9 @@ class MultilinkTags extends Multilink
 		if ($request->has($this->name)) {
 			$src = $request->get($this->name);
 			$tags = [];
-			foreach (explode(',', $src) as $tag) {
+			$delimiter = (string)$this->param('delimiter') ?: ', ';
+			$delimiter = trim($delimiter, ' ');
+			foreach (explode($delimiter, $src) as $tag) {
 				$tag = trim($tag);
 				if (!empty($tag)) {
 					$tags[$tag] = $tag;
@@ -57,6 +69,8 @@ class MultilinkTags extends Multilink
 	}
 
 	/**
+	 * Attach Tags to related model
+	 *
 	 * @param array $tags
 	 * @throws \TAO\Exception\UnknownDatatype
 	 * @throws \TAO\ORM\Exception\NonStrorableObjectSaving
@@ -69,23 +83,38 @@ class MultilinkTags extends Multilink
 			$tagModel = $this->relatedModel();
 			$tagItem = $tagModel->findTag($tag);
 			if (!$tagItem) {
-				/** @var Tag $tagItem */
-				$tagItem = $this->relatedModel()->newInstance();
-				if (method_exists($tagItem, 'initTagByValue')) {
-					$tagItem->initTagByValue($tag);
-				} else {
-					$tagItem->setTitle($tag);
-				}
-				$tagItem->save();
+				$tagItem = $this->createNewTag($tag);
 			}
 			$this->belongsToMany()->attach($tagItem);
 		}
+	}
+
+	/**
+	 * Create new Tag
+	 *
+	 * @param string $tag title/value of new tag
+	 * @return Tag new instance
+	 * @throws \TAO\Exception\UnknownDatatype
+	 * @throws \TAO\ORM\Exception\NonStrorableObjectSaving
+	 */
+	private function createNewTag($tag)
+	{
+		/** @var Tag $newTagItem */
+		$newTagItem = $this->relatedModel()->newInstance();
+
+		if (method_exists($newTagItem, 'initTagByValue')) {
+			$newTagItem->initTagByValue($tag);
+		} else {
+			$newTagItem->setTitle($tag);
+		}
+
+		$newTagItem->save();
+
+		return $newTagItem;
 	}
 
 	protected function itemsFromModel()
 	{
 		return $this->relatedModel()->itemsForSelectFlat();
 	}
-
-
 }
