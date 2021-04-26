@@ -61,7 +61,7 @@ class Integer extends Field
 
 		$unsigned = (bool)$this->typeParamsEnumArg(array('unsigned'));
 		if (!$unsigned) {
-			if ($value[0] === '-') {
+			if (isset($value[0]) && $value[0] === '-') {
 				$newValue = '-' . $newValue;
 			}
 		}
