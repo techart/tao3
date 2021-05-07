@@ -5,10 +5,11 @@ use Illuminate\Mail\MailServiceProvider;
 
 class ServiceProvider extends MailServiceProvider
 {
-	protected function registerSwiftTransport()
+	public function register()
 	{
-		parent::registerSwiftTransport();
-		app('swift.transport')->extend('php', function () {
+		parent::register();
+		
+		app('mail.manager')->extend('php', function () {
 			return app('tao.mail.transport');
 		});
 	}
