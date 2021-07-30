@@ -12,10 +12,14 @@ class PHPTransport extends BaseTransport
 		$bodyPos = strpos($body, "\r\n\r\n");
 		$body = trim(substr($body, $bodyPos));
 		$headers = $message->getHeaders();
-		$subject = $headers->get('subject');
-		
-		foreach($this->getTo($message) as $email) {
-			$rc = mail($email, trim($subject->toString()), $body, trim($headers->toString()));
+		$subject = $headers->get('subject')->getValue();
+		$to = $this->getTo($message);
+		$headers->remove('To');
+		$headers->remove('Cc');
+		$headers->remove('Bcc');
+		$headersString = $headers->toString();
+		foreach($to as $email) {
+			$rc = mail($email, trim($subject), $body, trim($headersString));
 		}
 		return $rc;
 	}

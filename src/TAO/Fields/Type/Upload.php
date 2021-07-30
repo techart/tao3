@@ -159,6 +159,23 @@ class Upload extends Field
 			$this->item[$this->name] = $dest;
 		}
 	}
+	
+	public function apiActionDownload()
+	{
+		$datatype = dt(app()->request()->get('datatype'));
+		$field = app()->request()->get('field');
+		$item = $datatype->find(app()->request()->get('id'));
+		if ($item->accessView()) {
+			$file = $item->field($field)->value();
+			$filename = preg_replace('{^.+/}', '', $file);
+			$mime = \Storage::mimeType($file);
+			return \Storage::download($file, 200, [
+				'Content-Type' => $mime,
+				'Content-Disposition' => 'inline; filename="'.$filename.'"',
+			]);
+		}
+		return \TAO::pageNotFound();
+	}
 
 	/**
 	 * @return array|bool|mixed
@@ -261,6 +278,9 @@ class Upload extends Field
 		}
 		if (!\Storage::exists($file)) {
 			return null;
+		}
+		if ($this->param('private', false)) {
+			return $this->apiUrl('download');
 		}
 		return \Storage::url($file);
 	}

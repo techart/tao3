@@ -70,7 +70,7 @@ class Attaches extends StringField implements \IteratorAggregate
 				if (\Storage::exists($path)) {
 					$data['key'] = $key;
 					$data['new'] = false;
-					$data['url'] = \Storage::url($data['path']);
+					$data['url'] = $this->fileUrl($data['path'], $key);
 					if (!isset($data['info'])) {
 						$data['info'] = $defs;
 					}
@@ -83,6 +83,37 @@ class Attaches extends StringField implements \IteratorAggregate
 			}
 		}
 		return $out;
+	}
+	
+	public function fileUrl($path, $key = '')
+	{
+		if ($this->param('private', false)) {
+			return $this->apiUrl('download', [
+				'key' => $key,
+			]);
+		}
+		return \Storage::url($path);
+	}
+	
+	public function apiActionDownload()
+	{
+		$key = app()->request()->get('key');
+		$datatype = dt(app()->request()->get('datatype'));
+		$field = app()->request()->get('field');
+		$item = $datatype->find(app()->request()->get('id'));
+		if ($item->accessView()) {
+			$files = $item->field($field)->value();
+			if ($file = $files[$key] ?? false) {
+				$path = $file['path'];
+				$filename = preg_replace('{^.+/}', '', $path);
+				$mime = \Storage::mimeType($path);
+				return \Storage::download($path, 200, [
+					'Content-Type' => $mime,
+					'Content-Disposition' => 'inline; filename="'.$filename.'"',
+				]);
+			}
+		}
+		return \TAO::pageNotFound();
 	}
 
 	/**

@@ -3,6 +3,7 @@
 namespace TAO\Fields\Controllers;
 
 use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 use TAO\Fields\Exception\UndefinedField;
 
 /**
@@ -71,7 +72,7 @@ class API extends \TAO\Controller
 						return $this->error("API action '{$this->action}' not found");
 					}
 					$rc = $this->field->$method($this);
-					if ($rc instanceof Response) {
+					if ($rc instanceof Response || $rc instanceof StreamedResponse) {
 						return $rc;
 					}
 					if (is_string($rc)) {
