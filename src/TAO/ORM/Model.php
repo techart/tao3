@@ -524,53 +524,6 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 		return $this->validate('admin');
 	}
 
-	protected function triggerEventForFields($eventName, $data = [])
-	{
-		foreach ($this->fieldsObjects() as $field) {
-			Callback::instance([$field, $eventName])->call($data);
-		}
-	}
-
-	public function beforeInsert()
-	{
-		$this->triggerEventForFields('beforeItemInsert');
-	}
-
-	public function afterInsert()
-	{
-		$this->triggerEventForFields('afterItemInsert');
-	}
-
-	public function beforeSave()
-	{
-		$this->triggerEventForFields('beforeItemSave');
-	}
-
-	public function afterSave()
-	{
-		$this->triggerEventForFields('afterItemSave');
-	}
-
-	public function beforeUpdate()
-	{
-		$this->triggerEventForFields('beforeItemUpdate');
-	}
-
-	public function afterUpdate()
-	{
-		$this->triggerEventForFields('afterItemUpdate');
-	}
-
-	public function beforeDelete()
-	{
-		$this->triggerEventForFields('beforeItemDelete');
-	}
-
-	public function afterDelete()
-	{
-		$this->triggerEventForFields('afterItemDelete');
-	}
-
 	public function save(array $options = [])
 	{
 		if (!$this->isStrobale()) {

@@ -72,4 +72,29 @@
 			],
 		],
 	],
+
+	'services' => [
+		'binds' => [
+			'pdf' => \TAO\Foundation\Pdf::class,
+			'scss' => \TAO\Foundation\Scss::class,
+			'tao.http' => \TAO\Foundation\HTTP::class,
+			'tao.mail.transport' => \TAO\Mail\PHPTransport::class,
+		],
+
+		'singletons' => [
+			'context' => \TAO\Foundation\AppContext::class,
+			'sitemap.manager' => \TAO\Components\Sitemap\Manager::class,
+			'session' => '*makeSessionService',
+			'tao' => '*makeTaoService',
+			'tao.admin' => \TAO\Admin::class,
+			'tao.assets' => \TAO\Foundation\Assets::class . '*init',
+			'tao.fields' => \TAO\Fields::class . '*init',
+			'tao.images' => \TAO\Foundation\Images::class . '*init',
+			'tao.view' => \TAO\View::class . '*init',
+			'tao.utils'=> \TAO\Foundation\Utils::class,
+			'view.finder' => '*makeViewFinderService',
+			'unisender' => [\TAO\Components\Unisender\API::class, 'makeInstance'],
+			'url' => '*makeUrlService',
+		],
+	],
 ];

@@ -2,6 +2,8 @@
 
 namespace TAO\ORM\Traits;
 
+use TAO\Callback;
+
 /**
  * Class Events
  */
@@ -65,11 +67,19 @@ trait Events
 	{
 	}
 
+	protected function triggerEventForFields($eventName, $data = [])
+	{
+		foreach ($this->fieldsObjects() as $field) {
+			Callback::instance([$field, $eventName])->call($data);
+		}
+	}
+
 	/**
 	 *
 	 */
 	final public function immutableBeforeSave()
 	{
+		$this->triggerEventForFields('beforeItemSave');
 		$this->generateUrl();
 	}
 
@@ -78,6 +88,7 @@ trait Events
 	 */
 	final public function immutableAfterSave()
 	{
+		$this->triggerEventForFields('afterItemSave');
 		$this->generateUrlAfterSave();
 	}
 
@@ -89,6 +100,7 @@ trait Events
 		if ($this->idType == 'uuid') {
 			$this->{$this->getKeyName()} = (string)$this->generateNewId();
 		}
+		$this->triggerEventForFields('beforeItemInsert');
 	}
 
 	/**
@@ -96,6 +108,7 @@ trait Events
 	 */
 	final public function immutableAfterInsert()
 	{
+		$this->triggerEventForFields('afterItemInsert');
 	}
 
 	/**
@@ -103,6 +116,7 @@ trait Events
 	 */
 	final public function immutableBeforeUpdate()
 	{
+		$this->triggerEventForFields('beforeItemUpdate');
 	}
 
 	/**
@@ -110,6 +124,7 @@ trait Events
 	 */
 	final public function immutableAfterUpdate()
 	{
+		$this->triggerEventForFields('afterItemUpdate');
 	}
 
 	/**
@@ -117,6 +132,7 @@ trait Events
 	 */
 	final public function immutableBeforeDelete()
 	{
+		$this->triggerEventForFields('beforeItemDelete');
 	}
 
 	/**
@@ -124,6 +140,7 @@ trait Events
 	 */
 	final public function immutableAfterDelete()
 	{
+		$this->triggerEventForFields('afterItemDelete');
 	}
 
 	/**

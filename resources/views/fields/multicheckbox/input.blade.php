@@ -14,7 +14,7 @@
 				name="{{ $field->name }}[{{ $id }}]"
 				class="input checkbox {{ $field->classForInput() }}"
 				value="1"
-				@if ($field->isAttached($id))checked="checked"@endif
+				@if ($field->isAttached((string)$id))checked="checked"@endif
 				{!! $field->renderAttrs() !!}
 			>
 			<span class="multilink-item-label">{{ $title }}</span>

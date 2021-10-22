@@ -118,97 +118,86 @@ class Provider extends ServiceProvider
 		}
 	}
 
+	protected function makeService($service, $app)
+	{
+		if (is_string($service)) {
+			if (starts_with($service, '*')) {
+				$method = substr($service, 1);
+				return call_user_func([$this, $method], $app);
+			}
+			if ($m = \TAO::regexp('{^(.+)\*(.+)$}', $service)) {
+				$object = app()->make($m[1]);
+				call_user_func([$object, $m[2]], $app);
+				return $object;
+			}
+		}
+		if (is_callable($service)) {
+			return call_user_func($service, $app);
+		}
+		return app()->make($service);
+	}
+
 	protected function bindServices()
 	{
-		$this->app->singleton('view.finder', function ($app) {
-			$finder = new \TAO\View\Finder($app['files'], []);
-			return $finder;
+		$services = config('tao.services.binds');
+		if (is_array($services)) {
+			foreach($services as $code => $service) {
+				if ($service) {
+					$this->app->bind($code, function($app) use ($service) {
+						return $this->makeService($service, $app);
+					});
+				}
+			}
+		}
+
+		$services = config('tao.services.singletons');
+		if (is_array($services)) {
+			foreach($services as $code => $service) {
+				if ($service) {
+					$this->app->singleton($code, function($app) use ($service) {
+						return $this->makeService($service, $app);
+					});
+				}
+			}
+		}
+	}
+
+	protected function makeViewFinderService($app)
+	{
+		$finder = new \TAO\View\Finder($app['files'], []);
+		return $finder;
+	}
+
+	protected function makeUrlService($app)
+	{
+		$routes = $app['router']->getRoutes();
+		$app->instance('routes', $routes);
+
+		$url = new UrlGenerator($routes, $app->rebinding('request', function ($app, $request) {
+			$app['url']->setRequest($request);
+		}));
+
+		$url->setSessionResolver(function () {
+			return $this->app['session'];
 		});
 
-		$this->app->bind('tao.http', function ($app) {
-			return app()->make(HTTP::class);
+		$app->rebinding('routes', function ($app, $routes) {
+			$app['url']->setRoutes($routes);
 		});
 
-		$this->app->bind('pdf', function ($app) {
-			return app()->make(\TAO\Foundation\Pdf::class);
-		});
+		return $url;
+	}
 
-		$this->app->bind('scss', function ($app) {
-			return app()->make(\TAO\Foundation\Scss::class);
-		});
+	protected function makeSessionService($app)
+	{
+		return new \TAO\Session\Manager($app);
+	}
 
-		$this->app->bind('tao.mail.transport', function ($app) {
-			return app()->make(\TAO\Mail\PHPTransport::class);
-		});
-
-		$this->app->singleton('url', function ($app) {
-			$routes = $app['router']->getRoutes();
-			$app->instance('routes', $routes);
-
-			$url = new UrlGenerator($routes, $app->rebinding('request', function ($app, $request) {
-				$app['url']->setRequest($request);
-			}));
-
-			$url->setSessionResolver(function () {
-				return $this->app['session'];
-			});
-
-			$app->rebinding('routes', function ($app, $routes) {
-				$app['url']->setRoutes($routes);
-			});
-
-			return $url;
-		});
-
-		$this->app->singleton('session', function ($app) {
-			return new \TAO\Session\Manager($app);
-		});
-
-		$this->app->singleton('tao', function () {
-			$tao = app()->make('\TAO\Foundation\TAO');
-			$tao->app = $this->app;
-			return $tao;
-		});
-
-		$this->app->singleton('tao.fields', function () {
-			$fields = app()->make(\TAO\Fields::class);
-			$fields->init();
-			return $fields;
-		});
-
-		$this->app->singleton('tao.admin', function () {
-			return app()->make(\TAO\Admin::class);
-		});
-
-		$this->app->singleton('tao.assets', function () {
-			$assets = app()->make(\TAO\Foundation\Assets::class);
-			$assets->init();
-			return $assets;
-		});
-
-		$this->app->singleton('tao.images', function () {
-			$images = app()->make(\TAO\Foundation\Images::class);
-			$images->init();
-			return $images;
-		});
-
-		$this->app->singleton('tao.view', function () {
-			$assets = app()->make(\TAO\View::class);
-			$assets->init();
-			return $assets;
-		});
-
-		$this->app->singleton('sitemap.manager', function () {
-			return app()->make(Manager::class);
-		});
-
-		$this->app->singleton('tao.utils', function () {
-			return app()->make(\TAO\Foundation\Utils::class);
-		});
-
-		$this->app->singleton('unisender', function () {
-			return \TAO\Components\Unisender\API::makeInstance();
-		});
+	protected function makeTaoService()
+	{
+		$tao = app()->make('\TAO\Foundation\TAO');
+		$tao->app = $this->app;
+		return $tao;
 	}
 
 	protected function registerRouters()

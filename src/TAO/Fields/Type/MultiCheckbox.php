@@ -89,6 +89,23 @@ class MultiCheckbox extends Field
 		return $this->attachedKeys()->containsStrict($id);
 	}
 
+	public function applyFilter($builder, $value)
+	{
+		if (!is_array($value)) {
+			$value = [$value];
+		}
+		return $builder->join($this->tableName(), function($join) use ($value) {
+		    $table = $this->item->table;
+		    $rel = $this->tableName();
+		    $fkey = $this->item->getForeignKey();
+		    return $join
+				->on("{$table}.id", '=', "{$rel}.{$fkey}")
+				->where("{$rel}.field", $this->name)
+				->whereIn("{$rel}.key", $value)
+			;
+		})->groupBy('id');
+	}
+
 	/**
 	 * Запись в item значения.
 	 * Сохранение в базу попозже
@@ -257,4 +274,22 @@ class MultiCheckbox extends Field
 			'key' => $value
 		];
 	}
+
+	public function dataExportValue()
+	{
+		return implode(',', array_keys($this->attachedKeys()->toArray()));
+	}
+
+	public function dataImport($src)
+	{
+		$ids = [];
+		foreach (explode(',', $src) as $id) {
+			$id = (int)trim($id);
+			if ($id>0) {
+				$ids[] = $id;
+			}
+		}
+		$this->set($ids);
+	}
+
 }
