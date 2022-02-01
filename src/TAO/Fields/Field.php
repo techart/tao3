@@ -308,6 +308,15 @@ abstract class Field
 	}
 
 	/**
+	 * @param string $action
+	 * @return mixed
+	 */
+	public function accessApiAction($action)
+	{
+		return false;
+	}
+
+	/**
 	 * @return mixed
 	 */
 	public function value()

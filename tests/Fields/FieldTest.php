@@ -136,8 +136,8 @@ class FieldTest extends TestCase
 		], $item);
 		$item->save();
 		$renderRes = $field->renderForAdminList();
-		$this->assertContains('href="/test/' . $item->getKey() . '/"', $renderRes);
-		$this->assertContains($render, $renderRes);
+		$this->assertStringContainsString('href="/test/' . $item->getKey() . '/"', $renderRes);
+		$this->assertStringContainsString($render, $renderRes);
 	}
 
 	public function testCsvValue()

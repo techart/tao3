@@ -14,7 +14,7 @@ class Upload extends TestCase
 	public function testRenderForAdminList()
 	{
 		$field = $this->createField();
-		$this->assertContains('href=', $field->renderForAdminList());
+		$this->assertStringContainsString('href=', $field->renderForAdminList());
 
 		// With callback
 		$render = 'Admin content';

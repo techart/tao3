@@ -66,7 +66,8 @@ class Coordinates extends TestCase
 		$lat = 52.3;
 		$lng = 37.5;
 
-		$item->field($fieldName)->set("$lat, $lng");
+		$value = number_format($lat, 2) . ', ' . number_format($lng, 2);
+		$item->field($fieldName)->set($value);
 
 		$this->assertEquals($lat, $item->field($fieldName)->lat());
 		$this->assertEquals($lng, $item->field($fieldName)->lng());

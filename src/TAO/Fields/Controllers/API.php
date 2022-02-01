@@ -66,7 +66,7 @@ class API extends \TAO\Controller
 					return $this->error("Field {$this->field} not found");
 				}
 
-				if ($this->field->accessAPI()) {
+				if ($this->field->accessApiAction($this->action) || $this->field->accessAPI()) {
 					$method = 'apiAction' . ucfirst(camel_case($this->action));
 					if (!method_exists($this->field, $method)) {
 						return $this->error("API action '{$this->action}' not found");

@@ -35,13 +35,13 @@ class Utils
 		if (\TAO::regexp('{^\d+$}', trim($date))) {
 			$dateTimeString = date('Y-m-d H:i:s', $date);
 		}
-		if ($m = \TAO::regexp('{(\d+)\.(\d+)\.(\d+)\s*-\s*(\d+):(\d+):(\d+)}', $date)) {
+		elseif ($m = \TAO::regexp('{(\d+)\.(\d+)\.(\d+)\s*-\s*(\d+):(\d+):(\d+)}', $date)) {
 			$dateTimeString = "{$m[3]}-{$m[2]}-{$m[1]} {$m[4]}:{$m[5]}:{$m[6]}";
 		}
-		if ($m = \TAO::regexp('{(\d+)\.(\d+)\.(\d+)\s*-\s*(\d+):(\d+)}', $date)) {
+		elseif ($m = \TAO::regexp('{(\d+)\.(\d+)\.(\d+)\s*-\s*(\d+):(\d+)}', $date)) {
 			$dateTimeString = "{$m[3]}-{$m[2]}-{$m[1]} {$m[4]}:{$m[5]}";
 		}
-		if ($m = \TAO::regexp('{(\d+)\.(\d+)\.(\d+)}', $date)) {
+		elseif ($m = \TAO::regexp('{(\d+)\.(\d+)\.(\d+)}', $date)) {
 			$dateTimeString = "{$m[3]}-{$m[2]}-{$m[1]}";
 		}
 

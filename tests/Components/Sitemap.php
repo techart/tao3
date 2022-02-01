@@ -16,7 +16,7 @@ class Sitemap extends TestCase
 		$manager = app('sitemap.manager');
 		$response = $manager->generateDynamically();
 
-		$this->assertContains('<loc>http://localhost/</loc>', $response->getContent());
+		$this->assertStringContainsString('<loc>http://localhost/</loc>', $response->getContent());
 	}
 
 	public function testAddLinksWithoutSource()
@@ -29,9 +29,9 @@ class Sitemap extends TestCase
 		$content = $manager->generateDynamically()->getContent();
 
 
-		$this->assertContains('<loc>http://localhost/</loc>', $content);
-		$this->assertContains("<loc>$link1</loc>", $content);
-		$this->assertContains("<loc>$link2</loc>", $content);
+		$this->assertStringContainsString('<loc>http://localhost/</loc>', $content);
+		$this->assertStringContainsString("<loc>$link1</loc>", $content);
+		$this->assertStringContainsString("<loc>$link2</loc>", $content);
 	}
 
 	public function testAddLinksFromSource()
@@ -46,9 +46,9 @@ class Sitemap extends TestCase
 		Source::addLinks([$link1, $link2]);
 		$content = $manager->generateDynamically()->getContent();
 
-		$this->assertContains('<loc>http://localhost/</loc>', $content);
-		$this->assertContains("<loc>$link1</loc>", $content);
-		$this->assertContains("<loc>$link2</loc>", $content);
+		$this->assertStringContainsString('<loc>http://localhost/</loc>', $content);
+		$this->assertStringContainsString("<loc>$link1</loc>", $content);
+		$this->assertStringContainsString("<loc>$link2</loc>", $content);
 	}
 
 	public function testAddLinksFromDatatype()
@@ -72,9 +72,9 @@ class Sitemap extends TestCase
 		$content = $manager->generateDynamically()->getContent();
 		$domain = config('app.url');
 
-		$this->assertContains('<loc>http://localhost/</loc>', $content);
-		$this->assertContains("<loc>$domain$link1</loc>", $content);
-		$this->assertContains("<loc>$domain$link2</loc>", $content);
+		$this->assertStringContainsString('<loc>http://localhost/</loc>', $content);
+		$this->assertStringContainsString("<loc>$domain$link1</loc>", $content);
+		$this->assertStringContainsString("<loc>$domain$link2</loc>", $content);
 	}
 
 	public function testCache()
@@ -95,9 +95,9 @@ class Sitemap extends TestCase
 		$content3 = $manager->generateDynamically()->getContent();
 
 		$this->assertEquals($content1, $content2);
-		$this->assertNotContains("<loc>$link1</loc>", $content1);
-		$this->assertContains("<loc>$link1</loc>", $content3);
-		$this->assertContains("<loc>$link2</loc>", $content3);
+		$this->assertStringNotContainsString("<loc>$link1</loc>", $content1);
+		$this->assertStringContainsString("<loc>$link1</loc>", $content3);
+		$this->assertStringContainsString("<loc>$link2</loc>", $content3);
 	}
 
 	public function testHost()
@@ -113,9 +113,9 @@ class Sitemap extends TestCase
 
 		$content = $manager->generateDynamically(0, 'http://example.com')->getContent();
 
-		$this->assertContains("<loc>$domain/</loc>", $content);
-		$this->assertContains("<loc>$domain$link1</loc>", $content);
-		$this->assertContains("<loc>$domain$link2</loc>", $content);
+		$this->assertStringContainsString("<loc>$domain/</loc>", $content);
+		$this->assertStringContainsString("<loc>$domain$link1</loc>", $content);
+		$this->assertStringContainsString("<loc>$domain$link2</loc>", $content);
 	}
 
 	protected function resolveApplication()

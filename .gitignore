@@ -1,1 +1,4 @@
 resources/public/scripts/tinymce
+vendor
+composer.lock
+.phpunit.result.cache

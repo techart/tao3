@@ -1,7 +1,9 @@
-image: php:7.2
+image: php:7.3
 before_script:
-- bash ci/docker_install.sh > /dev/null
+- apt-get -y update && apt-get -y install git zip unzip
+- curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
+- docker-php-ext-install pdo_mysql
 test:app:
  script:
  - composer install
- - phpunit --configuration phpunit.xml
+ - ./vendor/bin/phpunit --configuration phpunit.xml

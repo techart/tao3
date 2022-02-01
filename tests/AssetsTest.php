@@ -11,8 +11,8 @@ class AssetsTest extends TestCase
 		\Assets::useFile($scriptUrl);
 		\Assets::useFile($stylesUrl);
 
-		$this->assertContains("src=\"$scriptUrl\"", \Assets::scripts());
-		$this->assertContains("href=\"$stylesUrl\"", \Assets::styles());
+		$this->assertStringContainsString("src=\"$scriptUrl\"", \Assets::scripts());
+		$this->assertStringContainsString("href=\"$stylesUrl\"", \Assets::styles());
 	}
 
 	public function testSupportExternalHttpsUrls()
@@ -22,7 +22,7 @@ class AssetsTest extends TestCase
 		\Assets::useFile($scriptUrl);
 		\Assets::useFile($stylesUrl);
 
-		$this->assertContains("src=\"$scriptUrl\"", \Assets::scripts());
-		$this->assertContains("href=\"$stylesUrl\"", \Assets::styles());
+		$this->assertStringContainsString("src=\"$scriptUrl\"", \Assets::scripts());
+		$this->assertStringContainsString("href=\"$stylesUrl\"", \Assets::styles());
 	}
 }

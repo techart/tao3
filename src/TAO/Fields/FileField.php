@@ -11,6 +11,18 @@ trait FileField
 	 */
 	protected $tempId = false;
 
+
+	public function accessApiAction($action)
+	{
+		if ($action == 'download') {
+			$method = 'accessApiDownloadFile';
+			if (method_exists($this->item, $method)) {
+				return $this->item->$method($this->name);
+			}
+		}
+		return false;
+	}
+
 	/**
 	 * @param $info
 	 * @return string
@@ -147,7 +159,7 @@ trait FileField
 	}
 	
 	protected function getImageSize($path)
-	{
+	{//dd(new \ReflectionClass(\Image::class));
 		$image = \Image::make(\Storage::get($path));
 		if ($image) {
 			$size = $image->getSize();
