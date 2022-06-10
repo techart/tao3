@@ -42,7 +42,6 @@ class Assets
 		return $this->vars[$name] ?? $default;
 	}
 
-
 	public function renderMeta()
 	{
 		foreach (['title', 'description', 'keywords'] as $name) {
@@ -51,6 +50,15 @@ class Assets
 			}
 		}
 		return view('meta', array('meta' => $this->meta));
+	}
+	
+	/**
+	 * Возвращает массив текущих мета-тегов
+	 *
+	 * @return array
+	 */
+	public function getMetas() {
+		return $this->meta;
 	}
 
 	public function getParam($name, $default = null)
