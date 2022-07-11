@@ -5,6 +5,19 @@ namespace TAO\Fields\Type;
 class Image extends Upload
 {
 	/**
+	 * Поддерживаемые расширения
+	 *
+	 * @var array
+	 */
+	private $supported_extentions = [
+		'gif',
+		'png',
+		'jpg',
+		'jpeg',
+		'webp',
+	];
+
+	/**
 	 * @return string
 	 */
 	public function adminPreviewUrl()
@@ -32,15 +45,16 @@ class Image extends Upload
 				$image = \Image::make(\Storage::get($path));
 			}
 		}
-		if ($m = \TAO::regexp('{^image/(gif|png|jpeg)$}', $image->mime)) {
-			$ext = str_replace('jpeg', 'jpg', $m[1]);
+
+		$extentins_str = implode('|', $this->supported_extentions);
+
+		if ($m = \TAO::regexp("{^image/($extentins_str)$}", $image->mime)) {
 			return $image->resize(100, 100, function ($c) {
 				$c->aspectRatio();
-			})->response($ext);
+			})->response($m[1]);
 		} else {
 			return 'Invalid mime type: ' . $image->mime;
 		}
-
 	}
 
 	/**
@@ -54,11 +68,12 @@ class Image extends Upload
 		if (is_string($check)) {
 			return $check;
 		}
-		$ext = str_replace('jpeg', 'jpg', strtolower($info['ext']));
-		if ($ext != 'jpg' && $ext != 'png' && $ext != 'gif') {
-			return 'Only jpg/png/gif!';
+
+		if (!in_array($info['ext'], $this->supported_extentions)) {
+			$extentins_str = implode('|', $this->supported_extentions);
+			return "Only {$extentins_str}!";
 		}
-		$info['ext'] = $ext;
+
 		$info['preview'] = $this->adminPreviewUrl();
 		return true;
 	}
@@ -84,17 +99,17 @@ class Image extends Upload
 		$mods = $this->param('mods', false);
 		return $this->url($mods);
 	}
-	
+
 	public function renderForAdminList()
 	{
 		return $this->renderForAdmin('list');
 	}
-	
+
 	public function renderForAdminView()
 	{
 		return $this->renderForAdmin('view');
 	}
-	
+
 	public function renderForAdmin($action)
 	{
 		if ($action == 'view') {

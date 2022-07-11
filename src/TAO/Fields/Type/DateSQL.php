@@ -65,6 +65,11 @@ class DateSQL extends DateInteger
 			}
 			$value = $dateTimeTimestamp;
 		}
-		$this->item[$this->name] = $value;
+
+		if ($this->isStorable()) {
+			$this->item[$this->name] = $value;
+		} else {
+			$this->value = $value;
+		}
 	}
 }
