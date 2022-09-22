@@ -39,7 +39,8 @@ github:
  - git config --global user.name 'Git Techart'
  - git add .
  - git commit -m "Version $NEWVER"
- - git push
+ - git tag v$NEWVER
+ - git push --tags
  - cd ..
  - rm -rf ./ghrepo
  - fi
