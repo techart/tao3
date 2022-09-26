@@ -1,8 +1,5 @@
 variables:
  UPDATE_REPO: "git@github.com:techart/tao3.git"
-stages:
-- test
-- deploy
 test.app:
  stage: test
  tags:
@@ -11,39 +8,6 @@ test.app:
  script:
  - composer install
  - ./vendor/bin/phpunit --configuration phpunit.xml
-github:
- stage: deploy
- rules:
-  - changes:
-    - composer.json
- tags:
- - docker
- - ubuntu20
- script:
- - apt-get -y update && apt-get install -y openssh-client rsync git
- - mkdir ~/.ssh/
- - echo "StrictHostKeyChecking=no" >> ~/.ssh/config
- - eval $(ssh-agent -s)
- - ssh-add <( echo "$GITHUB_PRIVATE_KEY" )
- - REPONAME=`pwd | sed 's/.\+\///'`
- - cd ..
- - git clone $UPDATE_REPO ghrepo
- - OLDVER=`cat ./ghrepo/composer.json | sed "s/\s//g" | sed -n 's/^"version":"\(.*\)",$/\1/p'`
- - NEWVER=`cat ./$REPONAME/composer.json | sed "s/\s//g" | sed -n 's/^"version":"\(.*\)",$/\1/p'`
- - if [ OLDVER != NEWVER ]
- - then
- - echo "Upgrade version $OLDVER --> $NEWVER"
- - rsync -r --del --exclude=.git ./$REPONAME/ ./ghrepo
- - cd ./ghrepo
- - git config --global user.email 'git@tchart.ru'
- - git config --global user.name 'Git Techart'
- - git add .
- - git commit -m "Version $NEWVER"
- - git push
- - git tag v$NEWVER
- - git push --tags
- - cd ..
- - rm -rf ./ghrepo
- - fi
- - ssh-agent -k
-
+include:
+ - project: "libs/cicd-includes"
+   file: "/templates/.gitlab-ci-packagist.yml"

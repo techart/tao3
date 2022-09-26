@@ -118,37 +118,28 @@ class Assets
 		return $this;
 	}
 
-	public function useScript($file, $params = [])
+	public function useScript($file)
 	{
-		if (!is_array($params)) {
-			$params = [$params];
-		}
-		$this->useFile($file, array_merge($params, [
+		$this->useFile($file, [
 			'scope' => 'scripts',
 			'type' => 'js'
-		]));
+		]);
 	}
 
-	public function useBottomScript($file, $params = [])
+	public function useBottomScript($file)
 	{
-		if (!is_array($params)) {
-			$params = [$params];
-		}
-		$this->useFile($file, array_merge($params, [
+		$this->useFile($file, [
 			'scope' => 'bottom_scripts',
 			'type' => 'js'
-		]));
+		]);
 	}
 
-	public function useStyle($file, $params = [])
+	public function useStyle($file)
 	{
-		if (!is_array($params)) {
-			$params = [$params];
-		}
-		$this->useFile($file, array_merge($params, [
+		$this->useFile($file, [
 			'scope' => 'styles',
 			'type' => 'css'
-		]));
+		]);
 	}
 
 	public function useScss($files, $name = false)
