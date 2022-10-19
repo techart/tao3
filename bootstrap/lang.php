@@ -1,6 +1,6 @@
 <?php
 if (!function_exists('tao_lang')) {
-	function tao_lang($name, $locale, $values = [])
+	function tao_lang(string $name, string $locale, array $values = []):array
 	{
 		if (preg_match('/^(.+?):(.+?)$/', $name, $m)) {
 			// from composer package

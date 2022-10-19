@@ -1,7 +1,7 @@
 <?php
 
 if (!function_exists('who_calls')) {
-	function who_calls($limit = 0)
+	function who_calls(int $limit = 0):void
 	{
 		$out = [];
 		$data = debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, $limit);
@@ -31,13 +31,17 @@ if (!function_exists('trait_used')) {
 	 * @param string $traitName
 	 * @return bool
 	 */
-	function trait_used($object, $traitName)
+	function trait_used($object, $traitName):bool
 	{
 		return in_array($traitName, class_uses_recursive($object));
 	}
 }
 
 if (!function_exists('dt')) {
+	/**
+	 * @param string $code
+	 * @return TAO\ORM\Model
+	 */
 	function dt($code)
 	{
 		return \TAO::datatype($code);
@@ -45,7 +49,7 @@ if (!function_exists('dt')) {
 }
 
 if (!function_exists('protect_field')) {
-	function protect_field($time = 5)
+	function protect_field(int $time = 5):string
 	{
 		return app(\TAO\Components\Protect\Utils::class)->timeField($time);
 	}
@@ -53,7 +57,7 @@ if (!function_exists('protect_field')) {
 
 
 if (!function_exists('insertions')) {
-	function insertions($src)
+	function insertions(string $src):string
 	{
 		return \TAO\Text::process($src, 'insertions');
 	}

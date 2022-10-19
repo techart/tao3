@@ -2,7 +2,7 @@
 
 namespace TaoTests\Components;
 
-use Laravelium\Sitemap\SitemapServiceProvider;
+use Spatie\Sitemap\SitemapServiceProvider;
 use TAO\Components\Sitemap\Manager;
 use TaoTests\Components\Sitemap\Datatype;
 use TaoTests\Components\Sitemap\Source;

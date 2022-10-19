@@ -45,6 +45,7 @@ return [
 		TAO\Provider::class,
 		TAO\App\Providers\AppServiceProvider::class,
 		TAO\App\Providers\AuthServiceProvider::class,
+		Spatie\Sitemap\SitemapServiceProvider::class,
 		// App\Providers\BroadcastServiceProvider::class,
 		TAO\App\Providers\EventServiceProvider::class,
 		TAO\App\Providers\RouteServiceProvider::class,

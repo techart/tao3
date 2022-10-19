@@ -2,8 +2,10 @@
 namespace TAO\Components\Sitemap;
 
 use Illuminate\Http\Response;
-use Laravelium\Sitemap\Sitemap;
-
+use Illuminate\Support\Facades\Cache;
+use Spatie\Sitemap\Sitemap;
+use Spatie\Sitemap\SitemapIndex;
+use Spatie\Sitemap\Tags\Url;
 
 /**
  * Class Sitemap
@@ -115,8 +117,16 @@ class Manager
 	 */
 	public function render($cacheLifetime = 0)
 	{
-		$generator = $this->makeGenerator($cacheLifetime);
-		return $this->addLinksToGenerator($generator, $this->collectLinks())->render();
+		if ($cacheLifetime && $this->checkCache($this->cacheName())) {
+			$value = $this->getFromCache($this->cacheName());
+			return $this->getResponse($value);
+		}
+		$sitemap = $this->makeSitemap();
+		$value = $this->addLinksToSitemap($sitemap, $this->collectLinks())->toResponse(request());
+		if ($cacheLifetime) {
+			Cache::put($this->cacheName(), $value->original, $cacheLifetime);
+		}
+		return $this->addLinksToSitemap($sitemap, $this->collectLinks())->toResponse(request());
 	}
 
 	/**
@@ -128,13 +138,16 @@ class Manager
 	 */
 	public function store($urlsLimit = 0)
 	{
-		$generator = $this->makeGenerator();
+		$sitemap = $this->makeSitemap();
 		$links = $this->collectLinks();
 		if ($this->isRequiredSeparatedSitemap($urlsLimit, $links)) {
-			$this->addLinksToGeneratorForSeparatedSitemap($generator, $links, $urlsLimit);
-			return $generator->store('sitemapindex', 'sitemap');
+			$sitemapIndex = $this->makeSitemapIndex();
+			$this->addLinksToSitemapIndexForSeparatedSitemap($sitemapIndex, $links, $urlsLimit);
+			return $sitemapIndex
+				->writeToFile(public_path('sitemap.xml'));
 		} else {
-			return $this->addLinksToGenerator($generator, $links)->store();
+			return $this->addLinksToSitemap($sitemap, $links)
+				->writeToFile(public_path('sitemap.xml'));
 		}
 	}
 
@@ -168,7 +181,7 @@ class Manager
 		if (isset($link['changefreq'])) {
 			$link['freq'] = $link['changefreq'];
 		}
-		return $link;
+		return $this->linkToObject($link);
 	}
 
 	public function addLinks($links)
@@ -193,10 +206,10 @@ class Manager
 	 * @param [] $links
 	 * @return Sitemap
 	 */
-	protected function addLinksToGenerator($generator, $links)
+	protected function addLinksToSitemap($generator, $links)
 	{
 		foreach ($links as $linkData) {
-			$generator->addItem($linkData);
+			$generator->add($linkData);
 		}
 		return $generator;
 	}
@@ -209,12 +222,12 @@ class Manager
 	 * @param int $urlsLimit
 	 * @return Sitemap
 	 */
-	protected function addLinksToGeneratorForSeparatedSitemap($generator, $links, $urlsLimit)
+	protected function addLinksToSitemapIndexForSeparatedSitemap($sitemapIndex, $links, $urlsLimit)
 	{
 		foreach (array_chunk($links, $urlsLimit) as $chunkIndex => $linksChunk) {
-			$this->storeSitemapChunk($linksChunk, $generator, $chunkIndex);
+			$this->storeSitemapChunk($linksChunk, $sitemapIndex, $chunkIndex);
 		}
-		return $generator;
+		return $sitemapIndex;
 	}
 
 	/**
@@ -225,12 +238,12 @@ class Manager
 	 * @param string $name
 	 * @return string
 	 */
-	protected function storeLinksWithGenerator($links, $generator, $name)
+	protected function storeLinksWithGenerator($links, $sitemap, $name)
 	{
 		foreach ($links as $linkData) {
-			$generator->addItem($linkData);
+			$sitemap->add($linkData);
 		}
-		return $generator->store('xml', $name);
+		return $sitemap->writeToFile(public_path($name . '.xml'));
 	}
 
 	/**
@@ -243,9 +256,9 @@ class Manager
 	protected function storeSitemapChunk($links, $generator, $index)
 	{
 		$sitemapName = 'sitemap' . $index;
-		$this->storeLinksWithGenerator($links, $generator, $sitemapName);
-		$generator->addSitemap(url($sitemapName . '.xml'));
-		$generator->model->resetItems();
+		$sitemap = $this->makeSitemap();
+		$generator->add('/' . $sitemapName);
+		$this->storeLinksWithGenerator($links, $sitemap, $sitemapName);
 	}
 
 	/**
@@ -261,17 +274,82 @@ class Manager
 	}
 
 	/**
-	 * Создает экземпляр генератора sitemap.
+	 * Создает экземпляр sitemap.
 	 *
-	 * @param int $cacheLifetime
-	 * @return \Illuminate\Foundation\Application|mixed|Sitemap
+	 * @return Sitemap
 	 */
-	protected function makeGenerator($cacheLifetime = 0)
+	protected function makeSitemap()
 	{
-		$generator = app('sitemap');
-		if ($cacheLifetime > 0) {
-			$generator->setCache($this->cacheName(), $cacheLifetime);
+		return Sitemap::create();
+	}
+
+
+	/**
+	 * Создает экземпляр SitemapIndex
+	 * 
+	 * @return SitemapIndex
+	 */
+	protected function makeSitemapIndex()
+	{
+		return SitemapIndex::create();
+	}
+
+
+	/**
+	 * Проверяет есть ли значение по ключю в кэше
+	 *
+	 * @return boolean
+	 */
+	protected function checkCache($key)
+	{
+		return Cache::has($key);
+	}
+
+	/**
+	 * Возвращает значение из кэша
+	 *
+	 * @param string $key ключ по которому значение хранится в кэше
+	 * @return string|null
+	 */
+	protected function getFromCache($key)
+	{
+		return Cache::get($key);
+	}
+
+	/**
+	 * Создает response на основе значения сайтмапа
+	 *
+	 * @param String $value строка сайтмапа
+	 * @return Request
+	 */
+	protected function getResponse($value)
+	{
+		return response($value, 200, ['Content-type' => 'text/xml; charset=utf-8']);
+	}
+
+	/**
+	 *
+	 * Оборачивает нормализованную ссылку в обьект для генератора сайтмапа
+	 *
+	 * @param array $link Нормализованный массив с параметрами ссылки
+	 * @return URL
+	 */
+	protected function linkToObject($link)
+	{
+		$link = URL::create($link['loc']);
+		foreach ($link as $key => $value) {
+			switch($key) {
+				case 'lastmod':
+					$link->setLastModificationDate($value);
+					break;
+				case 'priority':
+					$link->setPriority($value);
+					break;
+				case 'freq':
+					$link->setChangeFrequency($value);
+					break;
+			}
 		}
-		return $generator;
+		return $link;
 	}
 }
