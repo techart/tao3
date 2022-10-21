@@ -1,6 +1,7 @@
 <?php
 namespace TAO\Components\Sitemap;
 
+use Carbon\Carbon;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Cache;
 use Spatie\Sitemap\Sitemap;
@@ -143,10 +144,10 @@ class Manager
 		if ($this->isRequiredSeparatedSitemap($urlsLimit, $links)) {
 			$sitemapIndex = $this->makeSitemapIndex();
 			$this->addLinksToSitemapIndexForSeparatedSitemap($sitemapIndex, $links, $urlsLimit);
-			return $sitemapIndex
+			$sitemapIndex
 				->writeToFile(public_path('sitemap.xml'));
 		} else {
-			return $this->addLinksToSitemap($sitemap, $links)
+			$this->addLinksToSitemap($sitemap, $links)
 				->writeToFile(public_path('sitemap.xml'));
 		}
 	}
@@ -336,20 +337,10 @@ class Manager
 	 */
 	protected function linkToObject($link)
 	{
-		$link = URL::create($link['loc']);
-		foreach ($link as $key => $value) {
-			switch($key) {
-				case 'lastmod':
-					$link->setLastModificationDate($value);
-					break;
-				case 'priority':
-					$link->setPriority($value);
-					break;
-				case 'freq':
-					$link->setChangeFrequency($value);
-					break;
-			}
-		}
-		return $link;
+		$linkObj = URL::create($link['loc']);
+		$linkObj->setLastModificationDate($link['lastmod'] ?? Carbon::now());
+		$linkObj->setPriority($link['priority'] ?? 0);
+		$linkObj->setChangeFrequency($link['freq'] ?? '');
+		return $linkObj;
 	}
 }
