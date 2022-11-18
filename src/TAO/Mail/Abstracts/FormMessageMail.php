@@ -89,7 +89,7 @@ abstract class FormMessageMail extends Mailable
 	{
 		foreach ($this->files as $field) {
 			if ($field->isNotEmpty()) {
-				$this->attach('.' . \Storage::url($field->value()));
+				$this->attach(\Storage::path($field->value()));
 			}
 			break;
 		}

@@ -10,6 +10,7 @@
 	],
 
 	'fields' => [
+		'yacaptcha' => \TAO\Fields\Type\Yacaptcha::class,
 		'dummy' => \TAO\Fields\Type\Dummy::class,
 		'string' => \TAO\Fields\Type\StringField::class,
 		'remember_token' => \TAO\Fields\Type\RememberToken::class,

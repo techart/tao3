@@ -8,9 +8,9 @@
 @component('mail::table')
 | Поле                | Значение             |
 | ------------------- | -------------------- |
-    @foreach ($data as $item)
+@foreach ($data as $item)
 | {{ $item['name'] }} | {{ $item['value'] }} |
-    @endforeach
+@endforeach
 @endcomponent
 
 @endcomponent

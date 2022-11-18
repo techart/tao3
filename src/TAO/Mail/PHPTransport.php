@@ -14,23 +14,31 @@ class PHPTransport extends AbstractTransport
 	 */
 	protected function doSend(SentMessage $message): void
 	{
-		$email = MessageConverter::toEmail($message->getOriginalMessage());
-		$body = $email->getHtmlBody();
-		$bodyPos = mb_strpos($body, "\r\n\r\n");
-		$body = trim(mb_substr($body, $bodyPos));
-		$headers = $email->getHeaders();
+		$mail = MessageConverter::toEmail($message->getOriginalMessage());
+
+		$headers = $mail->getPreparedHeaders();
+
 		$subject = $headers->get('subject');
-		$emails = $this->getTo($email);
+		$subject = trim(preg_replace('{^Subject:}i', '', trim($subject->toString())));
+
+		$emails = $this->getTo($mail);
 		$headers->remove('to');
 		$headers->remove('cc');
 		$headers->remove('bcc');
-		$headers->addHeader('content-type', 'text/html');
-		$headers->addHeader('charset', $email->getHtmlCharset());
-		$subject = trim(preg_replace('{^Subject:}i', '', trim($subject->toString())));
 
-		foreach($emails as $email) {
-			mail($email, $subject, $body, trim($headers->toString()));
+		$head = $headers->toString();
+
+		$_part = $mail->getBody();
+		if (($_part_headers = $_part->getPreparedHeaders()) &&
+			($_part_head = $_part_headers->toString())) {
+			$head .= $_part_head;
 		}
+		$body = $_part->bodyToString();
+
+		foreach ($emails as $email) {
+			mail($email, $subject, $body, $head);
+		}
+
 	}
 
 
