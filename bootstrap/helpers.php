@@ -49,7 +49,7 @@ if (!function_exists('dt')) {
 }
 
 if (!function_exists('protect_field')) {
-	function protect_field(int $time = 5):string
+	function protect_field(int $time = 5):\Illuminate\Support\HtmlString
 	{
 		return app(\TAO\Components\Protect\Utils::class)->timeField($time);
 	}
