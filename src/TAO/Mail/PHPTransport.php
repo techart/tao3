@@ -18,7 +18,9 @@ class PHPTransport extends AbstractTransport
 
 		$headers = $mail->getPreparedHeaders();
 
-		$subject = $headers->get('subject');
+		if ($subject = $headers->get('subject')) {
+			$headers->remove('subject');
+		}
 		$subject = trim(preg_replace('{^Subject:}i', '', trim($subject->toString())));
 
 		$emails = $this->getTo($mail);

@@ -62,7 +62,21 @@ trait Access
 	 */
 	public function accessAdminMenuItem($menuItem, $user)
 	{
-		return $this->accessAdmin($user);
+		if (!$user) {
+			$user = \Auth::user();
+		}
+		if (!$user) {
+			return false;
+		}
+		if ($user['is_admin'] || $user['is_secondary_admin']) {
+			return true;
+		}
+
+		$group = $this->groupForAdmin();
+		if ($group) {
+			return $user->checkAccess($group);
+		}
+		return false;
 	}
 
 	/**
