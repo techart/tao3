@@ -67,10 +67,10 @@ class Attaches extends StringField implements \IteratorAggregate
 			foreach ($value as $key => $data) {
 				$data = (array)$data;
 				$path = $data['path'] ?? false;
-				if (\Storage::exists($path)) {
+				if (\Storage::exists($path) && $path) {
 					$data['key'] = $key;
 					$data['new'] = false;
-					$data['url'] = $this->fileUrl($data['path'], $key);
+					$data['url'] = $this->fileUrl($path, $key);
 					if (!isset($data['info'])) {
 						$data['info'] = $defs;
 					}
