@@ -3,8 +3,8 @@ variables:
 test.app:
  stage: test
  tags:
- - docker
- - php81
+ - ssh
+ - php82
  script:
  - composer install
  - ./vendor/bin/phpunit --configuration phpunit.xml

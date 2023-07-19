@@ -81,9 +81,12 @@ class FloatField extends Field
 
 	public function set($value)
 	{
-		$newValue = preg_replace('{[^\d\.]}', '', $value);
-		if ($value[0] === '-') {
-			$newValue = '-' . $newValue;
+		$newValue = $value;
+		if ($value) {
+			$newValue = preg_replace('{[^\d\.]}', '', $value);
+			if (mb_substr((string) $value, 0, 1) === '-') {
+				$newValue = '-' . $newValue;
+			}
 		}
 
 		parent::set($newValue);

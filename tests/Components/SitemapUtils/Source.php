@@ -1,6 +1,6 @@
 <?php
 
-namespace TaoTests\Components\Sitemap;
+namespace TaoTests\Components\SitemapUtils;
 
 use TAO\Components\Sitemap\SitemapSource;
 

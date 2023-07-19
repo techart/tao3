@@ -89,7 +89,11 @@ class Assets
 		if (empty($path)) {
 			return $this;
 		}
+
+		// Отрезаем timestamp из пути, если таковой там есть и ипользуем в проверках
+		$path_without_timestamp = \explode('?', $path)[0];
 		$scope = '';
+
 		if (is_string($fileParams)) {
 			$scope = $fileParams;
 			$fileParams = [];
@@ -98,23 +102,30 @@ class Assets
 			unset($fileParams['scope']);
 		}
 
-		if (!preg_match('{^http(s)?://}', $path) && !preg_match('{^/}', $path)) {
+		if (!preg_match('{^http(s)?://}', $path_without_timestamp) && !preg_match('{^/}', $path_without_timestamp)) {
 			$path = "/{$path}";
 		}
+
 		$fileParams['path'] = $path;
+
 		if (!$scope) {
-			if (preg_match('{\.css$}i', $path)) {
+			if (preg_match('{\.css$}i', $path_without_timestamp)) {
 				$scope = 'styles';
-			} elseif (preg_match('{\.js$}i', $path)) {
+				$fileParams['type'] = 'css';
+			} elseif (preg_match('{\.js$}i', $path_without_timestamp)) {
 				$scope = 'scripts';
+				$fileParams['type'] = 'js';
 			}
 		}
+
 		if ($scope) {
 			if (!isset($this->scopes[$scope])) {
 				$this->scopes[$scope] = array();
 			}
+
 			$this->scopes[$scope][$path] = $fileParams;
 		}
+
 		return $this;
 	}
 
