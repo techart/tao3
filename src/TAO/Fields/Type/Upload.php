@@ -159,7 +159,7 @@ class Upload extends Field
 			$this->item[$this->name] = $dest;
 		}
 	}
-	
+
 	public function apiActionDownload()
 	{
 		$datatype = dt(app()->request()->get('datatype'));
@@ -362,19 +362,18 @@ class Upload extends Field
 		}
 	}
 
-	/**@see https://laravel.com/api/5.0/Illuminate/Filesystem/FilesystemAdapter.html
+	/**
 	 * Метод возвращает абсолютный путь до файла на сервере
 	 * Использовать на свой страх и риск, корректно работает только с локальным хранилищем
 	 * @return bool|string
 	 */
 	public function getAbsolutePath ()
 	{
-		$prefixPath = Storage::getDriver()->getAdapter()->getPathPrefix();
-		if( $prefixPath ){
-			return rtrim($prefixPath, '/').'/'.ltrim($this->value(), '/');
-
+		if (!$this->value()) {
+			return false;
 		}
-		return false;
+
+		return \Storage::path($this->value());
 	}
 
 	/** @see https://laravel.com/api/5.6/Illuminate/Http/File.html
