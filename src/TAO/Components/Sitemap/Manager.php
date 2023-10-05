@@ -338,7 +338,13 @@ class Manager
 	protected function linkToObject($link)
 	{
 		$linkObj = URL::create($link['loc']);
-		$linkObj->setLastModificationDate($link['lastmod'] ?? Carbon::now());
+		$lastmode = Carbon::now();
+
+		if (isset($link['lastmod']) && $link['lastmod']) {
+			$lastmode = Carbon::parse($link['lastmod']);
+		}
+
+		$linkObj->setLastModificationDate($lastmode);
 		$linkObj->setPriority($link['priority'] ?? 0);
 		$linkObj->setChangeFrequency($link['freq'] ?? '');
 		return $linkObj;
