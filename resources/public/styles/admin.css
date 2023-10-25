@@ -439,6 +439,13 @@ td.admin-tree-title {}
     }
 
 .tao-fields-attaches {
+	padding-bottom: 10px;
+	border-bottom: 1px solid #44aac8;
+}
+
+.tao-fields-attaches:last-child {
+	padding-bottom: 0;
+	border-bottom-width: 0;
 }
 
 .tao-fields-attaches .upload-error {

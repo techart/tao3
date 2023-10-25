@@ -17,3 +17,18 @@
 			border: 1px solid #44aac8;
 			color: white;
 		}
+
+	.b-variants__label {
+		width: fit-content;
+		margin: 10px 0 3px;
+		padding: 1px 3px;
+		border: 1px solid #44aac8;
+		background-color: #44aac8;
+		color: #fff;
+		font-size: 1.2rem;
+		line-height: 1.4rem;
+	}
+
+		.b-variants__label:first-child {
+			margin-top: 0;
+		}

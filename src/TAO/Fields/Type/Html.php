@@ -13,7 +13,8 @@ class Html extends Text
 	 */
 	public function createField(Blueprint $table, $column = false)
 	{
-		return $table->longText($this->name);
+		$column = $column? $column : $this->name;
+		return $table->longText($column);
 	}
 
 	/**
@@ -25,7 +26,7 @@ class Html extends Text
 	 *
 	 * @return array
 	 */
-	public function editorConfig()
+	public function editorConfig($variant = '')
 	{
 		$user_config = [];
 
@@ -43,7 +44,7 @@ class Html extends Text
 			$user_config['content_css'] = \TAO::frontend()->cssUrl($user_config['tao_webpack_css']);
 		}
 
-		return array_replace_recursive(config('html-editor'), $user_config, ['selector' => '#' . $this->editorID()]);
+		return array_replace_recursive(config('html-editor'), $user_config, ['selector' => '#' . $this->editorID($variant)]);
 	}
 
 	/**
@@ -51,9 +52,9 @@ class Html extends Text
 	 *
 	 * @return string
 	 */
-	public function editorID()
+	public function editorID($variant = '')
 	{
-		return 'editor_' . $this->name . '_' . ($this->item ? $this->item->getKey() : rand(1, 100));
+		return 'editor_' . $this->name . (!in_array($variant, ['', 'default']) ? '_' . $variant : '') . '_' . ($this->item ? $this->item->getKey() : rand(1, 100));
 	}
 
 	/**

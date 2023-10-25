@@ -53,10 +53,10 @@ class Attaches extends StringField implements \IteratorAggregate
 	 * @param bool $raw
 	 * @return array
 	 */
-	public function value($raw = false)
+	public function value($variant = '', $raw = false)
 	{
 		$defs = $this->defaultInfo();
-		$value = parent::value();
+		$value = parent::variantValue($variant);
 		if (starts_with($value, '{')) {
 			$value = (array)json_decode($value);
 		} else {
@@ -101,8 +101,9 @@ class Attaches extends StringField implements \IteratorAggregate
 		$datatype = dt(app()->request()->get('datatype'));
 		$field = app()->request()->get('field');
 		$item = $datatype->find(app()->request()->get('id'));
+		$variant = \TAO::getVariant();
 		if ($item->accessView()) {
-			$files = $item->field($field)->value();
+			$files = $item->field($field)->variantValue($variant);
 			if ($file = $files[$key] ?? false) {
 				$path = $file['path'];
 				$filename = preg_replace('{^.+/}', '', $path);
@@ -119,17 +120,17 @@ class Attaches extends StringField implements \IteratorAggregate
 	/**
 	 * @return \ArrayIterator
 	 */
-	public function getIterator()
+	public function getIterator($variant = '')
 	{
-		return new \ArrayIterator($this->value());
+		return new \ArrayIterator($this->value($variant, false));
 	}
 
 	/**
 	 * @return string
 	 */
-	public function renderFilelistJSON()
+	public function renderFilelistJSON($variant)
 	{
-		return json_encode((object)$this->value(true));
+		return json_encode((object)$this->value($variant, true));
 	}
 
 	/**
@@ -266,50 +267,57 @@ class Attaches extends StringField implements \IteratorAggregate
 	 */
 	public function setFromRequestAfterSave($request)
 	{
-		$out = [];
-		$files = (array)json_decode($request[$this->name]);
 		$dir = $this->param('private', false) ? $this->item->getPrivateHomeDir() : $this->item->getHomeDir();
 		$dir = "{$dir}/{$this->name}";
 		$exists = [];
-		foreach ($files as $key => $data) {
-			$data = (array)$data;
-			if (isset($data['name']) && isset($data['path'])) {
-				$name = $data['name'];
-				$path = $data['path'];
-				$new = isset($data['new']) ? $data['new'] : false;
+		$variants = $this->variantsWithDefault();
+		foreach ($variants as $code => $vdata) {
+			$field_name = $this->name . $vdata['postfix'];
+			$out = [];
+			$files = (array)json_decode($request[$field_name]);
+			foreach ($files as $key => $data) {
+				$data = (array)$data;
+				if (isset($data['name']) && isset($data['path'])) {
+					$name = $this->nameWithPostfix($data['name'], $vdata['postfix']);
+					$path = $data['path'];
+					$new = isset($data['new']) ? $data['new'] : false;
 
-				if ($new) {
-					$newPath = "{$dir}/{$name}";
-					if (\Storage::exists($newPath)) {
-						\Storage::delete($newPath);
+					if ($new) {
+						$newPath = "{$dir}/{$name}";
+						if (\Storage::exists($newPath)) {
+							\Storage::delete($newPath);
+						}
+						\Storage::copy($path, $newPath);
+						\Storage::delete($path);
+						$data['path'] = $newPath;
 					}
-					\Storage::copy($path, $newPath);
-					\Storage::delete($path);
-					$data['path'] = $newPath;
+
+					unset($data['url']);
+					unset($data['new']);
+					unset($data['error']);
+					unset($data['key']);
+					if ($name !== $data['name']) {
+						$data['name'] = $name;
+					}
+
+					$this->checkWidthAndHeight($data);
+
+					$exists[$name] = $name;
+
+					$out[$key] = $data;
 				}
-
-				unset($data['url']);
-				unset($data['new']);
-				unset($data['error']);
-				unset($data['key']);
-
-				$this->checkWidthAndHeight($data);
-
-				$exists[$name] = $name;
-
-				$out[$key] = $data;
 			}
-		}
 
-		foreach (\Storage::files($dir) as $file) {
-			$filename = basename($file);
-			if (!isset($exists[$filename])) {
-				\Storage::delete($file);
+			foreach (\Storage::files($dir) as $file) {
+				$filename = basename($file);
+				if (!isset($exists[$filename])) {
+					\Storage::delete($file);
+				}
 			}
-		}
 
-		$this->item->where($this->item->getKeyName(), $this->item->getKey())->update([$this->name => serialize($out)]);
-		$this->item[$this->name] = serialize($out);
+			$this->item->where($this->item->getKeyName(), $this->item->getKey())->update([$field_name => serialize($out)]);
+			$this->item[$field_name] = serialize($out);
+		}
 	}
 
 	/**
@@ -562,5 +570,20 @@ class Attaches extends StringField implements \IteratorAggregate
 	public function defaultTemplate()
 	{
 		return 'fields ~ attaches.template';
+	}
+
+	protected function nameWithPostfix($name, $postfix = '')
+	{
+		if ($postfix) {
+			$p = explode('.', $name);
+			if (2 > ($l = count($p))) {
+				$name = implode('.', $p) . $postfix;
+			} else {
+				$p[$l - 2] .= $postfix;
+				$name = implode('.', $p);
+			}
+		}
+
+		return $name;
 	}
 }

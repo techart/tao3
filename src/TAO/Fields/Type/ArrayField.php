@@ -7,6 +7,11 @@ use TAO\Fields\Field;
 
 class ArrayField extends StringField
 {
+	public function variants()
+	{
+		return false;
+	}
+
 	public function checkSchema(Blueprint $table)
 	{
 		if (!$this->item->hasColumn($this->name)) {
@@ -60,8 +65,9 @@ class ArrayField extends StringField
 		if (is_string($value)) {
 			$this->item[$this->name] = \TAO\Text::process($value, 'arrays');
 			$this->item[$this->columnSrc()] = $value;
-		} else {
-			$this->item[$this->columnSrc()] = $value;
+		} else if (is_array($value)) {
+			$this->item[$this->name] = $value;
+			$this->item[$this->columnSrc()] = $this->arrayToSrc($value);
 		}
 	}
 
@@ -94,5 +100,27 @@ class ArrayField extends StringField
 			return $data;
 		}
 		return $this->item[$this->name];
+	}
+
+	protected function arrayToSrc($array, $prefix = '')
+	{
+		$lines = [];
+
+		foreach ($array as $key => $value) {
+			if (\Illuminate\Support\Str::startsWith($key, '__')) {
+				continue;
+			}
+			if (is_array($value)) {
+				$lines[] = $prefix . $key . ' = {';
+				if ($line = rtrim($this->arrayToSrc($value, $prefix . "\t"), PHP_EOL)) {
+					$lines[] = $line;
+				}
+				$lines[] = $prefix . '}';
+			} else {
+				$lines[] = $prefix . $key . ' = ' . strval($value);
+			}
+		}
+
+		return rtrim(implode(PHP_EOL, $lines), PHP_EOL) . PHP_EOL;
 	}
 }

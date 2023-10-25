@@ -1,10 +1,10 @@
 <script>
     $(function () {
-        var files = {!! $field->renderFilelistJSON() !!};
-        var $button = $("#tao_attaches_button_{{ $field->name }}");
-        var $informer = $("#tao_attaches_informer_{{ $field->name }}");
-        var $hidden = $("#tao_attaches_hidden_{{ $field->name }}");
-        var $filelist = $("#tao_attaches_filelist_{{ $field->name }}");
+        var files = {!! $field->renderFilelistJSON($code) !!};
+        var $button = $("#tao_attaches_button_{{ $field->name }}{{ $vdata['postfix'] }}");
+        var $informer = $("#tao_attaches_informer_{{ $field->name }}{{ $vdata['postfix'] }}");
+        var $hidden = $("#tao_attaches_hidden_{{ $field->name }}{{ $vdata['postfix'] }}");
+        var $filelist = $("#tao_attaches_filelist_{{ $field->name }}{{ $vdata['postfix'] }}");
 
         @if ($field->isSortable())
             @bottomScript('/tao/scripts/jquery-ui.min.js')
@@ -33,9 +33,9 @@
 
         renderFileList();
 
-        $adminForm[0].elements['{{ $field->name }}-files'].onchange = function () {
+        $adminForm[0].elements['{{ $field->name }}{{ $vdata['postfix'] }}-files'].onchange = function () {
             var formData = new FormData();
-            var fileList = $adminForm[0].elements['{{ $field->name }}-files'].files;
+            var fileList = $adminForm[0].elements['{{ $field->name }}{{ $vdata['postfix'] }}-files'].files;
             for (var i = 0; i < fileList.length; i++) {
                 formData.append("uploadfile[]", fileList[i]);
             }

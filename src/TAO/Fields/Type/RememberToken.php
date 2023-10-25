@@ -7,6 +7,11 @@ use TAO\Fields\Field;
 
 class RememberToken extends StringField
 {
+	public function variants()
+	{
+		return false;
+	}
+
 	/**
 	 * @param Blueprint $table
 	 * @param bool $column
