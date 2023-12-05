@@ -143,6 +143,7 @@ class StoriesGenerate extends Command
 							'styles' => $has_with && isset($blockData['with']['styles']) ? $blockData['with']['styles'] : [],
 							'scripts' => $has_with && isset($blockData['with']['scripts']) ? $blockData['with']['scripts'] : [],
 							'vars' => $tempVars,
+							'replaces' => isset($variantParams['replaces']) ? $variantParams['replaces'] : [],
 							'php' => isset($paramData['php']) ? $paramData['php'] : '',
 						];
 					}
