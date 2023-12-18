@@ -53,7 +53,7 @@ class Attaches extends StringField implements \IteratorAggregate
 	 * @param bool $raw
 	 * @return array
 	 */
-	public function value($variant = '', $raw = false)
+	public function value($variant = 'default', $raw = false)
 	{
 		$defs = $this->defaultInfo();
 		$value = parent::variantValue($variant);
@@ -84,7 +84,7 @@ class Attaches extends StringField implements \IteratorAggregate
 		}
 		return $out;
 	}
-	
+
 	public function fileUrl($path, $key = '')
 	{
 		if ($this->param('private', false)) {
@@ -94,7 +94,7 @@ class Attaches extends StringField implements \IteratorAggregate
 		}
 		return \Storage::url($path);
 	}
-	
+
 	public function apiActionDownload()
 	{
 		$key = app()->request()->get('key');
@@ -504,7 +504,7 @@ class Attaches extends StringField implements \IteratorAggregate
 		$context['container_class'] = $this->containerClass();
 		return $context;
 	}
-	
+
 	public function jsonValue()
 	{
 		$out = [];
@@ -566,7 +566,7 @@ class Attaches extends StringField implements \IteratorAggregate
 			}
 		}
 	}
-	
+
 	public function defaultTemplate()
 	{
 		return 'fields ~ attaches.template';
