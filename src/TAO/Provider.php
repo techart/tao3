@@ -98,6 +98,15 @@ class Provider extends ServiceProvider
 		Blade::directive('endTextProcess', function ($args) {
 			return "<?php \$textProcess = ob_get_clean(); print \TAO\Text::process(\$textProcess, [$args]) ?>";
 		});
+
+		Blade::directive('textBlock', function($args) {
+			$textCode = trim(trim($args), '\'"');
+			return '<?php ob_start(); $textDirectiveCodeValue = \''. $textCode . '\';?>';
+		});
+
+		Blade::directive('endTextBlock', function() {
+			return '<?php $textValue = ob_get_clean(); \\Assets::addLine($textDirectiveCodeValue, $textValue); ?>';
+		});
 	}
 
 	protected function checkEnviroment()

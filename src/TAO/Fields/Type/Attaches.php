@@ -103,7 +103,7 @@ class Attaches extends StringField implements \IteratorAggregate
 		$item = $datatype->find(app()->request()->get('id'));
 		$variant = \TAO::getVariant();
 		if ($item->accessView()) {
-			$files = $item->field($field)->variantValue($variant);
+			$files = $item->field($field)->value($variant);
 			if ($file = $files[$key] ?? false) {
 				$path = $file['path'];
 				$filename = preg_replace('{^.+/}', '', $path);
