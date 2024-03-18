@@ -106,4 +106,28 @@ class Utils
 		$data = unserialize($data);
 		return $data;
 	}
+
+	public function plural($number, $single_form, $several_form, $many_form, $with_number=true)
+	{
+		$str_number = strval($number);
+		$last_digit = substr($str_number, -1);
+		$output = [];
+		if ($with_number) {
+			$output[] = $str_number;
+		}
+
+		if ((20 > $number) && (10 < $number)) {
+			$output[] = $many_form;
+		} else
+		if ('1' === $last_digit) {
+			$output[] = $single_form;
+		} else
+		if (in_array($last_digit, ['2', '3', '4'])) {
+			$output[] = $several_form;
+		} else {
+			$output[] = $many_form;
+		}
+		return implode(' ', $output);
+	}
+
 }

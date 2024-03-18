@@ -21,21 +21,16 @@ class Admin
 		$menu = array();
 		foreach (\TAO::datatypes() as $code => $datatype) {
 			$section = $datatype->adminMenuSection();
-			$title = $datatype->adminMenuTitle();
-			$url = '/admin/datatype/' . $code;
 			if (is_string($section)) {
+				$dtlink = $datatype->adminMenuLink($code);
 				if (!isset($menu[$section])) {
 					$menu[$section] = array(
 						'title' => $section,
-						'url' => $url,
+						'url' => $dtlink['url'],
 						'sub' => array(),
 					);
 				}
-				$menu[$section]['sub'][] = array(
-					'title' => $title,
-					'url' => $url,
-					'access' => "datatype.$code::accessAdminMenuItem"
-				);
+				$menu[$section]['sub'][] = $dtlink;
 			}
 		}
 		return $menu;

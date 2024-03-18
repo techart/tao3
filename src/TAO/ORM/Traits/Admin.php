@@ -144,6 +144,20 @@ trait Admin
 	}
 
 	/**
+	 * Описание пункта меню для навигации в административном разделе
+	 *
+	 * @return array
+	 */
+	public function adminMenuLink($code)
+	{
+		return [
+			'title' => $this->adminMenuTitle(),
+			'url' => "/admin/datatype/$code",
+			'access' => "datatype.$code::accessAdminMenuItem",
+		];
+	}
+
+	/**
 	 * Заголовок страницы со списком записей в админке. Если не указан, то будет использован adminTitle
 	 *
 	 * @return string

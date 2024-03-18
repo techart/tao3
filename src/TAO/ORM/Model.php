@@ -324,7 +324,7 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 	public function applyFilter($builder, $filter)
 	{
 		foreach ($filter as $name => $value) {
-			if (!empty($value)) {
+			if ('' !== $value) {
 				$method = 'applyFilter' . camel_case($name);
 				if (method_exists($this, $method)) {
 					$this->$method($builder, $value);

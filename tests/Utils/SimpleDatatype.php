@@ -19,7 +19,7 @@ class SimpleDatatype extends Model
 
 	public function addField($name, $data)
 	{
-		$this->processedFields[$name] = $data;
+		// $this->processedFields[$name] = $data;
 		$this->_fields[$name] = $data;
 	}
 

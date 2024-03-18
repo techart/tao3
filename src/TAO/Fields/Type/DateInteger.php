@@ -141,14 +141,6 @@ class DateInteger extends Field
 	}
 
 	/**
-	 * @return string
-	 */
-	public function renderForAdminList()
-	{
-		return $this->render();
-	}
-
-	/**
 	 * @param $value
 	 */
 	public function set($value)
