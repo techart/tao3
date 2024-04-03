@@ -1,5 +1,6 @@
 variables:
  UPDATE_REPO: "git@github.com:techart/tao3.git"
+ UPDATE_REPO_BRANCH: "v10"
 test.app:
  stage: test
  tags:
@@ -10,4 +11,4 @@ test.app:
  - ./vendor/bin/phpunit --configuration phpunit.xml
 include:
  - project: "libs/cicd-includes"
-   file: "/templates/.gitlab-ci-packagist.yml"
+   file: "/templates/.gitlab-ci-packagist-versions.yml"

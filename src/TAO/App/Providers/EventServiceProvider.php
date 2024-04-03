@@ -8,24 +8,24 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 class EventServiceProvider extends ServiceProvider
 {
 	/**
-	 * The event listener mappings for the application.
-	 *
-	 * @var array
-	 */
-	protected $listen = [
-		'App\Events\SomeEvent' => [
-			'App\Listeners\EventListener',
-		],
-	];
-
-	/**
 	 * Register any events for your application.
 	 *
 	 * @return void
 	 */
 	public function boot()
 	{
-		$this->listen = \TAO::merge($this->listen, config('events', []));
+		$events = config('events', []);
+
+		foreach ($events as $event => $listeners) {
+			if (!is_array($listeners)) {
+				$listeners = [$listeners];
+			}
+
+			foreach ($listeners as $listener) {
+				\Event::listen($event, $listener);
+			}
+		}
+
 		parent::boot();
 
 		//
