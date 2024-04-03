@@ -14,7 +14,7 @@
     <body id="login">
         <div class="container-fluid">
 
-            <form class="form-signin" method="POST" action="{{ url('/admin/login') }}">
+            <form class="form-signin" method="POST" action="{{ url('/admin/login') }}" novalidate>
                 {{ csrf_field() }}
                 <h2 class="form-signin-heading">Авторизация</h2>
                 <div class="form-group">

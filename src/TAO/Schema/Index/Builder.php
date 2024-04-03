@@ -2,7 +2,6 @@
 
 namespace TAO\Schema\Index;
 
-use Doctrine\DBAL\Schema\Index;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 
@@ -24,24 +23,26 @@ class Builder
 	 */
 	public function makeIndex($indexName, $columns, $type)
 	{
-		$flags = [];
-		if ($type == 'fulltext') {
-			$flags[] = $type;
-		}
-		return new Index($indexName, $columns, $type == 'unique', false, $flags);
+		return [
+			'name' => $indexName,
+			'columns' => $columns,
+			'type' => $type == 'fulltext' ? 'fulltext' : 'btree',
+			'unique' => $type == 'unique',
+			'primary' => false,
+		];
 	}
 
 	/**
-	 * @param Index $index
+	 * @param array $index
 	 * @param Blueprint $table
 	 * @param Connection $connection
 	 *
 	 * Метод проверяет наличие данного индекса в указанной таблице. В случае отсутствия оного - создает,
 	 * при наличии - обновляет.
 	 */
-	public function process(Index $index, Blueprint $table, Connection $connection)
+	public function process($index, Blueprint $table)
 	{
-		$existingIndex = $this->getExistingIndex($connection, $index->getName(), $table->getTable());
+		$existingIndex = $this->getExistingIndex($index['name'], $table->getTable());
 		if ($existingIndex) {
 			if (!$this->indexesIsSame($existingIndex, $index)) {
 				$this->drop($existingIndex, $table);
@@ -58,9 +59,20 @@ class Builder
 	 *
 	 * Создает указанный индекс в таблице
 	 */
-	public function create(Index $index, Blueprint $table)
+	public function create($index, Blueprint $table)
 	{
-		$this->mode($index)->create($index, $table);
+		$name = $index['name'];
+		$columns = $index['columns'];
+		if ($index['unique'] ?? false) {
+			return $table->unique($columns, $name);
+		}
+		if ($index['primary'] ?? false) {
+			return $table->primary($columns, $name);
+		}
+		if ('fulltext' === $index['type'] ?? '') {
+			return $table->fullText($columns, $name);
+		}
+		return $table->index($columns, $name);
 	}
 
 	/**
@@ -69,9 +81,19 @@ class Builder
 	 *
 	 * Удаляет указанный индекс из таблицы
 	 */
-	public function drop(Index $index, Blueprint $table)
+	public function drop($index, Blueprint $table)
 	{
-		$this->mode($index)->drop($index, $table);
+		$name = $index['name'];
+		if ($index['unique'] ?? false) {
+			return $table->dropUnique($name);
+		}
+		if ($index['primary'] ?? false) {
+			return $table->dropPrimary($name);
+		}
+		if ('fulltext' === $index['type'] ?? '') {
+			return $table->dropFullText($name);
+		}
+		return $table->dropIndex($name);
 	}
 
 	/**
@@ -83,28 +105,19 @@ class Builder
 	 * Ищет индекс по имени в данной таблице. Возвращает объект индекса при наличии. В случае отсутсвия
 	 * - возвращает null.
 	 */
-	public function getExistingIndex(Connection $connection, $indexName, $tableName)
+	public function getExistingIndex($indexName, $tableName)
 	{
-		$indexes = $connection->getDoctrineSchemaManager()->listTableIndexes($tableName);
-		return isset($indexes[$indexName]) ? $indexes[$indexName] : null;
+		$indexes = \Schema::getIndexes($tableName);
+		foreach ($indexes as $index) {
+			if ($index['name'] == $indexName) {
+				return $index;
+			}
+		}
+		return null;
 	}
 
-	public function indexesIsSame(Index $index1, Index $index2)
+	public function indexesIsSame($index1, $index2)
 	{
-		return $index1->getName() == $index2->getName() &&
-			$index1->getColumns() == $index2->getColumns() &&
-			$index1->isUnique() == $index2->isUnique() &&
-			$index1->hasFlag('fulltext') == $index2->hasFlag('fulltext');
-	}
-
-	/**
-	 * @param Index $index
-	 * @return Mode\ModeInterface
-	 *
-	 * Возвращает объект, который реализует логику управления данным видом индекса.
-	 */
-	protected function mode(Index $index)
-	{
-		return Mode\Factory::mode($index);
+		return $index1 === $index2;
 	}
 }

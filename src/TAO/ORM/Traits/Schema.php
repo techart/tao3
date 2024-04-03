@@ -112,17 +112,6 @@ trait Schema
 		return $this->dbSchema()->getColumnType($this->getTable(), $name);
 	}
 
-	/**
-	 * Возвращает информацию об индексе в таблице
-	 *
-	 * @param $name
-	 * @return mixed
-	 */
-	public function getIndexInfo($name)
-	{
-		$indexes = $this->getConnection()->getDoctrineSchemaManager()->listTableIndexes($this->getTable());
-		return isset($indexes[$name]) ? $indexes[$name] : null;
-	}
 
 	/**
 	 * Выполняет безусловное обновление схемы

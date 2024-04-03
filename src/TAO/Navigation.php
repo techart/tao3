@@ -600,6 +600,17 @@ class Navigation
 				$args['delimiter'] = ' &nbsp;&gt;&nbsp; ';
 			}
 		}
+
+		if ($tpl) {
+			\Event::dispatch(
+				'tao.' . $tpl . '.navigation',
+				[
+					&$tpl,
+					&$args,
+				]
+			);
+		}
+
 		return view("navigation ~ {$tpl}", $args);
 	}
 }

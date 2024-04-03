@@ -24,10 +24,10 @@ class Index extends TestCase
 			],
 		]);
 		$tableName = $item->getTableName();
-		$indexes = \DB::connection()->getDoctrineSchemaManager()->listTableIndexes($tableName);
+		$indexes = \DB::connection()->getSchemaBuilder()->getIndexes($tableName);
 		$found = false;
 		foreach ($indexes as $index) {
-			if (in_array($columnName, $index->getColumns())) {
+			if (in_array($columnName, $index['columns'])) {
 				$found = true;
 				break;
 			}
@@ -45,12 +45,12 @@ class Index extends TestCase
 			]
 		], $tableName);
 
-		$indexes = \DB::connection()->getDoctrineSchemaManager()->listTableIndexes($tableName);
+		$indexes = \DB::connection()->getSchemaBuilder()->getIndexes($tableName);
 		$indexFound = false;
 		$indexNameMaxLength = 0;
 		foreach ($indexes as $indexName => $index) {
 			$indexNameMaxLength = max($indexNameMaxLength, strlen($indexName));
-			if (in_array($columnName, $index->getColumns())) {
+			if (in_array($columnName, $index['columns'])) {
 				$indexFound = true;
 				break;
 			}
@@ -79,12 +79,12 @@ class Index extends TestCase
 		$column2 = $field->relatedKey();
 		$column1Found = false;
 		$column2Found = false;
-		$indexes = \DB::connection()->getDoctrineSchemaManager()->listTableIndexes($tableRelName);
+		$indexes = \DB::connection()->getSchemaBuilder()->getIndexes($tableRelName);
 		foreach ($indexes as $index) {
-			if (in_array($column1, $index->getColumns())) {
+			if (in_array($column1, $index['columns'])) {
 				$column1Found = true;
 			}
-			if (in_array($column2, $index->getColumns())) {
+			if (in_array($column2, $index['columns'])) {
 				$column2Found = true;
 			}
 		}
@@ -110,13 +110,13 @@ class Index extends TestCase
 		$column1Found = false;
 		$column2Found = false;
 		$indexNameMaxLength = 0;
-		$indexes = \DB::connection()->getDoctrineSchemaManager()->listTableIndexes($tableRelName);
+		$indexes = \DB::connection()->getSchemaBuilder()->getIndexes($tableRelName);
 		foreach ($indexes as $indexName => $index) {
 			$indexNameMaxLength = max($indexNameMaxLength, strlen($indexName));
-			if (in_array($column1, $index->getColumns())) {
+			if (in_array($column1, $index['columns'])) {
 				$column1Found = true;
 			}
-			if (in_array($column2, $index->getColumns())) {
+			if (in_array($column2, $index['columns'])) {
 				$column2Found = true;
 			}
 		}
