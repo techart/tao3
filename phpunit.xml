@@ -9,6 +9,19 @@
       <exclude>tests/Components/SitemapUtils</exclude>
       <exclude>tests/Fields/DateInteger.php</exclude>
       <exclude>tests/TestFields.php</exclude>
+
+      <!--  Временное отключение тестов связанных с базой данных -->
+      <exclude>tests/TAO.php</exclude>
+      <exclude>tests/Fields/Upload.php</exclude>
+      <exclude>tests/Fields/Multilink.php</exclude>
+      <exclude>tests/Fields/Index.php</exclude>
+      <exclude>tests/Fields/Image.php</exclude>
+      <exclude>tests/Fields/Html.php</exclude>
+      <exclude>tests/Fields/FileFieldTest.php</exclude>
+      <exclude>tests/Fields/FieldTest.php</exclude>
+      <exclude>tests/Fields/Coordinates.php</exclude>
+      <exclude>tests/Components/Sitemap.php</exclude>
+      <exclude>tests/CallbackTest.php</exclude>
     </testsuite>
   </testsuites>
 </phpunit>

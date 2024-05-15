@@ -315,7 +315,14 @@ fieldset.admin {
 
 td.admin-tree-title {}
   td.admin-tree-title .controls { display: inline-block; padding: 0; position: relative; visibility: hidden; float: right;}
-  td.admin-tree-title .bullet { display: inline-block; padding: 0; }
+  td.admin-tree-title .bullet-text { max-width: calc(100% - 80px);}
+  td.admin-tree-title .bullet {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+    padding: 0;
+    justify-content: space-between;
+  }
   td.admin-tree-title .bullet-level-0 { padding-left: 0px;}
   td.admin-tree-title .bullet-level-1 { padding-left: 50px;}
   td.admin-tree-title .bullet-level-2 { padding-left: 100px;}
