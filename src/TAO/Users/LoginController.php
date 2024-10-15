@@ -86,7 +86,7 @@ class LoginController extends \TAO\Controller
 		}
 
 		if ($this->guard()->attempt(['email' => $email, 'password' => '~'], 1)) {
-			return redirect('/users/home/');
+			return redirect(config('auth.redirect_after_login', '/users/home/'));
 		}
 		return $this->sendFailedLoginResponse($request);
 	}

@@ -147,7 +147,7 @@ abstract class Field
 			 */
 			$indexBuilder = app()->make('\TAO\Schema\Index\Builder');
 			$index = $indexBuilder->makeIndex($name, $columns, $type);
-			$indexBuilder->process($index, $table);
+			$indexBuilder->process($index, $table, $this->item->getConnection()->getSchemaBuilder());
 		}
 		return $this;
 	}

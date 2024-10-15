@@ -42,11 +42,22 @@ class Text extends StringField
 		if (!$this->item->getKey()) {
 			return [
 				'result' => 'error',
-				'error' => 'Item not found',
+				'message' => 'Item not found',
 			];
 		}
 		$field = request()->get('field');
 		$value = request()->get('textarea');
+
+		if (method_exists($this->item, 'validateFieldValue')) {
+			$rc = $this->item->validateFieldValue($field, $value);
+			if (is_string($rc) && strlen($rc) > 0) {
+				return [
+					'result' => 'error',
+					'message' => $rc,
+				];
+			}
+		}
+
 		$this->item[$field] = $value;
 		$this->item->save();
 		return [

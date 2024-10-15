@@ -40,9 +40,9 @@ class Builder
 	 * Метод проверяет наличие данного индекса в указанной таблице. В случае отсутствия оного - создает,
 	 * при наличии - обновляет.
 	 */
-	public function process($index, Blueprint $table)
+	public function process($index, Blueprint $table, $builder = false)
 	{
-		$existingIndex = $this->getExistingIndex($index['name'], $table->getTable());
+		$existingIndex = $this->getExistingIndex($index['name'], $table->getTable(), $builder);
 		if ($existingIndex) {
 			if (!$this->indexesIsSame($existingIndex, $index)) {
 				$this->drop($existingIndex, $table);
@@ -105,9 +105,13 @@ class Builder
 	 * Ищет индекс по имени в данной таблице. Возвращает объект индекса при наличии. В случае отсутсвия
 	 * - возвращает null.
 	 */
-	public function getExistingIndex($indexName, $tableName)
+	public function getExistingIndex($indexName, $tableName, $builder = false)
 	{
-		$indexes = \Schema::getIndexes($tableName);
+		if ($builder) {
+			$indexes = $builder->getIndexes($tableName);
+		} else {
+			$indexes = \Schema::getIndexes($tableName);
+		}
 		foreach ($indexes as $index) {
 			if ($index['name'] == $indexName) {
 				return $index;

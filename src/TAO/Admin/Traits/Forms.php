@@ -48,10 +48,14 @@ trait Forms
 		)));
 	}
 
-
 	protected function templateEdit()
 	{
 		return 'table.form.edit';
+	}
+
+	protected function saveItem($item)
+	{
+		return $item->save();
 	}
 
 	/**
@@ -84,7 +88,7 @@ trait Forms
 			$item->validateForAdmin();
 			$errors = $item->errors();
 			if (count($errors) == 0) {
-				$item->save();
+				$this->saveItem($item);
 				foreach ($fields as $field) {
 					$field->setFromRequestAfterSave($request);
 				}
@@ -138,7 +142,7 @@ trait Forms
 				$errors = array();
 			}
 			if (count($errors) == 0) {
-				$item->save();
+				$this->saveItem($item);
 				$this->id = $item->getKey();
 				foreach ($fields as $field) {
 					$field->setFromRequestAfterSave($request);

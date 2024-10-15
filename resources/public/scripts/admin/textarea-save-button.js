@@ -18,7 +18,7 @@ $(function() {
 					if (response.result == 'ok') {
 						$button.css('visibility', 'hidden');
 					} else {
-						alert(response.error);
+						alert(response.message);
 					}
 				});
 				return false;
