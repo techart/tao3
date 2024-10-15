@@ -140,7 +140,7 @@ class Variable implements \ArrayAccess
 
 	public function getPrivateHomeDir()
 	{
-		$path = $this->getHomeSubDir();
+		$path = $this->getHomeSubDir() . '_files';
 		if (!\Storage::exists($path)) {
 			\Storage::makeDirectory($path);
 		}
