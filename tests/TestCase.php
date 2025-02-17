@@ -38,7 +38,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
 	protected function resolveApplication()
 	{
-		$appPath = $this->getBasePath();
+		$appPath = $this->getApplicationBasePath();
 		$vendorPath = $this->vendorPath();
 		$app = require realpath(__DIR__ . '/../bootstrap/app.php');
 

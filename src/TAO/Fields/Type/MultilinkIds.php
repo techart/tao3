@@ -29,7 +29,7 @@ class MultilinkIds extends Multilink
 	{
 		$key = $this->thisKey();
 		$table = $this->tableRelations();
-		$rc = \DB::select("SELECT COUNT(*) as cnt FROM {$table} WHERE {$key}=?", [$this->item->id]);
+		$rc = \DB::connection($this->item->getConnectionName())->select("SELECT COUNT(*) as cnt FROM {$table} WHERE {$key}=?", [$this->item->id]);
 		return current($rc)->cnt > 0;
 	}
 
@@ -48,7 +48,7 @@ class MultilinkIds extends Multilink
 		$key = $this->thisKey();
 		$rel = $this->relatedKey();
 		$table = $this->tableRelations();
-		$rc = \DB::select("SELECT * FROM {$table} WHERE {$key}=?", [$this->item->id]);
+		$rc = \DB::connection($this->item->getConnectionName())->select("SELECT * FROM {$table} WHERE {$key}=?", [$this->item->id]);
 		foreach ($rc as $row) {
 			$ids[] = $row->$rel;
 		}
@@ -77,10 +77,10 @@ class MultilinkIds extends Multilink
 		$rel = $this->relatedKey();
 		$table = $this->tableRelations();
 		if ($withDetaching) {
-			\DB::delete("DELETE FROM {$table} WHERE {$key}=?", [$this->item->id]);
+			\DB::connection($this->item->getConnectionName())->delete("DELETE FROM {$table} WHERE {$key}=?", [$this->item->id]);
 		}
 		foreach ($this->attachedIds as $id) {
-			\DB::insert("INSERT INTO {$table} SET {$key}=?, {$rel}=?", [$this->item->id, $id]);
+			\DB::connection($this->item->getConnectionName())->insert("INSERT INTO {$table} SET {$key}=?, {$rel}=?", [$this->item->id, $id]);
 		}
 	}
 

@@ -18,7 +18,7 @@ class VitaAuth extends \TAO\Controller
 			return $this->pageNotFound();
 		}
 		
-		$dataUrl = config('auth.vita_data_url', 'http://auth.techart.ru/data/')."{$token}/";
+		$dataUrl = config('auth.vita_data_url', 'https://auth.techart.ru/data/')."{$token}/";
 		$data = app('tao.http')->getJSON($dataUrl);
 		if (!$data && !isset($data['id'])) {
 			return $this->pageNotFound();
@@ -41,7 +41,7 @@ class VitaAuth extends \TAO\Controller
 	{
 		$this->guard()->logout();
 		app('request')->session()->invalidate();
-		$url = config('auth.vita_logout_url', 'http://auth.techart.ru/logout/');
+		$url = config('auth.vita_logout_url', 'https://auth.techart.ru/logout/');
 		return redirect($url);
 	}
 	
@@ -75,7 +75,7 @@ class VitaAuth extends \TAO\Controller
 			'r' => $returnUrl,
 		), $extra);
 		$data = app('tao.utils')->dataEncode($data);
-		return config('auth.vita_server_url', "http://auth.techart.ru/to/")."{$data}/";
+		return config('auth.vita_server_url', "https://auth.techart.ru/to/")."{$data}/";
 	}
 	
 	public static function process($extra = [])
