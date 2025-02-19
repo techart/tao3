@@ -194,11 +194,12 @@ class Assets
 		}
 
 		if (!empty($url)) {
+			$extraTagParams = $file['extra_tag_params'] ?? '';
 			if ($type == 'js') {
-				$tag = config("tao.jstag", '<script src="%url%"></script>' . "\n");
+				$tag = config("tao.jstag", "<script src=\"%url%\" {$extraTagParams}></script>\n");
 			}
 			if ($type == 'css') {
-				$tag = config("tao.csstag", '<link href="%url%" rel="stylesheet" media="screen">' . "\n");
+				$tag = config("tao.csstag", "<link href=\"%url%\" rel=\"stylesheet\" media=\"screen\" {$extraTagParams}>\n");
 			}
 			if (!empty($tag)) {
 				$tag = str_replace('%url%', $url, $tag);
