@@ -30,6 +30,13 @@ $(function() {
 		$activeSearchSelect.hide();
 	});
 
+	$('.tao-field-huge-select__select-zero').click(function() {
+		$('.tao-field-huge-select__hidden', $activeField).val(0);
+		$activeValueContainer.empty().show();
+		closeSearch();
+		return false;
+	});
+
 	$(document).mouseup(function(e) {
 		if ($activeField) {
 			if (!$activeField.is(e.target) && $activeField.has(e.target).length === 0) {

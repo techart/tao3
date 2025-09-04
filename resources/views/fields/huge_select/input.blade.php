@@ -6,5 +6,8 @@
     <div class="tao-field-huge-select__search">
         <input class="tao-field-huge-select__search-input" type="text" placeholder="{{ $field->searchPlaceholder() }}" value="">
         <div class="tao-field-huge-select__search-select" data-uid="{{ uniqid() }}"></div>
+        @if ($field->param('with_zero'))
+	        <div class="tao-field-huge-select__select-zero"></div>
+        @endif
     </div>
 </div>

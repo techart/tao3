@@ -53,7 +53,9 @@ class VitaAuth extends \TAO\Controller
 		}
 		
 		foreach(['id', 'name', 'email', 'nomination', 'office_id', 'techart_dep', 'company', 'agent_id'] as $key) {
-			$user->$key = $data->$key;
+			if (isset($user->$key)) {
+				$user->$key = $data->$key;
+			}
 		}
 		$user->is_admin = in_array('root', $data->groups);
 		$user->password = bcrypt('~');

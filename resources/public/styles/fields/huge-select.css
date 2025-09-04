@@ -16,6 +16,7 @@
 
 .tao-field-huge-select__search {
 	display: none;
+	position: relative;
 }
 
 .tao-field-huge-select__search-input {
@@ -44,4 +45,14 @@
 .tao-field-huge-select__search-select div.selected {
 	background-color: #007dbc;
 	color: #fff;
+}
+
+.tao-field-huge-select__select-zero {
+	position: absolute;
+	top: 8px;
+	right: 10px;
+	width: 16px;
+	height: 16px;
+	background-image: url("/tao/images/del16x16.png");
+	cursor: pointer;
 }
