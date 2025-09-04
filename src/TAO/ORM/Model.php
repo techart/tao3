@@ -398,7 +398,12 @@ abstract class Model extends \Illuminate\Database\Eloquent\Model
 			$p1 = substr($id, 0, 2);
 			$p2 = $id;
 		}
-		return 'datatypes/' . $this->getDatatype() . "/{$p1}/{$p2}";
+		return 'datatypes/' . $this->getHomeDirCode() . "/{$p1}/{$p2}";
+	}
+
+	public function getHomeDirCode()
+	{
+		return $this->getDatatype();
 	}
 
 	/**
