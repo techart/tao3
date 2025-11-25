@@ -35,7 +35,7 @@ class Pairs extends Field
 	 */
 	protected function prepareValue($value)
 	{
-		if (!is_null($value)) {
+		if (is_null($value)) {
 			return $this->defaultValue();
 		}
 		return parent::prepareValue(json_decode($value, true));
