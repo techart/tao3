@@ -18,9 +18,11 @@ class Decimal extends FloatField
 	public function set($value)
 	{
 		$newValue = preg_replace('{[^\d\.]}', '', $value);
-		$unsigned = (bool)$this->typeParamsEnumArg(array('unsigned'));
-		if (!$unsigned && $value[0] === '-') {
-			$newValue = '-' . $newValue;
+		if (!empty($value)) {
+			$unsigned = (bool)$this->typeParamsEnumArg(array('unsigned'));
+			if (!$unsigned && $value[0] === '-') {
+				$newValue = '-' . $newValue;
+			}
 		}
 
 		parent::set($newValue);

@@ -34,7 +34,7 @@ class Entry implements \ArrayAccess
 	public function url($mods = false)
 	{
 		if ($mods) {
-			return \Storage::url($this->path($mods));
+			return \Storage::disk($this->data['disk'])->url($this->path($mods));
 		}
 		return $this->data['url'];
 	}
@@ -87,7 +87,7 @@ class Entry implements \ArrayAccess
 		if (!$this->isImage()) {
 			return;
 		}
-		return \Images::modify($this->path, $mods);
+		return \Images::modify($this->path, $mods, $this->data['disk']);
 	}
 
 	/**
@@ -96,7 +96,7 @@ class Entry implements \ArrayAccess
 	 */
 	public function previewUrl($mods)
 	{
-		return \Storage::url($this->previewPath($mods));
+		return \Storage::disk($this->data['disk'])->url($this->previewPath($mods));
 	}
 
 	/**

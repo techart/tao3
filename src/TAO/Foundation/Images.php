@@ -42,37 +42,37 @@ class Images
 		}
 	}
 
-	public function modify($path, $mods)
+	public function modify($path, $mods, $disk = 'local')
 	{
 		$originalPath = $path;
 		$path = $this->localizePath($path);
-		if (\Storage::exists($path)) {
+		if (\Storage::disk($disk)->exists($path)) {
 			$mods = $this->parseMods($mods);
 			if (empty($mods)) {
 				return $path;
 			}
-			$lastModified = \Storage::lastModified($path);
+			$lastModified = \Storage::disk($disk)->lastModified($path);
 			$dest = $this->destination($path, $mods);
-			if (\Storage::exists($dest)) {
-				if ($lastModified < \Storage::lastModified($dest)) {
+			if (\Storage::disk($disk)->exists($dest)) {
+				if ($lastModified < \Storage::disk($disk)->lastModified($dest)) {
 					return $dest;
 				}
 			}
-			return $this->modifyImage($path, $dest, $mods);
+			return $this->modifyImage($path, $dest, $mods, $disk);
 		}
 		if (starts_with($path, 'data:')) {
-			return $this->modifyImage($path, false, $mods);
+			return $this->modifyImage($path, false, $mods, $disk);
 		}
 		return $originalPath;
 	}
 
-	public function make($path)
+	public function make($path, $disk = 'local')
 	{
 		$path = $this->localizePath($path);
 		if ($m = \TAO::regexp('{^data:.+;base64,(.+)$}', $path)) {
 			$content = base64_decode($m[1]);
 		} else {
-			$content = \Storage::get($path);
+			$content = \Storage::disk($disk)->get($path);
 		}
 		return \Image::make($content);
 	}
@@ -114,10 +114,10 @@ class Images
 		]);
 	}
 
-	public function modifyImage($path, $dest, $mods)
+	public function modifyImage($path, $dest, $mods, $disk = 'local')
 	{
 		$mods = $this->parseMods($mods);
-		$image = $this->make($path);
+		$image = $this->make($path, $disk);
 		if ($image) {
 			$ext = $this->ext($path);
 			if (Callback::isValidCallback($mods['mods'])) {
@@ -139,7 +139,7 @@ class Images
 				return 'data:image/png;base64,' . base64_encode($image->encode('png', 90));
 			}
 			$encoded = $image->encode($ext, 90);
-			\Storage::put($dest, $encoded);
+			\Storage::disk($disk)->put($dest, $encoded);
 			return $dest;
 		}
 		return $path;

@@ -11,7 +11,7 @@ class Gallery extends Attaches
 	{
 		return new Entry($data);
 	}
-	
+
 	/**
 	 * @return string
 	 */
@@ -85,10 +85,10 @@ class Gallery extends Attaches
 	{
 		if (app()->request()->has('path')) {
 			$path = app()->request()->get('path');
-			if (\Storage::exists($path)) {
+			if (\Storage::disk($this->getDisk())->exists($path)) {
 				$image = false;
 				try {
-					$image = \Image::make(\Storage::get($path));
+					$image = \Image::make(\Storage::disk($this->getDisk())->get($path));
 				} catch (NotReadableException $e) {
 				}
 				if ($image) {

@@ -4,7 +4,7 @@ namespace TAO\Fields\Type;
 
 class Image extends Upload
 {
-	/**
+/**
 	 * Поддерживаемые расширения
 	 *
 	 * @var array
@@ -31,8 +31,8 @@ class Image extends Upload
 	public function apiActionPreview()
 	{
 		$tid = app()->request()->get('upload_id');
-		$path = $this->tempDir($tid) . '/file';
-		if (!\Storage::exists($path)) {
+		$path = $this->tempDir($tid) . '/file.tmp';
+		if (!\Storage::disk($this->getDisk())->exists($path)) {
 			\Log::debug("$path !!!!!");
 			$path = trim($this->value());
 		}
@@ -42,7 +42,7 @@ class Image extends Upload
 			if (!$this->exists($path)) {
 				$image = \Image::make('tao/images/fields/image/noimage/100x100.png');
 			} else {
-				$image = \Image::make(\Storage::get($path));
+				$image = \Image::make(\Storage::disk($this->getDisk())->get($path));
 			}
 		}
 
@@ -91,7 +91,7 @@ class Image extends Upload
 		if (starts_with($modified, 'data:')) {
 			return $modified;
 		}
-		return \Storage::url($modified);
+		return \Storage::disk($this->getDisk())->url($modified);
 	}
 
 	public function publicUrl($mods = false)
@@ -145,7 +145,7 @@ class Image extends Upload
 		if (empty($path)) {
 			return null;
 		}
-		if (!$this->isBase64() && !\Storage::exists($path)) {
+		if (!$this->isBase64() && !\Storage::disk($this->getDisk())->exists($path)) {
 			return null;
 		}
 		return app('tao.images')->size($path);
@@ -157,7 +157,7 @@ class Image extends Upload
 		if (empty($path)) {
 			return '';
 		}
-		if (!$this->isBase64() && !\Storage::exists($path)) {
+		if (!$this->isBase64() && !\Storage::disk($this->getDisk())->exists($path)) {
 			return '';
 		}
 		return app('tao.images')->show($path, $mods, $tpl);

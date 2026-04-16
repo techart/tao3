@@ -13,6 +13,13 @@ class Attaches extends StringField implements \IteratorAggregate
 {
 	use FileField;
 
+	protected $defaultDisk;
+
+	public function __construct()
+	{
+		$this->defaultDisk = \config('filesystems.default');
+	}
+
 	/**
 	 * @param Blueprint $table
 	 * @param bool $column
@@ -57,6 +64,7 @@ class Attaches extends StringField implements \IteratorAggregate
 	{
 		$defs = $this->defaultInfo();
 		$value = parent::variantValue($variant);
+
 		if (starts_with($value, '{')) {
 			$value = (array)json_decode($value);
 		} else {
@@ -67,10 +75,11 @@ class Attaches extends StringField implements \IteratorAggregate
 			foreach ($value as $key => $data) {
 				$data = (array)$data;
 				$path = $data['path'] ?? false;
-				if (\Storage::exists($path) && $path) {
+				if ($path && \Storage::disk($this->getDisk())->exists($path)) {
 					$data['key'] = $key;
 					$data['new'] = false;
 					$data['url'] = $this->fileUrl($path, $key);
+					$data['disk'] = $this->getDisk();
 					if (!isset($data['info'])) {
 						$data['info'] = $defs;
 					}
@@ -92,7 +101,7 @@ class Attaches extends StringField implements \IteratorAggregate
 				'key' => $key,
 			]);
 		}
-		return \Storage::url($path);
+		return \Storage::disk($this->getDisk())->url($path);
 	}
 
 	public function apiActionDownload()
@@ -107,8 +116,8 @@ class Attaches extends StringField implements \IteratorAggregate
 			if ($file = $files[$key] ?? false) {
 				$path = $file['path'];
 				$filename = preg_replace('{^.+/}', '', $path);
-				$mime = \Storage::mimeType($path);
-				return \Storage::download($path, 200, [
+				$mime = \Storage::disk($this->getDisk())->mimeType($path);
+				return \Storage::disk($this->getDisk())->download($path, 200, [
 					'Content-Type' => $mime,
 					'Content-Disposition' => 'inline; filename="'.$filename.'"',
 				]);
@@ -284,11 +293,11 @@ class Attaches extends StringField implements \IteratorAggregate
 
 					if ($new) {
 						$newPath = "{$dir}/{$name}";
-						if (\Storage::exists($newPath)) {
-							\Storage::delete($newPath);
+						if (\Storage::disk($this->getDisk())->exists($newPath)) {
+							\Storage::disk($this->getDisk())->delete($newPath);
 						}
-						\Storage::copy($path, $newPath);
-						\Storage::delete($path);
+						\Storage::disk($this->getDisk())->copy($path, $newPath);
+						\Storage::disk($this->getDisk())->delete($path);
 						$data['path'] = $newPath;
 					}
 
@@ -308,10 +317,10 @@ class Attaches extends StringField implements \IteratorAggregate
 				}
 			}
 
-			foreach (\Storage::files($dir) as $file) {
+			foreach (\Storage::disk($this->getDisk())->files($dir) as $file) {
 				$filename = basename($file);
 				if (!isset($exists[$filename])) {
-					\Storage::delete($file);
+					\Storage::disk($this->getDisk())->delete($file);
 				}
 			}
 
@@ -348,18 +357,18 @@ class Attaches extends StringField implements \IteratorAggregate
 		$dir = "{$dir}/{$this->name}";
 		$dest = "{$dir}/{$fileName}";
 
-		if (\Storage::exists($dest)) {
-			\Storage::delete($dest);
+		if (\Storage::disk($this->getDisk())->exists($dest)) {
+			\Storage::disk($this->getDisk())->delete($dest);
 		}
 
 		if ($body) {
-			\Storage::put("{$dir}/{$fileName}", $body);
+			\Storage::disk($this->getDisk())->put("{$dir}/{$fileName}", $body);
 		} elseif (\TAO::regexp('{^https?://}', $path)) {
 			$dest = app('tao.http')->saveFile($path, $dir);
 		} elseif (is_file($path)) {
-			\Storage::putFileAs($dir, new File($path), $fileName);
+			\Storage::disk($this->getDisk())->putFileAs($dir, new File($path), $fileName);
 		} else {
-			\Storage::copy($path, "{$dir}/{$fileName}");
+			\Storage::disk($this->getDisk())->copy($path, "{$dir}/{$fileName}");
 		}
 
 		$data = array(
@@ -382,8 +391,8 @@ class Attaches extends StringField implements \IteratorAggregate
 		$tid = app()->request()->get('upload_id');
 		$this->tempId = $tid;
 		$dir = $this->tempDir($tid);
-		if (!\Storage::exists($dir)) {
-			\Storage::makeDirectory($dir);
+		if (!\Storage::disk($this->getDisk())->exists($dir)) {
+			\Storage::disk($this->getDisk())->makeDirectory($dir);
 		}
 		$files = app()->request()->file('uploadfile');
 		if (!is_array($files)) {
@@ -429,7 +438,7 @@ class Attaches extends StringField implements \IteratorAggregate
 		$name = (string)$this->destinationFileName($info);
 		$dir = rtrim($dir, '/');
 		$path = "{$dir}/{$name}";
-		$file->storeAs($dir, $name);
+		$file->storeAs($dir, $name, $this->getDisk());
 
 		$key = 'f' . md5($path);
 
@@ -526,7 +535,7 @@ class Attaches extends StringField implements \IteratorAggregate
 			$name = $data['name'] ?? false;
 			$path = $data['path'] ?? false;
 			$info = $data['info'] ?? [];
-			if ($name && $path && \Storage::exists($path)) {
+			if ($name && $path && \Storage::disk($this->getDisk())->exists($path)) {
 				$out .= "\n*name={$name}";
 				$out .= "\n*info=" . base64_encode(serialize($info));
 				$out .= "\n*file";
@@ -565,6 +574,16 @@ class Attaches extends StringField implements \IteratorAggregate
 				}
 			}
 		}
+	}
+
+	/**
+	 * Возвращает текущий диск для хранения файлов
+	 *
+	 * @return string
+	 */
+	public function getDisk()
+	{
+		return $this->param('disk') ?? $this->defaultDisk;
 	}
 
 	public function defaultTemplate()

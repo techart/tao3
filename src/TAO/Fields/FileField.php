@@ -143,7 +143,7 @@ trait FileField
 		return [
 			'ext' => !empty($info->ext) ? strtolower($info->ext) : '',
 			'Ext' => !empty($info->ext) ? $info->ext : '',
-			'datatype' => $this->item->getDatatype(),
+			'datatype' => str_replace('*', '_', $this->item->getDatatype()),
 			'field' => $this->name,
 			'id' => $this->item->getKey(),
 			'filename' => $info->name,
@@ -152,15 +152,15 @@ trait FileField
 			'translit' => \TAO\Text::process($nameWithoutExt, 'translit_for_url'),
 		];
 	}
-	
+
 	protected function isImage($path)
 	{
 		return \TAO::regexp('{\.(jpe?g|gif|png)$}i', $path);
 	}
-	
+
 	protected function getImageSize($path)
 	{//dd(new \ReflectionClass(\Image::class));
-		$image = \Image::make(\Storage::get($path));
+		$image = \Image::make(\Storage::disk($this->getDisk())->get($path));
 		if ($image) {
 			$size = $image->getSize();
 			return [
@@ -169,7 +169,7 @@ trait FileField
 			];
 		}
 	}
-	
+
 	protected function checkWidthAndHeight(&$data)
 	{
 		if (isset($data['path']) && $this->isImage($data['path'])) {

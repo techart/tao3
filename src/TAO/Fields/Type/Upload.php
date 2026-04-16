@@ -17,6 +17,12 @@ class Upload extends Field
 	use Fields\FileField;
 
 	protected $newFile = false;
+	protected $defaultDisk;
+
+	public function __construct()
+	{
+		$this->defaultDisk = \config('filesystems.default');
+	}
 
 	/**
 	 * @param Blueprint $table
@@ -61,8 +67,8 @@ class Upload extends Field
 	public function delete()
 	{
 		$file = trim($this->value());
-		if (!empty($file) && \Storage::exists($file)) {
-			\Storage::delete($file);
+		if (!empty($file) && \Storage::disk($this->getDisk())->exists($file)) {
+			\Storage::disk($this->getDisk())->delete($file);
 		}
 	}
 
@@ -73,26 +79,36 @@ class Upload extends Field
 	{
 		$tid = $request[$this->name];
 		$path = $this->tempDir($tid);
-		if (\Storage::exists("{$path}/file") && \Storage::exists("{$path}/info.json")) {
-			$info = json_decode(\Storage::get("{$path}/info.json"));
+		if (\Storage::disk($this->getDisk())->exists("{$path}/file.tmp") && \Storage::disk($this->getDisk())->exists("{$path}/info.json")) {
+			$info = json_decode(\Storage::disk($this->getDisk())->get("{$path}/info.json"));
 			$this->delete();
-			$filePath = "{$path}/file";
+			$filePath = "{$path}/file.tmp";
 
 			$dest = $this->setFile($filePath, $info);
 
-			\Storage::delete("{$path}/info.json");
-			\Storage::delete($filePath);
-			$this->oldValue = $this->item[$this->name];
-			$this->item[$this->name] = $dest;
-			$this->item->where($this->item->getKeyName(), $this->item->getKey())->update([$this->name => $dest]);
+			\Storage::disk($this->getDisk())->delete("{$path}/info.json");
+			\Storage::disk($this->getDisk())->delete($filePath);
+
+			$method = "setUploadFieldAfterSave";
+			$rc = null;
+			if (method_exists($this->item, $method)) {
+				$rc = $this->item->$method($this, $dest);
+			}
+			if (!is_null($rc)) {
+				$this->oldValue = $rc;
+			} else {
+				$this->oldValue = $this->item[$this->name];
+				$this->item[$this->name] = $dest;
+				$this->item->where($this->item->getKeyName(), $this->item->getKey())->update([$this->name => $dest]);
+			}
 		}
 	}
 
 	public function setFile($path, $info)
 	{
 		$dest = $this->destinationPath($info);
-		if (\Storage::exists($dest)) {
-			\Storage::delete($dest);
+		if (\Storage::disk($this->getDisk())->exists($dest)) {
+			\Storage::disk($this->getDisk())->delete($dest);
 		}
 		if ($this->isBase64()) {
 			$content = is_file($path)? file_get_contents($path) : \Storage::get($path);
@@ -100,9 +116,9 @@ class Upload extends Field
 		} else {
 			if (is_file($path)) {
 				list($dir, $file) = $this->destinationDirAndName($info);
-				\Storage::putFileAs($dir, new File($path), $file);
+				\Storage::disk($this->getDisk())->putFileAs($dir, new File($path), $file);
 			} else {
-				\Storage::copy($path, $dest);
+				\Storage::disk($this->getDisk())->copy($path, $dest);
 			}
 		}
 		return $dest;
@@ -124,7 +140,7 @@ class Upload extends Field
 			$temp = false;
 			if (\TAO::regexp('{^https?://}', $this->newFile)) {
 				$dir = 'temp/'.uniqid();
-				\Storage::makeDirectory($dir);
+				\Storage::disk($this->getDisk())->makeDirectory($dir);
 				$temp = app('tao.http')->saveFile($this->newFile, $dir);
 				$this->newFile = $temp;
 			}
@@ -143,8 +159,8 @@ class Upload extends Field
 			$this->newFile = false;
 
 			if ($temp) {
-				\Storage::delete($temp);
-				\Storage::deleteDirectory($dir);
+				\Storage::disk($this->getDisk())->delete($temp);
+				\Storage::disk($this->getDisk())->deleteDirectory($dir);
 			}
 
 			return $dest;
@@ -168,8 +184,8 @@ class Upload extends Field
 		if ($item->accessView()) {
 			$file = $item->field($field)->value();
 			$filename = preg_replace('{^.+/}', '', $file);
-			$mime = \Storage::mimeType($file);
-			return \Storage::download($file, 200, [
+			$mime = \Storage::disk($this->getDisk())->mimeType($file);
+			return \Storage::disk($this->getDisk())->download($file, 200, [
 				'Content-Type' => $mime,
 				'Content-Disposition' => 'inline; filename="'.$filename.'"',
 			]);
@@ -185,8 +201,8 @@ class Upload extends Field
 		$tid = app()->request()->get('upload_id');
 		$this->tempId = $tid;
 		$dir = $this->tempDir($tid);
-		if (!\Storage::exists($dir)) {
-			\Storage::makeDirectory($dir);
+		if (!\Storage::disk($this->getDisk())->exists($dir)) {
+			\Storage::disk($this->getDisk())->makeDirectory($dir);
 		}
 		$file = app()->request()->file('uploadfile');
 		$size = $file->getSize();
@@ -208,8 +224,10 @@ class Upload extends Field
 		if (is_array($check)) {
 			$info = $check;
 		}
-		\Storage::put("{$dir}/info.json", json_encode($info));
-		$file->storeAs($dir, 'file');
+		\Storage::disk($this->getDisk())->put("{$dir}/info.json", json_encode($info));
+		$file->storeAs($dir, 'file.tmp', [
+			'disk' => $this->getDisk(),
+		]);
 		return $info;
 	}
 
@@ -226,7 +244,7 @@ class Upload extends Field
 			$file = preg_replace('{^.+;base64,}', '', $file);
 			return strlen(base64_decode($file));
 		}
-		return \Storage::size($file);
+		return \Storage::disk($this->getDisk())->size($file);
 	}
 
 	/**
@@ -258,7 +276,7 @@ class Upload extends Field
 			return false;
 		}
 		if ((!starts_with($file, 'data:')) &&
-			(!\Storage::exists($file))) {
+			(!\Storage::disk($this->getDisk())->exists($file))) {
 			return false;
 		}
 		return true;
@@ -276,13 +294,13 @@ class Upload extends Field
 		if (starts_with($file, 'data:')) {
 			return $file;
 		}
-		if (!\Storage::exists($file)) {
+		if (!\Storage::disk($this->getDisk())->exists($file)) {
 			return null;
 		}
 		if ($this->param('private', false)) {
 			return $this->apiUrl('download');
 		}
-		return \Storage::url($file);
+		return \Storage::disk($this->getDisk())->url($file);
 	}
 
 	public function jsonValue()
@@ -323,9 +341,9 @@ class Upload extends Field
 			return chunk_split($value);
 		}
 		$path = $value;
-		if (\Storage::exists($path)) {
+		if (\Storage::disk($this->getDisk())->exists($path)) {
 			$name = preg_replace('{^.*/}', '', $value);
-			return ":{$name}\n".chunk_split(base64_encode(\Storage::get($path)));
+			return ":{$name}\n".chunk_split(base64_encode(\Storage::disk($this->getDisk())->get($path)));
 		}
 	}
 
@@ -356,7 +374,7 @@ class Upload extends Field
 				$info->ext = $ext;
 				$dest = $this->destinationPath($info);
 				list($dir, $file) = $this->destinationDirAndName($info);
-				\Storage::put($dest, $content);
+				\Storage::disk($this->getDisk())->put($dest, $content);
 				$this->item[$this->name] = $dest;
 			}
 		}
@@ -373,7 +391,7 @@ class Upload extends Field
 			return false;
 		}
 
-		return \Storage::path($this->value());
+		return \Storage::disk($this->getDisk())->path($this->value());
 	}
 
 	/** @see https://laravel.com/api/5.6/Illuminate/Http/File.html
@@ -386,5 +404,15 @@ class Upload extends Field
 			return new File( $absolutePath );
 		}
 		return false;
+	}
+
+	/**
+	 * Возвращает текущий диск для хранения файлов
+	 *
+	 * @return string
+	 */
+	protected function getDisk()
+	{
+		return $this->param('disk') ?? $this->defaultDisk;
 	}
 }
