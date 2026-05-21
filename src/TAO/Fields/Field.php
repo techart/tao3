@@ -715,7 +715,10 @@ abstract class Field
 	public function applyHandlers($value, $handlers = [])
 	{
 		foreach($handlers as $handler) {
-			if ($handler = trim($handler)) {
+			if (is_callable($handler)) {
+					$value = $handler($value, $this->item);
+			}
+			elseif ($handler = trim($handler)) {
 				if ($m = \TAO::regexp('{^(.+)\.([^.]+)$}', $handler)) {
 					$dt = dt($m[1]);
 					$method = $m[2];

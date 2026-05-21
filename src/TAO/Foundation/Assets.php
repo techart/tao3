@@ -4,17 +4,27 @@ namespace TAO\Foundation;
 
 class Assets
 {
-	protected $meta = array();
-	protected $scopes = array();
-	protected $textBlocks = array();
+	protected $meta = [];
+	protected $scopes = [];
+	protected $textBlocks = [];
+	protected $vars = [];
 	protected $urlRewrited;
 	protected $originalRequest;
 	protected $needRedirectTo;
 	protected $needRedirectType;
-	protected $vars = array();
 
 	public function init()
 	{
+		$this->meta = [];
+		$this->scopes = [];
+		$this->textBlocks = [];
+		$this->vars = [];
+		$this->urlRewrited = null;
+		$this->originalRequest = null;
+		$this->needRedirectTo = null;
+		$this->needRedirectType = null;
+
+
 		if (isset($_SERVER, $_SERVER['HTTP_HOST'])) {
 			$this->meta['title'] = config('tao.meta.title', config('app.name', $_SERVER['HTTP_HOST']));
 		}

@@ -117,7 +117,6 @@ class Provider extends ServiceProvider
 			if (!is_link($link)) {
 				symlink(storage_path('app/public'), $link);
 			}
-			$this->linkTinymce();
 			if (is_null(config('logging'))) {
 				$path = base_path('config/logging.php');
 				if (!is_file($path)) {
@@ -216,20 +215,6 @@ class Provider extends ServiceProvider
 			if (method_exists($router, 'register')) {
 				$router->register();
 			}
-		}
-	}
-
-	/**
-	 * Создание симлинка на tinyMCE
-	 */
-	protected function linkTinymce()
-	{
-		$scriptsDir = \TAO::publicPath() . '/tao/scripts';
-		$link = $scriptsDir . '/tinymce';
-		$linkTo = base_path("vendor/tinymce/tinymce");
-
-		if (is_dir($scriptsDir) && !is_link($link)) {
-			symlink($linkTo, $link);
 		}
 	}
 }
