@@ -175,7 +175,7 @@ trait Forms
 		}
 
 		$item = $this->datatype()->find($this->id);
-		if (!$item || !$item->accessEdit(\Auth::user())) {
+		if (!$item || !$item->accessDelete(\Auth::user())) {
 			return \TAO::pageNotFound();
 		}
 		$item->delete();
