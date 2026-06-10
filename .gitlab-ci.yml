@@ -1,6 +1,6 @@
 variables:
  UPDATE_REPO: "git@github.com:techart/tao3.git"
- UPDATE_REPO_BRANCH: "v11"
+ UPDATE_REPO_BRANCH: "v12"
 test.app:
  stage: test
  tags:
