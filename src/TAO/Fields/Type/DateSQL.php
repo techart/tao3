@@ -30,7 +30,7 @@ class DateSQL extends DateInteger
 	 */
 	public function nullValue()
 	{
-		return '0000-01-01 00:00:00';
+		return null;
 	}
 
 	/**
