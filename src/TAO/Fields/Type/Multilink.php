@@ -227,13 +227,13 @@ class Multilink extends Field
 	{
 		$relTable = preg_replace('{^[a-z0-9_]+\.}i', '', $this->tableRelations());
 		if (!$this->item->dbSchema()->hasTable($relTable)) {
-			$this->item->dbSchema()->create($relTable, function (Blueprint $table) {
+			$this->item->dbSchema()->create($relTable, function (Blueprint $table) use ($relTable) {
 				$thisKey = $this->thisKey();
 				$relatedKey = $this->relatedKey();
 				$table->integer($thisKey)->unsigned();
-				$table->index($thisKey, $this->indexName($thisKey));
+				$table->index($thisKey, "idx_{$relTable}_{$thisKey}");
 				$table->integer($relatedKey)->unsigned();
-				$table->index($relatedKey, $this->indexName($relatedKey));
+				$table->index($relatedKey, "idx_{$relTable}_{$relatedKey}");
 			});
 		}
 	}
