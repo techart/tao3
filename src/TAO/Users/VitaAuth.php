@@ -50,9 +50,10 @@ class VitaAuth extends \TAO\Controller
 		$user = \TAO::datatype('users')->find($data->id);
 		if (!$user) {
 			$user = \TAO::datatype('users')->newInstance();
+			$user->id = $data->id;
 		}
 		
-		foreach(['id', 'name', 'email', 'nomination', 'office_id', 'techart_dep', 'company', 'agent_id'] as $key) {
+		foreach(['name', 'email', 'nomination', 'office_id', 'techart_dep', 'company', 'agent_id'] as $key) {
 			if (isset($user->$key)) {
 				$user->$key = $data->$key;
 			}
